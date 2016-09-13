@@ -1,0 +1,17 @@
+dependencies:
+  cache_directories:
+    - ~/.meteor
+  override:
+    - meteor || curl https://install.meteor.com | /bin/sh
+    - npm install -g gagarin
+    - cd meteorExpenseReport
+
+test:
+  override:
+    - gagarin -v
+
+#deployment:
+#  production:
+#    branch: "master"
+#    commands:
+#      - printf "<Meteor username>\n<Meteor password>\n" | meteor deploy circlecivelocity.meteor.com
