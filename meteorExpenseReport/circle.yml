@@ -4,11 +4,10 @@ dependencies:
   override:
     - meteor || curl https://install.meteor.com | /bin/sh
     - npm install -g gagarin
-    - cd meteorExpenseReport
 
 test:
   override:
-    - gagarin -v
+    - gagarin ./meteorExpenseReport/tests/gagarin -v
 
 #deployment:
 #  production:
