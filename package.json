@@ -2,8 +2,8 @@
   "name": "meteorExpenseReport",
   "private": true,
   "scripts": {
-    "lint-dev": "eslint ./client ./server --fix; exit 0",
-    "lint-ci": "eslint ./client ./server; exit 0",
+    "lint-dev": "eslint ./client ./server --fix",
+    "lint-ci": "eslint ./client ./server",
     "pretest": "npm run lint --silent"
   },
   "dependencies": {
