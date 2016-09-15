@@ -1,8 +1,8 @@
-describe('My first Gagarin test suite', function () {
-  var server = meteor();
-  it('should just work', function () {
-    return server.execute(function () { 
-      console.log('I am alive!'); 
+describe('My first Gagarin test suite', () => {
+  const server = meteor();
+  it('should just work', () => {
+    return server.execute(() => {
+      console.log('I am alive!');
     });
   });
 });
