@@ -1,21 +1,15 @@
-import { Template } from 'meteor/templating';
-import { ReactiveVar } from 'meteor/reactive-var';
-import './main.html';
+var React = require('react');
+var ReactDOM = require('react-dom');
+var Router = require('react-router').Router;
+var Route = require('react-router').Route;
+var Link = require('react-router').Link;
+var Login = require('./components/login.jsx');
+var LoginSuccess = require('./components/loginSuccess.jsx');
+import { hashHistory } from 'react-router';
 
-Template.hello.onCreated(function helloOnCreated() {
-  // counter starts at 0
-  this.counter = new ReactiveVar(0);
-});
-
-Template.hello.helpers({
-  counter() {
-    return Template.instance().counter.get();
-  },
-});
-
-Template.hello.events({
-  'click button': function helloButtonClick(event, templateInstance) {
-    // increment the counter when button is clicked
-    templateInstance.counter.set(templateInstance.counter.get() + 1);
-  },
-});
+ReactDOM.render((
+	<Router history={hashHistory}>
+		<Route path="/loginSuccess" component={LoginSuccess} />
+		<Route path="/" component={Login} />
+	</Router>
+	), document.body);
