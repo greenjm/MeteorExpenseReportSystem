@@ -1,12 +1,12 @@
 // This is a placeholder file for what happens when there is a successful login.
 // This page is shown when the login button is clicked and it's determined to be a successful login.
 
-var React = require('react');
+const React = require('react');
 
-var LoginSuccess = React.createClass({
-  render: function() {
-    return (<div>Successfully logged in</div>);
-  }
+const Dashboard = React.createClass({
+  render() {
+    return (<div>Successfully logged in as non-admin</div>);
+  },
 });
 
-module.exports = LoginSuccess;
+module.exports = Dashboard;

@@ -3,16 +3,19 @@
 // When you add a new page, import the component and give it a <Route> tag with the proper path.
 
 import { hashHistory } from 'react-router';
+
 const React = require('react');
 const ReactDOM = require('react-dom');
 const Router = require('react-router').Router;
 const Route = require('react-router').Route;
 const Login = require('./components/login.jsx');
-const LoginSuccess = require('./components/loginSuccess.jsx');
+const AdminDashboard = require('./components/adminDashboard.jsx');
+const Dashboard = require('./components/dashboard.jsx');
 
 ReactDOM.render((
   <Router history={hashHistory}>
-  <Route path="/loginSuccess" component={LoginSuccess} />
-  <Route path="/" component={Login} />
+    <Route path="/adminDashboard" component={AdminDashboard} />
+    <Route path="/dashboard" component={Dashboard} />
+    <Route path="/" component={Login} />
   </Router>
 ), document.body);

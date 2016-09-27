@@ -3,8 +3,8 @@
   "private": true,
   "scripts": {
     "start-dev": "MONGO_URL=\"mongodb://admin:admin123@137.112.40.146:27017/dev\" meteor",
-    "lint-dev": "eslint ./client ./server ./api --fix",
-    "lint-ci": "eslint ./client ./server ./api",
+    "lint-dev": "eslint ./client ./client/**/*.jsx ./client/*.jsx ./server ./api --fix",
+    "lint-ci": "eslint ./client ./client/**/*.jsx ./client/*.jsx ./server ./api",
     "pretest": "npm run lint --silent"
   },
   "dependencies": {
@@ -28,20 +28,37 @@
   "eslintConfig": {
     "parser": "babel-eslint",
     "parserOptions": {
-      "allowImportExportEverywhere": true
+      "allowImportExportEverywhere": true,
+      "ecmaFeatures": {
+        "jsx": true
+      }
     },
     "plugins": [
-      "meteor"
+      "meteor",
+      "react"
     ],
     "extends": [
       "airbnb",
       "plugin:meteor/recommended"
     ],
     "settings": {
-      "import/resolver": "meteor"
+      "import/resolver": "meteor",
+      "react": {
+        "createClass": "createClass",
+        "pragma": "React",
+        "version": "15.0"
+      }
     },
     "rules": {
-      "import/no-extraneous-dependencies": "off"
+      "import/no-extraneous-dependencies": "off",
+      "react/jsx-uses-react": "error",
+      "react/jsx-uses-vars": "error",
+      "react/prefer-es6-class": [2, "never"],
+      "react/prefer-stateless-function": [0],
+      "react/require-extension": [0]
+    },
+    "globals": {
+      "document": true
     }
   }
 }
