@@ -5,6 +5,7 @@
 
 var React = require('react');
 import { hashHistory } from 'react-router';
+import { Meteor } from 'meteor/meteor';
 
 var Login = React.createClass({
   getInitialState: function() {
@@ -17,7 +18,22 @@ var Login = React.createClass({
   login: function() {
     console.log('Called login with ' + this.state.username + ', ' + this.state.password + '.');
     //call the server using Ajax! There is no server right now, so just pretend it was called.
-    this.loginSuccess();
+    Meteor.loginWithPassword(this.state.username, this.state.password, (error) => {
+      if (error) {
+        this.loginFailure();
+      } else {
+        Meteor.call('login.verify', (err, result) => {
+          if (err) {
+            this.loginFailure();
+          } else {
+            if (result.isAdmin) {
+              console.log('IS ADMIN');
+            }
+            this.loginSuccess();
+          }
+        });       
+      }
+    });
   },
 
   loginSuccess: function() {

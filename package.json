@@ -2,7 +2,7 @@
   "name": "meteorExpenseReport",
   "private": true,
   "scripts": {
-    "start-dev": "MONGO_URL=\"mongodb://admin:admin123@137.112.40.146:27017/dev\" meteor --settings settings.json",
+    "start-dev": "MONGO_URL=\"mongodb://admin:admin123@137.112.40.146:27017/dev\" meteor",
     "lint-dev": "eslint ./client ./server ./api --fix",
     "lint-ci": "eslint ./client ./server ./api",
     "pretest": "npm run lint --silent"
