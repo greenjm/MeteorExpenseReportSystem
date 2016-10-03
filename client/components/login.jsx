@@ -17,7 +17,7 @@ const Login = React.createClass({
   },
 
   login() {
-    Meteor.loginWithPassword(this.state.username, this.state.password, (error) => {
+    Meteor.loginWithPassword(this.state.username, this.state.password, error => {
       if (error) {
         this.loginFailure();
       } else {
@@ -34,7 +34,7 @@ const Login = React.createClass({
 
   loginSuccess(isAdmin) {
     if (isAdmin) {
-      hashHistory.push('/adminDashboard');
+      hashHistory.push('/adminDashboard', null, { username: this.state.username });
     } else {
       hashHistory.push('/dashboard');
     }
@@ -55,14 +55,14 @@ const Login = React.createClass({
   render() {
     return (
       <div className="loginBox">
-        <div className="loginInnerBox">
+        <form className="loginInnerBox">
           <label htmlFor="username">Username</label>
           <input type="text" name="username" className="loginInput" value={this.state.username} onChange={this.handleUsernameChange} />
 
           <label htmlFor="password">Password</label>
           <input type="password" name="password" className="loginInput" value={this.state.password} onChange={this.handlePasswordChange} />
-          <button onClick={this.login} className="loginInput">Login</button>
-        </div>
+          <button type="submit" onClick={this.login} className="loginInput">Login</button>
+        </form>
       </div>);
   },
 });

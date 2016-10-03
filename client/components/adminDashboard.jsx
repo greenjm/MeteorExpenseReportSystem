@@ -4,8 +4,26 @@
 const React = require('react');
 
 const AdminDashboard = React.createClass({
+  getInitialState() {
+    return {
+      projects: ['Project1', 'Project2', 'Project3'],
+    };
+  },
+
+  createItem(item) {
+    return <div className="project">{item}</div>;
+  },
+
   render() {
-    return (<div>Successfully logged in as admin</div>);
+    return (
+      <div>
+        <div className="dashTitle">Admin Dashboard</div>
+        <div className="dashboard">
+          {this.state.projects.map(this.createItem)}
+        </div>
+      </div>
+
+      );
   },
 });
 
