@@ -30,8 +30,8 @@ const AdminDashboard = React.createClass({
   },
 
   hideForm() {
-    document.getElementById('projectForm').style.display = 'none',
-    document.getElementById('name').value = '',
+    document.getElementById('projectForm').style.display = 'none';
+    document.getElementById('name').value = '';
     document.getElementById('project').value = '';
   },
 
