@@ -2,8 +2,8 @@ import { Meteor } from 'meteor/meteor';
 
 Meteor.methods({
   /**
-  *Verifies that a user is actually logged in to the server
-  *@return {JSON} object with success and isAdmin fields
+  Verifies that a user is actually logged in to the server
+  @return {JSON} object with success and isAdmin fields
   */
   'login.verify': function verifyLogin() {
     const loggedInUser = Meteor.user();
@@ -24,8 +24,8 @@ Meteor.methods({
   },
 
   /**
-  *Logs out the current user
-  *@return {JSON} object with success field
+  Logs out the current user
+  @return {JSON} object with success field
   */
   'login.logout': function logout() {
     if (this.userId == null) {
