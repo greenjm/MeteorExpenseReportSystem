@@ -23,3 +23,27 @@
 .dashboard p {
 	margin-left: 20px;
 }
+
+.newProjButton {
+	width:100px;
+	height:30px;
+	float:right;
+}
+
+.projectForm {
+	border: 1px solid black;
+	width: 800px;
+	margin-right: auto;
+	margin-left: auto;
+	height: 50px;
+	display: none;
+}
+
+.projectInput {
+	margin-left: auto;
+}
+
+.projectCancel {
+	margin-left: auto;
+	margin-right: 0px;
+}
