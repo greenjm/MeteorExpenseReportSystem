@@ -6,12 +6,18 @@ const React = require('react');
 const AdminDashboard = React.createClass({
   getInitialState() {
     return {
-      projects: ['Project1', 'Project2', 'Project3'],
+      projectNames: ['Project1', 'Project2', 'Project3'],
+      projectIds: [1, 2, 3],
     };
   },
 
-  createItem(item) {
-    return <div className="project">{item}</div>;
+  componentWillMount() {
+    // make api call to get projects and their ids. Set projectNames and projectIds
+  },
+
+  createItem(item, index) {
+    const url = `/#/project?id=${this.state.projectIds[index]}`;
+    return <a href={url}><div className="project" key={index}>{item}</div></a>;
   },
 
   render() {
@@ -19,7 +25,7 @@ const AdminDashboard = React.createClass({
       <div>
         <div className="dashTitle">Admin Dashboard</div>
         <div className="dashboard">
-          {this.state.projects.map(this.createItem)}
+          {this.state.projectNames.map(this.createItem)}
         </div>
       </div>
 

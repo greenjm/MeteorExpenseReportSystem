@@ -11,11 +11,13 @@ const Route = require('react-router').Route;
 const Login = require('./components/login.jsx');
 const AdminDashboard = require('./components/adminDashboard.jsx');
 const Dashboard = require('./components/dashboard.jsx');
+const ProjectDetail = require('./components/projectDetail.jsx');
 
 ReactDOM.render((
   <Router history={hashHistory}>
     <Route path="/adminDashboard" component={AdminDashboard} />
     <Route path="/dashboard" component={Dashboard} />
+    <Route path="/project*" component={ProjectDetail} />
     <Route path="/" component={Login} />
   </Router>
 ), document.body);

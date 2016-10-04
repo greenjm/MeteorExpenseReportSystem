@@ -17,7 +17,7 @@ const Login = React.createClass({
   },
 
   login() {
-    Meteor.loginWithPassword(this.state.username, this.state.password, error => {
+    Meteor.loginWithPassword(this.state.username, this.state.password, (error) => {
       if (error) {
         this.loginFailure();
       } else {
