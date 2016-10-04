@@ -24,7 +24,7 @@ const AdminDashboard = React.createClass({
   newProject(projectName) {
     this.createItem(projectName, 4);
   },
-  
+
   showForm() {
     document.getElementById('projectForm').style.display = 'block';
   },
@@ -32,7 +32,7 @@ const AdminDashboard = React.createClass({
   hideForm() {
     document.getElementById('projectForm').style.display = 'none',
     document.getElementById('name').value = '',
-    document.getElementById('project').value = ''
+    document.getElementById('project').value = '';
   },
 
   render() {
