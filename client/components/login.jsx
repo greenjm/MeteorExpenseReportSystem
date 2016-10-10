@@ -17,7 +17,7 @@ const Login = React.createClass({
   },
 
   login() {
-    Meteor.loginWithPassword(this.state.username, this.state.password, (error) => {
+    Meteor.loginWithPassword({ email: this.state.username }, this.state.password, (error) => {
       if (error) {
         this.loginFailure();
       } else {
@@ -61,7 +61,7 @@ const Login = React.createClass({
 
           <label htmlFor="password">Password</label>
           <input type="password" name="password" className="loginInput" value={this.state.password} onChange={this.handlePasswordChange} />
-          <button type="submit" onClick={this.login} className="loginInput">Login</button>
+          <button type="button" onClick={this.login} className="loginInput">Login</button>
         </form>
       </div>);
   },
