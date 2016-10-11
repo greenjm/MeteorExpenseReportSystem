@@ -1,28 +1,9 @@
 import { Meteor } from 'meteor/meteor';
-import { Mongo } from 'meteor/mongo';
 import { check } from 'meteor/check';
+import './projects.js';
 
-const Projects = new Mongo.Collection('projects');
-export { Projects as default };
-
-if (Meteor.isServer) {
-  Meteor.publish('projects', () => {
-    const currentUser = Meteor.user();
-
-    if (currentUser == null || currentUser.profile == null) {
-      return {};
-    }
-
-    if (currentUser.profile.isAdmin) {
-      const projects = Projects.find();
-      return projects;
-    }
-
-    const projects = Projects.find({ $or: [{
-      managers: Meteor.userId() }, { employees: Meteor.userId() }] });
-    return projects;
-  });
-}
+/* global Projects:true*/
+/* eslint no-undef: "error"*/
 
 Meteor.methods({
   /**

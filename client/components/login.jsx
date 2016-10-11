@@ -17,19 +17,23 @@ const Login = React.createClass({
   },
 
   login() {
-    Meteor.loginWithPassword({ email: this.state.username }, this.state.password, (error) => {
-      if (error) {
-        this.loginFailure();
-      } else {
-        Meteor.call('login.verify', (err, result) => {
-          if (err) {
-            this.loginFailure();
-          } else {
-            this.loginSuccess(result.isAdmin);
-          }
-        });
-      }
-    });
+    Meteor.loginWithPassword({ email: this.state.username },
+     this.state.password, (error) => {
+       if (error) {
+         this.loginFailure();
+       } else {
+         const loggedInUser = Meteor.user();
+         if (loggedInUser == null) {
+           this.loginFailure();
+           return;
+         }
+         if (loggedInUser.profile) {
+           this.loginSuccess(loggedInUser.profile.isAdmin);
+         } else {
+           this.loginSuccess(false);
+         }
+       }
+     });
   },
 
   loginSuccess(isAdmin) {
