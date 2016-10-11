@@ -1,7 +1,21 @@
 // This is a placeholder file for what happens when there is a successful login.
 // This page is shown when the login button is clicked and it's determined to be a successful login.
+import { Meteor } from 'meteor/meteor';
+import { Tracker } from 'meteor/tracker';
+import '../../imports/api/projects/projects.js';
+
+/* global Projects:true*/
+/* eslint no-undef: "error"*/
 
 const React = require('react');
+
+const sub = Meteor.subscribe('projects');
+
+Tracker.autorun(() => {
+  if (sub.ready()) {
+    console.log(Projects.find().fetch());
+  }
+});
 
 const AdminDashboard = React.createClass({
   getInitialState() {

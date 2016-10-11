@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "start-dev": "MONGO_URL=\"mongodb://admin:admin123@137.112.40.146:27017/dev\" meteor",
-    "lint-dev": "eslint ./client ./client/**/*.jsx ./client/*.jsx ./server ./api --fix",
+    "lint-dev": "eslint ./client ./client/**/*.jsx ./client/*.jsx ./server ./imports --fix",
     "lint-ci": "eslint ./client ./client/**/*.jsx ./client/*.jsx ./server ./api",
     "test": "mocha test"
   },
@@ -54,16 +54,10 @@
       "import/no-extraneous-dependencies": "off",
       "react/jsx-uses-react": "error",
       "react/jsx-uses-vars": "error",
-      "react/prefer-es6-class": [
-        2,
-        "never"
-      ],
-      "react/prefer-stateless-function": [
-        0
-      ],
-      "react/require-extension": [
-        0
-      ]
+      "react/prefer-es6-class": [2, "never"],
+      "react/prefer-stateless-function": [0],
+      "react/require-extension": [0],
+      "no-underscore-dangle": [0]
     },
     "globals": {
       "document": true
