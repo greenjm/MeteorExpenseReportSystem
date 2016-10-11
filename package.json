@@ -5,7 +5,7 @@
     "start-dev": "MONGO_URL=\"mongodb://admin:admin123@137.112.40.146:27017/dev\" meteor",
     "lint-dev": "eslint ./client ./client/**/*.jsx ./client/*.jsx ./server ./imports --fix",
     "lint-ci": "eslint ./client ./client/**/*.jsx ./client/*.jsx ./server ./api",
-    "pretest": "npm run lint --silent"
+    "test": "meteor test --once --driver-package dispatch:mocha"
   },
   "dependencies": {
     "check": "^1.0.0",
