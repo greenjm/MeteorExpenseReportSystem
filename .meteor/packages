@@ -25,3 +25,4 @@ check
 ejson
 accounts-base
 dispatch:mocha
+dispatch:mocha-phantomjs
