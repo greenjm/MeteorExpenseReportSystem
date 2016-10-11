@@ -1,7 +1,7 @@
-describe('My first Gagarin test suite', () => {
+describe('My first Mocha test suite', function() {
   const server = meteor();
-  it('should just work', () => {
-    return server.execute(() => {
+  it('should just work', function() {
+    return server.execute( function() {
       console.log('I am alive!');
     });
   });

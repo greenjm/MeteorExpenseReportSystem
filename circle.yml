@@ -3,13 +3,15 @@ dependencies:
     - ~/.meteor
   override:
     - meteor || curl https://install.meteor.com | /bin/sh
-    - npm install -g gagarin
+    # - npm install -g gagarin
     - meteor npm install
+    - meteor add dispatch:mocha
 
 test:
   override:
-    - gagarin -v
+#     - gagarin -v
     - meteor npm run lint-ci
+    - meteor npm run test
 
 #deployment:
 #  production:

@@ -5,7 +5,7 @@ import '../api/users.js';
 import '../api/projects.js';
 
 function seedUsers() {
-  const users = ['greenjm', 'havensid', 'kerrickm', 'weissna'];
+  const users = ['greenjm', 'havensid', 'kerrickm', 'weissna', 'johnsonl'];
 
   for (let i = 0; i < users.length; i += 1) {
     const user = users[i];
@@ -35,7 +35,6 @@ function seedUsers() {
 }
 
 Meteor.startup(() => {
-  Meteor.users.remove({});
   // code to run on server at startup
   if (Meteor.users.find().count() <= 0) {
     // Seed new users
