@@ -17,14 +17,11 @@ const ProjectDetail = React.createClass({
   getInitialState() {
     return {
       projectId: this.props.location.query.id,
-      projectDetails: {
-        Id: -1,
-        Name: '',
-        Managers: [],
-        Employees: [],
-        BornOn: '',
-        Active: '',
-      },
+      Name: '',
+      Managers: [],
+      Employees: [],
+      BornOn: '',
+      Active: '',
     };
   },
 
@@ -32,15 +29,43 @@ const ProjectDetail = React.createClass({
     Tracker.autorun(() => {
       Meteor.subscribe('projectGet', this.state.projectId, () => {
         const project = Projects.findOne();
-        const proj = {
+        this.setState({
           Name: project.name,
           Managers: project.managers,
           Employees: project.employees,
           BornOn: project.bornOn.toString(),
-          Active: project.isactive,
-        };
+          Active: !!project.isActive,
+        });
+      });
+    });
+  },
 
-        this.setState({ projectDetails: proj });
+  toggleActive() {
+    this.setState({ Active: !this.state.Active });
+  },
+
+  changeName(event) {
+    this.setState({ Name: event.target.value });
+  },
+
+  editProject() {
+    if (this.state.projectDetails.Active) {
+      Tracker.autorun(() => {
+        Meteor.call('projects.activate', this.state.projectId, (err) => {
+          console.log(err);
+        });
+      });
+    } else {
+      Tracker.autorun(() => {
+        Meteor.call('projects.deactivate', this.state.projectId, (err) => {
+          console.log(err);
+        });
+      });
+    }
+
+    Tracker.autorun(() => {
+      Meteor.call('projects.editName', this.state.projectId, this.state.Name, (err) => {
+        console.log(err);
       });
     });
   },
@@ -48,12 +73,18 @@ const ProjectDetail = React.createClass({
   render() {
     return (
       <div className="dashboard">
-        <p>Name: {this.state.projectDetails.Name}</p>
-        <p>Project Id: {this.state.projectDetails.Id}</p>
-        <p>Managers: {this.state.projectDetails.Managers.join(', ')}</p>
-        <p>Employees: {this.state.projectDetails.Employees.join(', ')}</p>
-        <p>Start Date: {this.state.projectDetails.BornOn}</p>
-        <p>Active: {this.state.projectDetails.Active}</p>
+        <label htmlFor="name">Name:</label>
+        <input name="name" type="text" value={this.state.Name} onChange={this.changeName} />
+
+        <p>Id: {this.state.projectId}</p>
+        <p>Managers: {this.state.Managers.join(', ')}</p>
+        <p>Employees: {this.state.Employees.join(', ')}</p>
+        <p>Start Date: {this.state.BornOn}</p>
+
+        <label htmlFor="active">Active:</label>
+        <input name="active" type="checkbox" checked={this.state.Active} onClick={this.toggleActive} />
+
+        <button onClick={this.editProject}>Save Changes</button>
       </div>
     );
   },

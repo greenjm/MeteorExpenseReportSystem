@@ -149,6 +149,6 @@ Meteor.methods({
 
       return result.nModified === 1;
     }
-    throw new Meteor.Error('projects.deactivate.unauthorized', 'You do not have permission to deactivate projects.');
+    throw new Meteor.Error('projects.editName.unauthorized', 'You do not have permission to deactivate projects.');
   },
 });
