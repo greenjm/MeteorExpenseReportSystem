@@ -1,7 +1,7 @@
 // methods.test.js
 
-describe('Mocha test for api_users_methods', function() {
-  it('should just work', function() {
-      console.log('I am at api_users_methods!');
+describe('Mocha test for api_users_methods', () => {
+  it('should just work', () => {
+    console.log('I am at api_users_methods!');
   });
 });

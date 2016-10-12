@@ -5,6 +5,13 @@ import './projects.js';
 /* global Projects:true*/
 /* eslint no-undef: "error"*/
 
+// Security
+Projects.deny({
+  insert() { return true; },
+  update() { return true; },
+  remove() { return true; },
+});
+
 Meteor.methods({
   /**
   Creates new project using the name of the project and one manager provided

@@ -1,6 +1,6 @@
 // login.test.js
-describe('Mocha test for api_login', function() {
-  it('should just work', function() {
-      console.log('I am at api_login!');
+describe('Mocha test for api_login', () => {
+  it('should just work', () => {
+    console.log('I am at api_login!');
   });
 });

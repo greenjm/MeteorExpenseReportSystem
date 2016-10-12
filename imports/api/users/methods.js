@@ -2,22 +2,11 @@ import { Meteor } from 'meteor/meteor';
 import { Accounts } from 'meteor/accounts-base';
 import { check } from 'meteor/check';
 
-// Security setup
-Meteor.users.allow({
-  update() {
-    const currentUser = Meteor.user();
-    if (currentUser == null || currentUser.profile == null) {
-      return false;
-    }
-    return currentUser.profile.isAdmin;
-  },
-  remove() {
-    const currentUser = Meteor.user();
-    if (currentUser == null || currentUser.profile == null) {
-      return false;
-    }
-    return currentUser.profile.isAdmin;
-  },
+// Security
+Meteor.users.deny({
+  insert() { return true; },
+  update() { return true; },
+  remove() { return true; },
 });
 
 Meteor.methods({
