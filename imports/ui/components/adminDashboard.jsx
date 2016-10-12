@@ -2,7 +2,7 @@
 // This page is shown when the login button is clicked and it's determined to be a successful login.
 import { Meteor } from 'meteor/meteor';
 import { Tracker } from 'meteor/tracker';
-import '../../imports/api/projects/projects.js';
+import '../../api/projects/projects.js';
 
 /* global Projects:true*/
 /* eslint no-undef: "error"*/
