@@ -1,4 +1,4 @@
-// publications.test.js
+/* global describe it:true */
 
 describe('Mocha test for api_users_server_publications', function() {
   it('should just work', function() {

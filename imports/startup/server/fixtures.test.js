@@ -1,4 +1,4 @@
-// fixtures.test.js
+/* global describe it:true */
 
 describe('Mocha test for startup_server_fixtures', function() {
   it('should just work', function() {
