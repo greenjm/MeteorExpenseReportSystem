@@ -5,6 +5,7 @@
 
 import { hashHistory } from 'react-router';
 import { Meteor } from 'meteor/meteor';
+import { Tracker } from 'meteor/tracker';
 
 const React = require('react');
 
@@ -15,6 +16,7 @@ const Login = React.createClass({
       password: '',
     };
   },
+
 
   login() {
     Meteor.loginWithPassword({ email: this.state.username },

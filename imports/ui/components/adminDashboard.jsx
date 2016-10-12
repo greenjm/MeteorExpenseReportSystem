@@ -57,10 +57,21 @@ const AdminDashboard = React.createClass({
     document.getElementById('project').value = '';
   },
 
+  showUserForm() {
+    document.getElementById('userForm').style.display = 'block';
+  },
+
+  hideUserForm() {
+    document.getElementById('userForm').style.display = 'none';
+    document.getElementById('userName').value = '';
+    document.getElementById('userID').value = '';
+  },
+
   render() {
     return (
       <div>
         <input type="button" value="New Project" onClick={this.showForm} className="newProjButton" />
+        <input type="button" value="New User" onClick={this.showUserForm} className="newUserButton" />
         <div className="dashTitle">Admin Dashboard</div>
         <form className="projectForm" id="projectForm">
           Name:
@@ -69,6 +80,14 @@ const AdminDashboard = React.createClass({
           <input type="text" id="project" placeholder="Project" />
           <button type="submit" className="projectInput" onClick={this.newProject(document.getElementById('project'))}>Submit</button>
           <button type="submit" className="projectCancel" onClick={this.hideForm}>Cancel</button>
+        </form>
+        <form className="userForm" id="userForm">
+          Name:
+          <input type="text" id="userName" placeholder="Name" />
+          User ID:
+          <input type="text" id="userID" placeholder="userID" />
+          <button type="submit" className="userInput" onClick={this.newProject(document.getElementById('userForm'))}>Submit</button>
+          <button type="submit" className="userCancel" onClick={this.hideUserForm}>Cancel</button>
         </form>
         <div className="dashboard">
           {this.state.projectNames.map(this.createItem)}

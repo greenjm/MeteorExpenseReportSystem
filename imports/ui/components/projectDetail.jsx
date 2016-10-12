@@ -42,7 +42,27 @@ const ProjectDetail = React.createClass({
 
         this.setState({ projectDetails: proj });
       });
+      Meteor.subscribe('users', () => {
+        const allUsers = Meteor.users.find().fetch();
+      });
     });
+  },
+
+  showAddEmployee() {
+    document.getElementById('addUserForm').style.display = 'block';
+    var sel = document.getElementById('employeeDropDown');
+    for (var i = 0; i < allUsers.length - 1; i++) {
+      var opt = allUsers[i]
+      var el = document.createElement("option");
+      el.textContent = opt;
+      el.value = opt;
+      sel.appendChild(el);
+    }
+    // var options = 
+  },
+
+  hideForm() {
+    document.getElementById('addUserForm').style.display = "none";
   },
 
   render() {
@@ -54,7 +74,14 @@ const ProjectDetail = React.createClass({
         <p>Employees: {this.state.projectDetails.Employees.join(', ')}</p>
         <p>Start Date: {this.state.projectDetails.BornOn}</p>
         <p>Active: {this.state.projectDetails.Active}</p>
+        <input type="button" value="Add Employee" onClick={this.showAddEmployee} className="addUserButton" />
+        <form className="addUserForm" id="addUserForm">
+          <select className="employeeDropDown"></select>
+          <button type="submit" className="employeeButton">Submit</button>
+          <button type="submit" className="employeeButton" onClick={this.hideForm}>Cancel</button>
+        </form>
       </div>
+
     );
   },
 });

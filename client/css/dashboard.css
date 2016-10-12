@@ -47,3 +47,27 @@
 	margin-left: auto;
 	margin-right: 0px;
 }
+
+.newUserButton {
+	width:100px;
+	height:30px;
+	float:left;
+}
+
+.userForm {
+	border: 1px solid black;
+	width: 800px;
+	margin-right: auto;
+	margin-left: auto;
+	height: 50px;
+	display: none;
+}
+
+.userInput {
+	margin-left: auto;
+}
+
+.userCancel {
+	margin-left: auto;
+	margin-right: 0px;
+}
