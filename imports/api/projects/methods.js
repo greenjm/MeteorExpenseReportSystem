@@ -134,4 +134,21 @@ Meteor.methods({
     }
     throw new Meteor.Error('projects.deactivate.unauthorized', 'You do not have permission to deactivate projects.');
   },
+
+  'projects.editName': function editName(proj, newname) {
+    check(proj, String);
+    check(newname, String);
+
+    if (newname === '') {
+      throw new Meteor.Error('projects.editName.emptyName', 'You did not provide a new name for the project.');
+    }
+
+    if (isAdmin()) {
+      const result = Projects.update({ _id: proj },
+                    { $set: { name: newname } });
+
+      return result.nModified === 1;
+    }
+    throw new Meteor.Error('projects.editName.unauthorized', 'You do not have permission to deactivate projects.');
+  },
 });
