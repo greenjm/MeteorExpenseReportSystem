@@ -2,7 +2,7 @@
 // This page is shown when the login button is clicked and it's determined to be a successful login.
 import { Meteor } from 'meteor/meteor';
 import { Tracker } from 'meteor/tracker';
-import '../../imports/api/projects/projects.js';
+import '../../api/projects/projects.js';
 
 /* global Projects:true*/
 /* eslint no-undef: "error"*/
@@ -11,23 +11,33 @@ const React = require('react');
 
 const sub = Meteor.subscribe('projects');
 
-Tracker.autorun(() => {
-  if (sub.ready()) {
-    console.log(Projects.find().fetch());
-  }
-});
-
 const AdminDashboard = React.createClass({
   getInitialState() {
     // console.log('Temp');
     return {
-      projectNames: ['Project1', 'Project2', 'Project3'],
-      projectIds: [1, 2, 3],
+      projectNames: [],
+      projectIds: [],
     };
   },
 
   componentWillMount() {
     // make api call to get projects and their ids. Set projectNames and projectIds
+    Tracker.autorun(() => {
+      if (sub.ready()) {
+        const projects = Projects.find().fetch();
+        const projectNames = [];
+        const projectIds = [];
+        for (let i = 0; i < projects.length; i += 1) {
+          projectNames.push(projects[i].name);
+          projectIds.push(projects[i]._id);
+        }
+        this.update(projectNames, projectIds);
+      }
+    });
+  },
+
+  update(projectNames, projectIds) {
+    this.setState({ projectNames, projectIds });
   },
 
   createItem(item, index) {

@@ -4,7 +4,7 @@
   "scripts": {
     "start-dev": "MONGO_URL=\"mongodb://admin:admin123@137.112.40.146:27017/dev\" meteor",
     "lint-dev": "eslint ./client ./client/**/*.jsx ./client/*.jsx ./server ./imports --fix",
-    "lint-ci": "eslint ./client ./client/**/*.jsx ./client/*.jsx ./server ./api",
+    "lint-ci": "eslint ./client ./client/**/*.jsx ./client/*.jsx ./server ./imports",
     "test": "meteor test --once --driver-package dispatch:mocha-phantomjs"
   },
   "dependencies": {

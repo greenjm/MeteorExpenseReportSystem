@@ -4,7 +4,7 @@ import '../projects.js';
 /* global Projects:true*/
 /* eslint no-undef: "error"*/
 
-Meteor.publish('projects', () => {
+Meteor.publish('projects', function projectsPublish() {
   const currentUser = Meteor.users.findOne(this.userId);
 
   if (currentUser == null || currentUser.profile == null) {
