@@ -1,3 +1,10 @@
+import { Meteor } from 'meteor/meteor';
+import { Tracker } from 'meteor/tracker';
+import '../../api/projects/projects.js';
+
+/* global Projects:true*/
+/* eslint no-undef: "error"*/
+
 const React = require('react');
 
 const ProjectDetail = React.createClass({
@@ -11,19 +18,31 @@ const ProjectDetail = React.createClass({
     return {
       projectId: this.props.location.query.id,
       projectDetails: {
-        Id: 1,
-        Name: 'Project1',
-        Managers: ['Steve', 'Bob', 'Joe'],
-        Employees: ['Susan', 'Sarah', 'Billy-Bob'],
-        BornOn: 'October 3 2006',
-        Active: 'true',
-        TotalCost: '$55,000',
+        Id: -1,
+        Name: '',
+        Managers: [],
+        Employees: [],
+        BornOn: '',
+        Active: '',
       },
     };
   },
 
   componentWillMount() {
-    // make api call using this.state.projectId and set projectDetails
+    Tracker.autorun(() => {
+      Meteor.subscribe('projectGet', this.state.projectId, () => {
+        const project = Projects.findOne();
+        const proj = {
+          Name: project.name,
+          Managers: project.managers,
+          Employees: project.employees,
+          BornOn: project.bornOn.toString(),
+          Active: project.isactive,
+        };
+
+        this.setState({ projectDetails: proj });
+      });
+    });
   },
 
   render() {
@@ -35,7 +54,6 @@ const ProjectDetail = React.createClass({
         <p>Employees: {this.state.projectDetails.Employees.join(', ')}</p>
         <p>Start Date: {this.state.projectDetails.BornOn}</p>
         <p>Active: {this.state.projectDetails.Active}</p>
-        <p>Total Cost: {this.state.projectDetails.TotalCost}</p>
       </div>
     );
   },

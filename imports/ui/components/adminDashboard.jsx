@@ -13,7 +13,6 @@ const sub = Meteor.subscribe('projects');
 
 const AdminDashboard = React.createClass({
   getInitialState() {
-    // console.log('Temp');
     return {
       projectNames: [],
       projectIds: [],
@@ -21,7 +20,6 @@ const AdminDashboard = React.createClass({
   },
 
   componentWillMount() {
-    // make api call to get projects and their ids. Set projectNames and projectIds
     Tracker.autorun(() => {
       if (sub.ready()) {
         const projects = Projects.find().fetch();
