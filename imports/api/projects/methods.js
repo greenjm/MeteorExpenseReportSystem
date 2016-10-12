@@ -12,6 +12,28 @@ Projects.deny({
   remove() { return true; },
 });
 
+// Helpers
+function isAdmin() {
+  const currentUser = Meteor.user();
+
+  if (currentUser == null || currentUser.profile == null) {
+    return false;
+  }
+
+  return currentUser.profile.isAdmin;
+}
+
+function isManager(projectId) {
+  const currentUser = Meteor.user();
+
+  if (currentUser == null || currentUser.profile == null) {
+    return false;
+  }
+
+  const project = Projects.findOne({ managers: { $in: [currentUser._id] }, _id: projectId });
+  return project != null || currentUser.profile.isAdmin;
+}
+
 Meteor.methods({
   /**
   Creates new project using the name of the project and one manager provided
@@ -36,10 +58,13 @@ Meteor.methods({
     check(proj, String);
     check(user, String);
 
-    const result = Projects.update({ _id: proj },
-                    { $addToSet: { managers: user } });
+    if (isAdmin()) {
+      const result = Projects.update({ _id: proj },
+                      { $addToSet: { managers: user } });
 
-    return result.nModified === 1;
+      return result.nModified === 1;
+    }
+    throw new Meteor.Error('projects.addManager.unauthorized', 'You do not have permission to add managers.');
   },
 
   'projects.removeManager': function removeManager(proj, user) {
@@ -47,10 +72,13 @@ Meteor.methods({
     check(proj, String);
     check(user, String);
 
-    const result = Projects.update({ _id: proj },
+    if (isAdmin()) {
+      const result = Projects.update({ _id: proj },
                     { $pull: { managers: user } });
 
-    return result.nModified === 1;
+      return result.nModified === 1;
+    }
+    throw new Meteor.Error('projects.removeManager.unauthorized', 'You do not have permission to remove managers.');
   },
 
   'projects.addEmployee': function addEmployee(proj, user) {
@@ -58,10 +86,13 @@ Meteor.methods({
     check(proj, String);
     check(user, String);
 
-    const result = Projects.update({ _id: proj },
+    if (isManager(proj)) {
+      const result = Projects.update({ _id: proj },
                     { $addToSet: { employees: user } });
 
-    return result.nModified === 1;
+      return result.nModified === 1;
+    }
+    throw new Meteor.Error('projects.addEmployee.unauthorized', 'You do not have permission to add employees.');
   },
 
   'projects.removeEmployee': function removeEmployee(proj, user) {
@@ -69,29 +100,38 @@ Meteor.methods({
     check(proj, String);
     check(user, String);
 
-    const result = Projects.update({ _id: proj },
+    if (isManager(proj)) {
+      const result = Projects.update({ _id: proj },
                     { $pull: { employees: user } });
 
-    return result.nModified === 1;
+      return result.nModified === 1;
+    }
+    throw new Meteor.Error('projects.removeEmployee.unauthorized', 'You do not have permission to remove employees.');
   },
 
   'projects.activate': function activate(proj) {
     // activate project
     check(proj, String);
 
-    const result = Projects.update({ _id: proj },
+    if (isAdmin()) {
+      const result = Projects.update({ _id: proj },
                     { $set: { isActive: true, inactiveDate: null } });
 
-    return result.nModified === 1;
+      return result.nModified === 1;
+    }
+    throw new Meteor.Error('projects.activate.unauthorized', 'You do not have permission to activate projects.');
   },
 
   'projects.deactivate': function deactivate(proj) {
     // deactivate project
     check(proj, String);
 
-    const result = Projects.update({ _id: proj },
+    if (isAdmin()) {
+      const result = Projects.update({ _id: proj },
                     { $set: { isActive: false, inactiveDate: new Date() } });
 
-    return result.nModified === 1;
+      return result.nModified === 1;
+    }
+    throw new Meteor.Error('projects.deactivate.unauthorized', 'You do not have permission to deactivate projects.');
   },
 });
