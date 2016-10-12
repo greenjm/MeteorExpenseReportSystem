@@ -7,6 +7,8 @@ import '../../api/projects/projects.js';
 
 const React = require('react');
 
+var allEmployees;
+
 const ProjectDetail = React.createClass({
   propTypes() {
     return {
@@ -35,6 +37,9 @@ const ProjectDetail = React.createClass({
           Employees: project.employees,
           BornOn: project.bornOn.toString(),
           Active: !!project.isActive,
+        });
+      Meteor.subscribe('users', () => {
+        allEmployees=Meteor.users.find().fetch();
         });
       });
     });
@@ -70,6 +75,19 @@ const ProjectDetail = React.createClass({
     });
   },
 
+  addAllEmployees() {
+    var sel=document.getElementById('employeeList');
+    sel.style.display='block';
+    for(var i = 0; i<allEmployees.length; i++){
+      var opt=allEmployees[i];
+      var el=document.createElement("option");
+      el.textContent=opt;
+      el.value=opt;
+      sel.appendChild(el);
+    }
+    this.setState({ Employees: allEmployees });
+  },
+
   render() {
     return (
       <div className="dashboard">
@@ -79,11 +97,13 @@ const ProjectDetail = React.createClass({
         <p>Id: {this.state.projectId}</p>
         <p>Managers: {this.state.Managers.join(', ')}</p>
         <p>Employees: {this.state.Employees.join(', ')}</p>
+        <select multiple className="employeeList" id="employeeList" display="none">All Employees</select>
         <p>Start Date: {this.state.BornOn}</p>
 
         <label htmlFor="active">Active:</label>
         <input name="active" type="checkbox" checked={this.state.Active} onClick={this.toggleActive} />
 
+        <button onClick={this.addAllEmployees}>Add Employee</button>
         <button onClick={this.editProject}>Save Changes</button>
       </div>
     );
