@@ -1,8 +1,10 @@
+import { hashHistory } from 'react-router';
 import { Meteor } from 'meteor/meteor';
 import { Tracker } from 'meteor/tracker';
 import Paper from 'material-ui/Paper';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
   from 'material-ui/Table';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
 import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
@@ -23,6 +25,10 @@ const paperStyle = {
   lineHeight: '35px',
   fontFamily: 'Roboto,sans-serif',
   paddingLeft: '24px',
+};
+
+const actionsColStyle= {
+  paddingLeft: '50px',
 };
 
 const AdminDashboard = React.createClass({
@@ -62,26 +68,27 @@ const AdminDashboard = React.createClass({
       <TableRow key={item._id} selectable={false}>
         <TableRowColumn>{item.profile.name}</TableRowColumn>
         <TableRowColumn>{item.emails[0].address}</TableRowColumn>
-        <TableRowColumn>
-          <IconButton tooltip="Edit">
-            <FontIcon className="material-icons">mode edit</FontIcon>
-          </IconButton>
+        <TableRowColumn style={actionsColStyle}>
+          <FloatingActionButton mini>
+            <i className="material-icons">edit</i>
+          </FloatingActionButton>
         </TableRowColumn>
       </TableRow>);
   },
 
   createProjectRow(item, index) {
+    const url = `/#/project?id=${this.state.projectIds[index]}`;
     return (
       <TableRow key={this.state.projectIds[index]} selectable={false}>
         <TableRowColumn>{item}</TableRowColumn>
-        <TableRowColumn>
-          <IconButton tooltip="View Details">
-            <FontIcon className="material-icons">info outline</FontIcon>
-          </IconButton>
+        <TableRowColumn style={actionsColStyle}>
+          <a href={url}>
+            <FloatingActionButton mini>
+              <i className="material-icons">search</i>
+            </FloatingActionButton>
+          </a>
         </TableRowColumn>
       </TableRow>);
-    //const url = `/#/project?id=${this.state.projectIds[index]}`;
-    //return <a href={url}><div className="project" key={index}>{item}</div></a>;
   },
 
   newProject(projectName) {
