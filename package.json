@@ -9,7 +9,9 @@
   },
   "dependencies": {
     "check": "^1.0.0",
+    "classnames": "^2.2.5",
     "ejson": "^2.1.2",
+    "flexboxgrid": "^6.3.1",
     "material-ui": "^0.16.0",
     "meteor-node-stubs": "~0.2.0",
     "react": "^15.3.2",

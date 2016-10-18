@@ -27,3 +27,4 @@ dispatch:mocha
 dispatch:mocha-phantomjs
 standard-minifier-css
 fourseven:scss
+lifefilm:react-flexbox-grid
