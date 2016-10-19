@@ -1,11 +1,11 @@
 import { Meteor } from 'meteor/meteor';
-import { Factory } from 'meteor/dburles:factory';
+// import { Factory } from 'meteor/dburles:factory';
 // import StubCollections from 'meteor/hwillson:stub-collections';
 // import { PublicationCollector } from 'meteor/johanbrook:publication-collector';
-import { chai } from 'meteor/practicalmeteor:chai';
+// import { chai } from 'meteor/practicalmeteor:chai';
 // import { Accounts } from 'meteor/accounts-base';
 
-import { Projects } from './projects.js';
+// import { Projects } from './projects.js';
 // import './publications.js';
 // import '../../../startup/server/fixtures.js';
 
@@ -46,5 +46,5 @@ if (Meteor.isServer) {
     it('should edit the project name', function () {
       console.log('changing names');
     });
-});
+  });
 }
