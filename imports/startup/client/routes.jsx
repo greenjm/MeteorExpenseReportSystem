@@ -3,6 +3,8 @@
 
 import { Meteor } from 'meteor/meteor';
 import { hashHistory } from 'react-router';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import injectTapEventPlugin from 'react-tap-event-plugin';
 
 const React = require('react');
 const ReactDOM = require('react-dom');
@@ -14,12 +16,15 @@ const Dashboard = require('../../ui/components/dashboard.jsx');
 const ProjectDetail = require('../../ui/components/projectDetail.jsx');
 
 Meteor.startup(() => {
+  injectTapEventPlugin();
   ReactDOM.render((
-    <Router history={hashHistory}>
-      <Route path="/adminDashboard" component={AdminDashboard} />
-      <Route path="/dashboard" component={Dashboard} />
-      <Route path="/project*" component={ProjectDetail} />
-      <Route path="/" component={Login} />
-    </Router>
+      <MuiThemeProvider>
+        <Router history={hashHistory}>
+          <Route path="/adminDashboard" component={AdminDashboard} />
+          <Route path="/dashboard" component={Dashboard} />
+          <Route path="/project*" component={ProjectDetail} />
+          <Route path="/" component={Login} />
+        </Router>
+      </MuiThemeProvider>
   ), document.getElementById('app'));
 });

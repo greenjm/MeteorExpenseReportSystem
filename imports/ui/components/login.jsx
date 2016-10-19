@@ -5,18 +5,42 @@
 
 import { hashHistory } from 'react-router';
 import { Meteor } from 'meteor/meteor';
+import { Card, CardActions, CardHeader, CardText } from 'material-ui/Card';
+import FlatButton from 'material-ui/FlatButton';
+import TextField from 'material-ui/TextField';
 
 const React = require('react');
+
+// Inline Styles
+
+const cardStyle = {
+  width: '35%',
+  margin: 'auto',
+  position: 'absolute',
+  top: '30%',
+  left: '0',
+  right: '0',
+};
+
+// Done
 
 const Login = React.createClass({
   getInitialState() {
     return {
       username: '',
       password: '',
+      usernameError: '',
+      passwordError: '',
     };
   },
 
-  login() {
+
+  login(e) {
+    e.preventDefault();
+    if (this.state.username === '' || this.state.password === '') {
+      this.emptyFieldError();
+      return;
+    }
     Meteor.loginWithPassword({ email: this.state.username },
      this.state.password, (error) => {
        if (error) {
@@ -36,6 +60,15 @@ const Login = React.createClass({
      });
   },
 
+  emptyFieldError() {
+    if (this.state.username === '') {
+      this.setState({ usernameError: 'This field is required.' });
+    }
+    if (this.state.password === '') {
+      this.setState({ passwordError: 'This field is required.' });
+    }
+  },
+
   loginSuccess(isAdmin) {
     if (isAdmin) {
       hashHistory.push('/adminDashboard', null, { username: this.state.username });
@@ -45,29 +78,53 @@ const Login = React.createClass({
   },
 
   loginFailure() {
-    this.setState({ username: '', password: '' });
+    this.setState({ username: '', password: '', passwordError: 'Either email or password is incorrect.' });
   },
 
   handleUsernameChange(event) {
-    this.setState({ username: event.target.value });
+    this.setState({ username: event.target.value, usernameError: '' });
   },
 
   handlePasswordChange(event) {
-    this.setState({ password: event.target.value });
+    this.setState({ password: event.target.value, passwordError: '' });
   },
 
   render() {
     return (
-      <div className="loginBox">
-        <form className="loginInnerBox">
-          <label htmlFor="username">Username</label>
-          <input type="text" name="username" className="loginInput" value={this.state.username} onChange={this.handleUsernameChange} />
-
-          <label htmlFor="password">Password</label>
-          <input type="password" name="password" className="loginInput" value={this.state.password} onChange={this.handlePasswordChange} />
-          <button type="button" onClick={this.login} className="loginInput">Login</button>
-        </form>
-      </div>);
+      <form onSubmit={this.login}>
+        <Card style={cardStyle}>
+          <CardHeader
+            title="Meteor Expense Report"
+            subtitle="Login"
+            expandable={false}
+          />
+          <CardText>
+            <TextField
+              hintText="email"
+              fullWidth
+              value={this.state.username}
+              errorText={this.state.usernameError}
+              name="username"
+              onChange={this.handleUsernameChange}
+            />
+            <TextField
+              hintText="password"
+              type="password"
+              fullWidth
+              value={this.state.password}
+              errorText={this.state.passwordError}
+              name="password"
+              onChange={this.handlePasswordChange}
+            />
+          </CardText>
+          <CardActions>
+            <FlatButton
+              label="Login"
+              type="submit"
+            />
+          </CardActions>
+        </Card>
+      </form>);
   },
 });
 
