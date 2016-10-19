@@ -7,8 +7,6 @@ import '../../api/projects/projects.js';
 
 const React = require('react');
 
-let allEmployees;
-
 const ProjectDetail = React.createClass({
   propTypes() {
     return {
@@ -24,13 +22,14 @@ const ProjectDetail = React.createClass({
       Employees: [],
       BornOn: '',
       Active: '',
+      allEmployees: [],
     };
   },
 
   componentWillMount() {
     Tracker.autorun(() => {
       Meteor.subscribe('projectGet', this.state.projectId, () => {
-        const project = Projects.findOne();
+        const project = Projects.findOne(this.state.projectId);
         this.setState({
           Name: project.name,
           Managers: project.managers,
@@ -39,7 +38,7 @@ const ProjectDetail = React.createClass({
           Active: !!project.isActive,
         });
         Meteor.subscribe('users', () => {
-          allEmployees = Meteor.users.find().fetch();
+          this.setState({ allEmployees: Meteor.users.find().fetch() });
         });
       });
     });
@@ -54,38 +53,51 @@ const ProjectDetail = React.createClass({
   },
 
   editProject() {
-    if (this.state.projectDetails.Active) {
+    if (this.state.Active) {
       Tracker.autorun(() => {
         Meteor.call('projects.activate', this.state.projectId, (err) => {
-          console.log(err);
+          if (err) {
+            console.log(err);
+          }
         });
       });
     } else {
       Tracker.autorun(() => {
         Meteor.call('projects.deactivate', this.state.projectId, (err) => {
-          console.log(err);
+          if (err) {
+            console.log(err);
+          }
         });
       });
     }
 
     Tracker.autorun(() => {
       Meteor.call('projects.editName', this.state.projectId, this.state.Name, (err) => {
-        console.log(err);
+        if (err) {
+          console.log(err);
+        }
       });
     });
   },
 
-  addAllEmployees() {
-    const sel = document.getElementById('employeeList');
-    sel.style.display = 'block';
-    for (let i = 0; i < allEmployees.length; i++) {
-      const opt = allEmployees[i];
-      const el = document.createElement('option');
-      el.textContent = opt;
-      el.value = opt;
-      sel.appendChild(el);
-    }
-    this.setState({ Employees: allEmployees });
+  showEmployee(item, i) {
+    return (<option key={i}>{item.profile.name}</option>);
+  },
+
+  addEmployee() {
+    const index = document.getElementById('employeeList').selectedIndex;
+    const arr = this.state.Employees.slice();
+    arr.push(this.state.allEmployees[index].profile.name);
+
+    Tracker.autorun(() => {
+      Meteor.call('projects.addEmployee', this.state.projectId, this.state.allEmployees[index]._id, (err) => {
+        if (err) {
+          console.log(err);
+        } else {
+          this.setState({ Employees: arr });
+        }
+      });
+    });
   },
 
   render() {
@@ -94,16 +106,22 @@ const ProjectDetail = React.createClass({
         <label htmlFor="name">Name:</label>
         <input name="name" type="text" value={this.state.Name} onChange={this.changeName} />
 
-        <p>Id: {this.state.projectId}</p>
         <p>Managers: {this.state.Managers.join(', ')}</p>
         <p>Employees: {this.state.Employees.join(', ')}</p>
-        <select multiple className="employeeList" id="employeeList" display="none">All Employees</select>
+
         <p>Start Date: {this.state.BornOn}</p>
 
         <label htmlFor="active">Active:</label>
         <input name="active" type="checkbox" checked={this.state.Active} onClick={this.toggleActive} />
 
-        <button onClick={this.addAllEmployees}>Add Employee</button>
+        <br /><br />
+        <select id="employeeList">
+          {this.state.allEmployees.map(this.showEmployee)}
+        </select>
+        <br />
+        <button onClick={this.addEmployee}>Add Employee</button>
+
+        <br /><br />
         <button onClick={this.editProject}>Save Changes</button>
       </div>
     );
