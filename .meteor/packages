@@ -26,3 +26,8 @@ ejson
 accounts-base
 dispatch:mocha
 dispatch:mocha-phantomjs
+practicalmeteor:chai
+dburles:factory
+hwillson:stub-collections
+johanbrook:publication-collector
+random
