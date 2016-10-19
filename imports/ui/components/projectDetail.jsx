@@ -7,7 +7,7 @@ import '../../api/projects/projects.js';
 
 const React = require('react');
 
-var allEmployees;
+let allEmployees;
 
 const ProjectDetail = React.createClass({
   propTypes() {
@@ -38,8 +38,8 @@ const ProjectDetail = React.createClass({
           BornOn: project.bornOn.toString(),
           Active: !!project.isActive,
         });
-      Meteor.subscribe('users', () => {
-        allEmployees=Meteor.users.find().fetch();
+        Meteor.subscribe('users', () => {
+          allEmployees = Meteor.users.find().fetch();
         });
       });
     });
@@ -76,13 +76,13 @@ const ProjectDetail = React.createClass({
   },
 
   addAllEmployees() {
-    var sel=document.getElementById('employeeList');
-    sel.style.display='block';
-    for(var i = 0; i<allEmployees.length; i++){
-      var opt=allEmployees[i];
-      var el=document.createElement("option");
-      el.textContent=opt;
-      el.value=opt;
+    const sel = document.getElementById('employeeList');
+    sel.style.display = 'block';
+    for (let i = 0; i < allEmployees.length; i++) {
+      const opt = allEmployees[i];
+      const el = document.createElement('option');
+      el.textContent = opt;
+      el.value = opt;
       sel.appendChild(el);
     }
     this.setState({ Employees: allEmployees });

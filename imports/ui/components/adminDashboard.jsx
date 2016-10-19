@@ -1,13 +1,17 @@
-import { hashHistory } from 'react-router';
 import { Meteor } from 'meteor/meteor';
 import { Tracker } from 'meteor/tracker';
 import Paper from 'material-ui/Paper';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
   from 'material-ui/Table';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
+import Dialog from 'material-ui/Dialog';
+import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
+import TextField from 'material-ui/TextField';
+import Toggle from 'material-ui/Toggle';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
-import FontIcon from 'material-ui/FontIcon';
-import IconButton from 'material-ui/IconButton';
 import '../../api/projects/projects.js';
 import Header from './header.jsx';
 
@@ -27,8 +31,16 @@ const paperStyle = {
   paddingLeft: '24px',
 };
 
-const actionsColStyle= {
+const actionsColStyle = {
   paddingLeft: '50px',
+};
+
+const tableHeaderButtonStyle = {
+  float: 'right',
+};
+
+const switchStyle = {
+  width: '50%',
 };
 
 const AdminDashboard = React.createClass({
@@ -37,6 +49,18 @@ const AdminDashboard = React.createClass({
       projectNames: [],
       projectIds: [],
       users: [],
+      newUserDialogOpen: false,
+      newProjectDialogOpen: false,
+      newUserEmail: '',
+      newUserName: '',
+      emailError: '',
+      userNameError: '',
+      isAdmin: false,
+      dialogError: '',
+      newProjectName: '',
+      projectNameError: '',
+      projectManager: '',
+      managerError: '',
     };
   },
 
@@ -69,7 +93,7 @@ const AdminDashboard = React.createClass({
         <TableRowColumn>{item.profile.name}</TableRowColumn>
         <TableRowColumn>{item.emails[0].address}</TableRowColumn>
         <TableRowColumn style={actionsColStyle}>
-          <FloatingActionButton mini>
+          <FloatingActionButton mini zDepth={1}>
             <i className="material-icons">edit</i>
           </FloatingActionButton>
         </TableRowColumn>
@@ -83,7 +107,7 @@ const AdminDashboard = React.createClass({
         <TableRowColumn>{item}</TableRowColumn>
         <TableRowColumn style={actionsColStyle}>
           <a href={url}>
-            <FloatingActionButton mini>
+            <FloatingActionButton mini zDepth={1}>
               <i className="material-icons">search</i>
             </FloatingActionButton>
           </a>
@@ -115,7 +139,135 @@ const AdminDashboard = React.createClass({
     document.getElementById('userID').value = '';
   },
 
+  // User Dialog functions
+  emptyUserFieldError() {
+    if (this.state.newUserEmail === '') {
+      this.setState({ emailError: 'This field is required.' });
+    }
+    if (this.state.newUserName === '') {
+      this.setState({ userNameError: 'This field is required.' });
+    }
+  },
+
+  submitUser() {
+    if (this.state.newUserEmail === '' || this.state.newUserName === '') {
+      this.emptyUserFieldError();
+      return;
+    }
+    Meteor.call('users.new', this.state.newUserEmail,
+      this.state.newUserName,
+      this.state.isAdmin,
+      (error, result) => {
+        if (error != null) {
+          this.setState({ dialogError: `Error: ${error.error}. Reason: ${error.reason}` });
+          return;
+        }
+        if (result) {
+          this.setState({ dialogError: '', newUserName: '', newUserEmail: '', isAdmin: false });
+        }
+        this.closeUserDialog();
+      });
+  },
+
+  closeUserDialog() {
+    this.setState({ newUserDialogOpen: false,
+                    newUserName: '',
+                    newUserEmail: '',
+                    isAdmin: false });
+  },
+
+  openUserDialog() {
+    this.setState({ newUserDialogOpen: true });
+  },
+
+  handleEmailChange(event) {
+    this.setState({ newUserEmail: event.target.value, emailError: '' });
+  },
+
+  handleUserNameChange(event) {
+    this.setState({ newUserName: event.target.value, userNameError: '' });
+  },
+
+  handleIsAdminChange() {
+    this.setState({ isAdmin: !this.state.isAdmin });
+  },
+
+  // Project Dialog functions
+  emptyProjectFieldError() {
+    if (this.state.newProjectName === '') {
+      this.setState({ projectNameError: 'This field is required.' });
+    }
+    if (this.state.projectManager === '') {
+      this.setState({ managerError: 'This field is required.' });
+    }
+  },
+
+  submitProject() {
+    if (this.state.newProjectName === '' || this.state.projectManager === '') {
+      this.emptyProjectFieldError();
+      return;
+    }
+    Meteor.call('projects.create', this.state.newProjectName, this.state.projectManager, (err, res) => {
+      if (err != null) {
+        this.setState({ dialogError: `Error: ${err.error}. Reason: ${err.reason}` });
+        return;
+      }
+      if (res) {
+        this.setState({ dialogError: '', newProjectName: '', projectManager: '' });
+      }
+      this.closeProjectDialog();
+    });
+  },
+
+  closeProjectDialog() {
+    this.setState({ newProjectDialogOpen: false });
+  },
+
+  openProjectDialog() {
+    this.setState({ newProjectDialogOpen: true });
+  },
+
+  handleProjectNameChange(event) {
+    this.setState({ newProjectName: event.target.value, projectNameError: '' });
+  },
+
+  handleManagerChange(event, index, value) {
+    this.setState({ projectManager: value, managerError: '' });
+  },
+
+  createUserMenuItem(item) {
+    return (
+      <MenuItem value={item._id} primaryText={item.profile.name} />
+    );
+  },
+
   render() {
+    const userDialogActions = [
+      <FlatButton
+        label="Cancel"
+        primary
+        onTouchTap={this.closeUserDialog}
+      />,
+      <FlatButton
+        label="Add"
+        primary
+        onTouchTap={this.submitUser}
+      />,
+    ];
+
+    const projectDialogActions = [
+      <FlatButton
+        label="Cancel"
+        primary
+        onTouchTap={this.closeProjectDialog}
+      />,
+      <FlatButton
+        label="Add"
+        primary
+        onTouchTap={this.submitProject}
+      />,
+    ];
+
     return (
       <div>
         <Header />
@@ -131,14 +283,15 @@ const AdminDashboard = React.createClass({
                 >
                   <TableHeader displaySelectAll={false}>
                     <TableRow selectable={false}>
-                      <TableHeaderColumn colSpan="3" tooltip="Users" style={{ textAlign: 'center' }}>
+                      <TableHeaderColumn colSpan="3" style={{ textAlign: 'center' }}>
+                        <RaisedButton label="New" primary style={tableHeaderButtonStyle} onTouchTap={this.openUserDialog} />
                         Users
                       </TableHeaderColumn>
                     </TableRow>
                     <TableRow selectable={false}>
-                      <TableHeaderColumn tooltip="Name">Name</TableHeaderColumn>
-                      <TableHeaderColumn tooltip="Email">Email</TableHeaderColumn>
-                      <TableHeaderColumn tooltip="Actions">Actions</TableHeaderColumn>
+                      <TableHeaderColumn>Name</TableHeaderColumn>
+                      <TableHeaderColumn>Email</TableHeaderColumn>
+                      <TableHeaderColumn>Actions</TableHeaderColumn>
                     </TableRow>
                   </TableHeader>
                   <TableBody
@@ -155,13 +308,14 @@ const AdminDashboard = React.createClass({
                 >
                   <TableHeader displaySelectAll={false}>
                     <TableRow selectable={false}>
-                      <TableHeaderColumn colSpan="2" tooltip="Projects" style={{ textAlign: 'center' }}>
+                      <TableHeaderColumn colSpan="2" style={{ textAlign: 'center' }}>
+                        <RaisedButton label="New" primary style={tableHeaderButtonStyle} onTouchTap={this.openProjectDialog} />
                         Projects
                       </TableHeaderColumn>
                     </TableRow>
                     <TableRow selectable={false}>
-                      <TableHeaderColumn tooltip="Name">Name</TableHeaderColumn>
-                      <TableHeaderColumn tooltip="Actions">Actions</TableHeaderColumn>
+                      <TableHeaderColumn>Name</TableHeaderColumn>
+                      <TableHeaderColumn>Actions</TableHeaderColumn>
                     </TableRow>
                   </TableHeader>
                   <TableBody
@@ -175,6 +329,66 @@ const AdminDashboard = React.createClass({
             </Row>
           </Grid>
         </div>
+        <Dialog
+          title="Add New User"
+          actions={userDialogActions}
+          modal={false}
+          open={this.state.newUserDialogOpen}
+          onRequestClose={this.closeUserDialog}
+        >
+          <TextField
+            hintText="email"
+            floatingLabelText="Email Address"
+            fullWidth
+            value={this.state.newUserEmail}
+            errorText={this.state.emailError}
+            name="newUserEmail"
+            onChange={this.handleEmailChange}
+          />
+          <TextField
+            hintText="name"
+            floatingLabelText="Full Name"
+            fullWidth
+            value={this.state.newUserName}
+            errorText={this.state.userNameError}
+            name="newUserEmail"
+            onChange={this.handleUserNameChange}
+          />
+          <br />
+          <Toggle
+            label="Is Admin?"
+            style={switchStyle}
+            toggled={this.state.isAdmin}
+            onToggle={this.handleIsAdminChange}
+          />
+          <div style={{ color: 'red' }}>{this.state.dialogError}</div>
+        </Dialog>
+
+        <Dialog
+          title="Add New Project"
+          actions={projectDialogActions}
+          modal={false}
+          open={this.state.newProjectDialogOpen}
+          onRequestClose={this.closeProjectDialog}
+        >
+          <TextField
+            hintText="name"
+            floatingLabelText="Project Name"
+            fullWidth
+            value={this.state.newProjectName}
+            errorText={this.state.projectNameError}
+            name="newUserEmail"
+            onChange={this.handleProjectNameChange}
+          />
+          <SelectField
+            value={this.state.projectManager}
+            onChange={this.handleManagerChange}
+            errorText={this.state.managerError}
+          >
+            {this.state.users.map(this.createUserMenuItem)}
+          </SelectField>
+          <div style={{ color: 'red' }}>{this.state.dialogError}</div>
+        </Dialog>
       </div>
       );
   },

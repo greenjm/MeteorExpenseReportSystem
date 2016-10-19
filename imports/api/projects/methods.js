@@ -45,12 +45,15 @@ Meteor.methods({
     check(name, String);
     check(mgr, String);
 
-    return Projects.insert({ name,
-      managers: [mgr],
-      employees: [],
-      bornOn: new Date(),
-      isActive: true,
-      inactiveDate: null });
+    if (isAdmin()) {
+      return Projects.insert({ name,
+        managers: [mgr],
+        employees: [],
+        bornOn: new Date(),
+        isActive: true,
+        inactiveDate: null });
+    }
+    throw new Meteor.Error('projects.create.unauthorized', 'You do not have permission to create projects.');
   },
 
   'projects.addManager': function addManager(proj, user) {

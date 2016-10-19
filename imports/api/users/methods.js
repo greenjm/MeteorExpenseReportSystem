@@ -47,7 +47,7 @@ Meteor.methods({
     }
     if (/^[A-Z0-9'.1234z_%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email)) {
       const username = email.substr(0, email.indexOf('@'));
-      Accounts.createUser({
+      const userId = Accounts.createUser({
         username,
         email,
         profile: {
@@ -56,13 +56,9 @@ Meteor.methods({
           autoInternet: true,
           autoPhone: true,
         },
-      }, (error, userId) => {
-        if (error != null) {
-          Accounts.sendEnrollmentEmail(userId);
-          return true;
-        }
-        throw new Meteor.Error('users.new.failed', 'Accounts.createUser call failed');
       });
+      Accounts.sendEnrollmentEmail(userId);
+      return true;
     }
     throw new Meteor.Error('users.new.invalidEmail', 'Email address is not valid');
   },

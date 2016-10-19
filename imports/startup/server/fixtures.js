@@ -4,7 +4,6 @@ import '../../api/projects/projects.js';
 
 /* global Projects:true*/
 /* eslint no-undef: "error"*/
-
 function seedUsers() {
   const users = ['greenjm', 'havensid', 'kerrickm', 'weissna'];
 
@@ -53,11 +52,15 @@ function seedProjects() {
   }
 }
 
+// Uncomment the following line to reseed users
+// Meteor.users.remove({});
 if (Meteor.users.find().count() <= 0) {
   // Seed new users
   seedUsers();
 }
 
+// Uncomment the following line to reseed projects
+// Projects.remove({});
 if (Projects.find().count() <= 0) {
   // Seed new projects
   seedProjects();

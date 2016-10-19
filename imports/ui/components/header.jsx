@@ -7,7 +7,6 @@ import IconButton from 'material-ui/IconButton';
 import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
-import Subheader from 'material-ui/Subheader';
 
 const React = require('react');
 
@@ -17,11 +16,7 @@ const Header = React.createClass({
   },
 
   logout() {
-    Meteor.logout((error) => {
-      if (error) {
-        logout();
-        return;
-      }
+    Meteor.logout(() => {
       hashHistory.push('/');
     });
   },
@@ -30,7 +25,7 @@ const Header = React.createClass({
     return (
       <AppBar
         title="Expense Report"
-        iconElementRight={ 
+        iconElementRight={
           <IconMenu
             iconButtonElement={
               <IconButton><MoreVertIcon /></IconButton>
@@ -44,7 +39,7 @@ const Header = React.createClass({
         }
         showMenuIconButton={false}
       />);
-  }  
+  },
 });
 
 module.exports = Header;

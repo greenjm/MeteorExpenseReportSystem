@@ -18,13 +18,13 @@ const ProjectDetail = require('../../ui/components/projectDetail.jsx');
 Meteor.startup(() => {
   injectTapEventPlugin();
   ReactDOM.render((
-      <MuiThemeProvider>
-        <Router history={hashHistory}>
-          <Route path="/adminDashboard" component={AdminDashboard} />
-          <Route path="/dashboard" component={Dashboard} />
-          <Route path="/project*" component={ProjectDetail} />
-          <Route path="/" component={Login} />
-        </Router>
-      </MuiThemeProvider>
+    <MuiThemeProvider>
+      <Router history={hashHistory}>
+        <Route path="/adminDashboard" component={AdminDashboard} />
+        <Route path="/dashboard" component={Dashboard} />
+        <Route path="/project*" component={ProjectDetail} />
+        <Route path="/" component={Login} />
+      </Router>
+    </MuiThemeProvider>
   ), document.getElementById('app'));
 });
