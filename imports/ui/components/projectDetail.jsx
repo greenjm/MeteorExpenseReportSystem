@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { Tracker } from 'meteor/tracker';
-import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
+import { Table, TableHeader, TableRow, TableRowColumn }
   from 'material-ui/Table';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
 import Paper from 'material-ui/Paper';
@@ -125,66 +125,60 @@ const ProjectDetail = React.createClass({
     return (
       <div>
         <Header />
-        <Paper style={paperStyle} zDepth={1}>Project Details</Paper>
+        <Paper style={paperStyle} zDepth={1}>Project Detail: {this.state.Name}</Paper>
         <br />
-
-        <div>
-          <Grid>
-            <Row>
-              <Table selectable={false}>
+        <br />
+        <Grid>
+          <Row>
+            <Col xs={12} sm={12} md={12} lg={12}>
+              <Table>
                 <TableHeader displaySelectAll={false}>
-                  <TableRow selectable={false}>
-                    <TableHeaderColumn style={{ textAlign: 'center' }}>
+                  <TableRow>
+                    <TableRowColumn>
                       <div>
-                        <label htmlFor="name">Name:</label>
+                        <label htmlFor="name">Name: </label>
                         <input name="name" type="text" value={this.state.Name} onChange={this.changeName} />
-                        <p>Start Date: {this.state.BornOn}</p>
                       </div>
-                    </TableHeaderColumn>
+                    </TableRowColumn>
+                  </TableRow>
+                  <TableRow selectable={false}>
+                    <TableRowColumn>
+                      <div>Managers: {this.state.Managers.join(', ')}</div>
+                    </TableRowColumn>
+                  </TableRow>
+                  <TableRow>
+                    <TableRowColumn>
+                      <div>Employees: {this.state.Employees.join(', ')}</div>
+                    </TableRowColumn>
+                  </TableRow>
+                  <TableRow>
+                    <TableRowColumn>
+                      <label htmlFor="active">Active: </label>
+                      <input name="active" type="checkbox" checked={this.state.Active} onClick={this.toggleActive} />
+                    </TableRowColumn>
+                  </TableRow>
+                  <TableRow>
+                    <TableRowColumn>
+                      <div>Start Date: {this.state.BornOn}</div>
+                    </TableRowColumn>
+                  </TableRow>
+                  <TableRow>
+                    <TableRowColumn>
+                      <div>
+                        Add Employees: <select id="employeeList">{this.state.allEmployees.map(this.showEmployee)}</select> <button onClick={this.addEmployee}>Add Employee</button>
+                      </div>
+                    </TableRowColumn>
+                  </TableRow>
+                  <TableRow>
+                    <TableRowColumn>
+                      <button onClick={this.editProject}>Save Changes</button>
+                    </TableRowColumn>
                   </TableRow>
                 </TableHeader>
               </Table>
-            </Row>
-            <Row>
-              <Col xs={12} sm={12} md={6} lg={6}>
-                <Table
-                  selectable={false}
-                >
-                  <TableHeader displaySelectAll={false}>
-                    <TableRow selectable={false}>
-                      <TableHeaderColumn style={{ textAlign: 'center' }}>
-                        Users
-                      </TableHeaderColumn>
-                    </TableRow>
-                    <TableRow selectable={false}>
-                      <TableHeaderColumn>Manager: {this.state.Managers.join(', ')}</TableHeaderColumn>
-                    </TableRow>
-                    <TableRow selectable={false}>
-                      <TableHeaderColumn>Employees: {this.state.Employees.join(', ')}</TableHeaderColumn>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody
-                    showRowHover
-                    displayRowCheckbox={false}
-                  >
-                    <div>
-                      <label htmlFor="active">Active:</label>
-                      <input name="active" type="checkbox" checked={this.state.Active} onClick={this.toggleActive} />
-                      <br /><br />
-                      <select id="employeeList">
-                        {this.state.allEmployees.map(this.showEmployee)}
-                      </select>
-                      <br />
-                      <button onClick={this.addEmployee}>Add Employee</button>
-                      <br /><br />
-                      <button onClick={this.editProject}>Save Changes</button>
-                    </div>
-                  </TableBody>
-                </Table>
-              </Col>
-            </Row>
-          </Grid>
-        </div>
+            </Col>
+          </Row>
+        </Grid>
       </div>
     );
   },
