@@ -12,8 +12,9 @@ const Router = require('react-router').Router;
 const Route = require('react-router').Route;
 const Login = require('../../ui/components/login.jsx');
 const AdminDashboard = require('../../ui/components/adminDashboard.jsx');
-const Dashboard = require('../../ui/components/dashboard.jsx');
 const ProjectDetail = require('../../ui/components/projectDetail.jsx');
+const UserDashboard = require('../../ui/components/userDashboard.jsx');
+const SubmitRequest = require('../../ui/components/submitRequest.jsx');
 
 Meteor.startup(() => {
   injectTapEventPlugin();
@@ -21,9 +22,10 @@ Meteor.startup(() => {
     <MuiThemeProvider>
       <Router history={hashHistory}>
         <Route path="/adminDashboard" component={AdminDashboard} />
-        <Route path="/dashboard" component={Dashboard} />
+        <Route path="/dashboard" component={UserDashboard} />
         <Route path="/project*" component={ProjectDetail} />
         <Route path="/" component={Login} />
+        <Route path="/submitRequest" component={SubmitRequest} />
       </Router>
     </MuiThemeProvider>
   ), document.getElementById('app'));
