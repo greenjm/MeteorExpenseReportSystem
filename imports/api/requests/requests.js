@@ -11,12 +11,17 @@ Requests.schema = new SimpleSchema({
   projectId: { type: String, regEx: SimpleSchema.RegEx.Id },
   status: { type: Boolean, optional: true },
   statMsg: { type: String, optional: true },
-  bornOn: { type: Date, default: Date.now },
+  bornOn: { type: Date,
+    autoValue: () => {
+      const date = Date.now();
+      return date;
+    },
+  },
   description: { type: String },
-  estCost: { type: Number },
+  estCost: { type: Number, decimal: true },
   vendor: { type: String },
   partNo: { type: String },
-  quantity: { type: Number, default: 1 },
-  unitCost: { type: Number },
+  quantity: { type: Number, defaultValue: 1 },
+  unitCost: { type: Number, decimal: true },
   receipt: { type: String, optional: true },
 });
