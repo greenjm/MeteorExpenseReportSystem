@@ -17,7 +17,7 @@ WORKDIR /opt/meteorExpenseReport/app/programs/server
 RUN npm install
 
 # Set environment variables 
-WORKDIR /opt/budgeter/app
+WORKDIR /opt/meteorExpenseReport/app
 ENV PORT 80
 ENV ROOT_URL http://127.0.0.1
 
