@@ -1,5 +1,7 @@
 import { Mongo } from 'meteor/mongo';
 import { SimpleSchema } from 'meteor/aldeed:simple-schema';
+import { Factory } from 'meteor/dburles:factory';
+import { faker } from 'meteor/digilord:faker';
 
 /* global Requests:true*/
 /* eslint no-undef: "error"*/
@@ -24,4 +26,16 @@ Requests.schema = new SimpleSchema({
   quantity: { type: Number, defaultValue: 1 },
   unitCost: { type: Number, decimal: true },
   receipt: { type: String, optional: true },
+});
+
+Factory.define('request', Requests, {
+  userId: () => '',
+  projectId: () => '',
+  bornOn: () => new Date(),
+  description: () => faker.lorem.sentence(),
+  estCost: () => 1.00,
+  vendor: () => faker.lorem.word(),
+  partNo: () => faker.lorem.word(),
+  quantity: () => 1,
+  unitCost: () => 1.00,
 });

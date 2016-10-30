@@ -13,7 +13,7 @@
 /* eslint-disable func-names, prefer-arrow-callback */
 /* global describe it:true */
 
-describe('ProjectPublicationCollections', function () {
+// describe('ProjectPublicationCollections', function () {
   // beforeEach(function () {
   //   StubCollections.stub([Meteor.users]);
   // });
@@ -51,7 +51,7 @@ describe('ProjectPublicationCollections', function () {
   //     });
   //   });
   // });
-  it('should just work', function () {
-    console.log('I am at publications test!');
-  });
-});
+//   it('should just work', function () {
+//     console.log('I am at publications test!');
+//   });
+// });

@@ -1,12 +1,16 @@
+/* global Projects:true*/
+/* eslint no-undef: "error"*/
+
+
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import '../projects.js';
 
-/* global Projects:true*/
-/* eslint no-undef: "error"*/
 
 Meteor.publish('projects', function projectsPublish() {
+  console.log(this.userId);
   const currentUser = Meteor.users.findOne(this.userId);
+  console.log(currentUser);
 
   if (currentUser == null || currentUser.profile == null) {
     return null;

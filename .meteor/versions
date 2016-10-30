@@ -25,6 +25,7 @@ ddp-rate-limiter@1.0.5
 ddp-server@1.2.10
 deps@1.0.12
 diff-sequence@1.0.6
+digilord:faker@1.0.7
 dispatch:mocha@0.0.9
 dispatch:mocha-phantomjs@0.1.7
 dispatch:phantomjs-tests@0.0.5
