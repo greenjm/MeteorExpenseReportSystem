@@ -6,13 +6,31 @@
 # Replace <container-name> with a custom name.
 
 APP_NAME:=meteorExpenseReport
-TARGET_DIRECTORY:=/home/meteorExpenseReport
+TARGET_DIRECTORY:=~/meteorExpenseReport
 SERVER_IP:=137.112.40.146
-IMAGE_NAME:=greenjm/meteorExpenseReport
-CONTAINER_NAME:=meteorExpenseReport
+IMAGE_NAME:=greenjm/meteor-expense-report-system
+CONTAINER_NAME:=meteor-expense-report-system
 TARBALL_NAME:=bundle.tar.gz.
-URL:=http://meteorexpreport.csse.rose-hulman.edu
+URL:=http://137.112.40.146
 PORT:=8085
+
+PHONY: dep
+dep:
+	@echo "-------------------------------------------------------"
+	@echo "Uploading and running app in a docker container"
+	@echo "-------------------------------------------------------"
+	@ssh csse@$(SERVER_IP) \
+        "cat > $(TARGET_DIRECTORY)/$(TARBALL_NAME) ; \
+        cd $(TARGET_DIRECTORY) ; \
+        tar -xzf ./$(TARBALL_NAME) ; \
+        cd ./bundle ; \
+        docker stop $(CONTAINER_NAME) ; \
+        docker rm $(CONTAINER_NAME) ; \
+        docker build --tag $(IMAGE_NAME) . ; \
+        docker run -p $(PORT):80 --name $(CONTAINER_NAME) -d $(IMAGE_NAME) ; \
+        " \
+   < ./deploy/$(TARBALL_NAME)
+
 
 PHONY: build
 build:
@@ -29,20 +47,3 @@ build:
 	@rm -rf ./bundle
 	@echo "Builded successfully!"
 	@echo "(the build output tarball is ./deploy/bundle.tar.gz)".
-
-PHONY: deploy
-deploy:
-	@echo "-------------------------------------------------------"
-	@echo "Uploading and running app in a docker container"
-	@echo "-------------------------------------------------------"
-	@ssh csse@$(SERVER_IP) \
-		"cat > $(TARGET_DIRECTORY)/$(TARBALL_NAME) ; \
-		cd $(TARGET_DIRECTORY) ; \
-		tar -xzf ./$(TARBALL_NAME) ; \
-		cd ./bundle ; \
-		docker stop $(CONTAINER_NAME) ; \
-		docker rm $(CONTAINER_NAME) ; \
-		docker build --tag $(IMAGE_NAME) . ; \
-		docker run -p $(PORT):80 --name $(CONTAINER_NAME) -d $(IMAGE_NAME) ; \
-		" \
-	< ./deploy/$(TARBALL_NAME)
