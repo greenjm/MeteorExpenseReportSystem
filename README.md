@@ -49,3 +49,8 @@ Employee users do not have a landing page yet, only a success message for loggin
 Admins cannot edit users yet, despite the pencil icon on the table.
 
 The "Profile" option in the hamburger menu doesn't do anything yet.
+
+## Deployment
+Deployment for this project is being handled by hosting a docker image on our own VM.
+Currently, deployment is a manual process, with the goal to automate it in the near future.
+The most recent deployed version can be reached at the url 137.112.40.146:8080 in any browser.
