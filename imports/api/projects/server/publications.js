@@ -8,9 +8,7 @@ import '../projects.js';
 
 
 Meteor.publish('projects', function projectsPublish() {
-  console.log(this.userId);
   const currentUser = Meteor.users.findOne(this.userId);
-  console.log(currentUser);
 
   if (currentUser == null || currentUser.profile == null) {
     return null;

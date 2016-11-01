@@ -26,20 +26,16 @@ if (Meteor.isServer) {
     });
 
     describe('publications', function () {
-      const adminId = Random.id();
-      Accounts.createUser({
-        _id: adminId,
-        username: 'user1+admin',
-        email: 'user+admin@rose-hulman.edu',
-        password: '12345678',
-        profile: {
-          isAdmin: true,
-        },
-      });
+      // const adminId = Accounts.createUser({
+      //   username: 'user1+admin',
+      //   email: 'user+admin@rose-hulman.edu',
+      //   password: '12345678',
+      //   profile: {
+      //     isAdmin: true,
+      //   },
+      // });
 
-      const manaId = Random.id();
-      Accounts.createUser({
-        _id: manaId,
+      const manaId = Accounts.createUser({
         username: 'user2',
         email: 'user2@rose-hulman.edu',
         password: '12345678',
@@ -48,9 +44,7 @@ if (Meteor.isServer) {
         },
       });
 
-      const empId = Random.id();
-      Accounts.createUser({
-        _id: empId,
+      const empId = Accounts.createUser({
         username: 'user3',
         email: 'user3@rose-hulman.edu',
         password: '12345678',
@@ -58,8 +52,6 @@ if (Meteor.isServer) {
           isAdmin: false,
         },
       });
-
-      console.log(Meteor.users.findOne(adminId));
 
       beforeEach(function () {
         Projects.remove({});
@@ -71,7 +63,7 @@ if (Meteor.isServer) {
 
       // describe('projectsPublish', function () {
       //   it('should return all projects for an admin', function () {
-      //     const collector = new PublicationCollector({ adminId });
+      //     const collector = new PublicationCollector({ userId: adminId });
       //     collector.collect('projects', (collections) => {
       //       chai.assert.typeOf(collections.Projects, 'array');
       //       chai.assert.equal(collections.Projects.length, 4);
@@ -83,8 +75,8 @@ if (Meteor.isServer) {
         it('should return all projects for a manager', function () {
           const collector = new PublicationCollector({ userId: manaId });
           collector.collect('projects', (collections) => {
-            chai.assert.typeOf(collections.Projects, 'array');
-            chai.assert.equal(collections.Projects.length, 2);
+            chai.assert.typeOf(collections.projects, 'array');
+            chai.assert.equal(collections.projects.length, 2);
           });
         });
       });
