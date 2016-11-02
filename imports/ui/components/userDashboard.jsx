@@ -53,6 +53,10 @@ const UserDashboard = React.createClass({
     hashHistory.push('/submitRequest');
   },
 
+  manageRequests() {
+    hashHistory.push('/manageRequests');
+  },
+
   render() {
     return (
       <div>
@@ -118,6 +122,7 @@ const UserDashboard = React.createClass({
                   style={buttonStyle}
                   icon={<ViewList />}
                   secondary
+                  onTouchTap={this.manageRequests}
                 />
               </Col>
             </Row>
