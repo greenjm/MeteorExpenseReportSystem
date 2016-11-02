@@ -53,8 +53,17 @@ const UserDashboard = React.createClass({
     hashHistory.push('/submitRequest');
   },
 
+<<<<<<< HEAD
   manageRequests() {
     hashHistory.push('/manageRequests');
+=======
+  viewRequests() {
+    hashHistory.push('/viewRequests');
+  },
+
+  submitReport() {
+    hashHistory.push('/submitReport');
+>>>>>>> 0bbe2bcc8bc9cd902e8078a3f12f429001853d25
   },
 
   render() {
@@ -96,6 +105,7 @@ const UserDashboard = React.createClass({
                   style={buttonStyle}
                   icon={<Description />}
                   primary
+                  onTouchTap={this.viewRequests}
                 />
                 <br />
                 <RaisedButton
@@ -104,6 +114,7 @@ const UserDashboard = React.createClass({
                   style={buttonStyle}
                   icon={<Assignment />}
                   secondary
+                  onTouchTap={this.submitReport}
                 />
               </Col>
               <Col xs={12} sm={12} md={6} lg={6} >

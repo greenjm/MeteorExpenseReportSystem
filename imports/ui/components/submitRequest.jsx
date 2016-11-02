@@ -57,8 +57,8 @@ const SubmitRequest = React.createClass({
         this.setState({ name: user.profile.name });
       }
       if (projectSub.ready()) {
-        const projects = Projects.find({ employees: Meteor.userId() }).fetch();
-        this.setState({ projects });
+        const projs = Projects.find({ employees: Meteor.userId() }).fetch();
+        this.setState({ projects: projs });
       }
     });
   },
