@@ -15,6 +15,9 @@ const AdminDashboard = require('../../ui/components/adminDashboard.jsx');
 const ProjectDetail = require('../../ui/components/projectDetail.jsx');
 const UserDashboard = require('../../ui/components/userDashboard.jsx');
 const SubmitRequest = require('../../ui/components/submitRequest.jsx');
+const ViewRequests = require('../../ui/components/viewRequests.jsx');
+const SubmitReport = require('../../ui/components/submitReport.jsx');
+const RequestDetail = require('../../ui/components/requestDetail.jsx');
 
 Meteor.startup(() => {
   injectTapEventPlugin();
@@ -26,6 +29,9 @@ Meteor.startup(() => {
         <Route path="/project*" component={ProjectDetail} />
         <Route path="/" component={Login} />
         <Route path="/submitRequest" component={SubmitRequest} />
+        <Route path="/viewRequests" component={ViewRequests} />
+        <Route path="/submitReport" component={SubmitReport} />
+        <Route path="/viewRequests/request*" component={RequestDetail} />
       </Router>
     </MuiThemeProvider>
   ), document.getElementById('app'));
