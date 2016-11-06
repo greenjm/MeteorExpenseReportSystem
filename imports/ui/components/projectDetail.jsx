@@ -33,7 +33,9 @@ const ProjectDetail = React.createClass({
       projectId: this.props.location.query.id,
       Name: '',
       Managers: [],
+      ManagerNames: [],
       Employees: [],
+      EmployeeNames: [],
       BornOn: '',
       Active: '',
       allEmployees: [],
@@ -44,10 +46,13 @@ const ProjectDetail = React.createClass({
     Tracker.autorun(() => {
       Meteor.subscribe('projectGet', this.state.projectId, () => {
         const project = Projects.findOne(this.state.projectId);
+
         this.setState({
           Name: project.name,
           Managers: project.managers,
+          ManagerNames: this.getNames(project.managers),
           Employees: project.employees,
+          EmployeeNames: this.getNames(project.employees),
           BornOn: project.bornOn.toString(),
           Active: !!project.isActive,
         });
@@ -56,6 +61,20 @@ const ProjectDetail = React.createClass({
         });
       });
     });
+  },
+
+  getNames(people) {
+    const ans = [];
+
+    if (people) {
+      for (let x = 0; x < people.length; x += 1) {
+        Meteor.call('users.getOne', people[x], (err, res) => {
+          ans.push(res.username);
+        });
+      }
+    }
+
+    return ans;
   },
 
   createUserRow(item) {
@@ -107,15 +126,17 @@ const ProjectDetail = React.createClass({
 
   addEmployee() {
     const index = document.getElementById('employeeList').selectedIndex;
-    const arr = this.state.Employees.slice();
-    arr.push(this.state.allEmployees[index].profile.name);
+    const arrIds = this.state.Employees.slice();
+    const arrNames = this.state.EmployeeNames.slice();
+    arrIds.push(this.state.allEmployees[index].profile._id);
+    arrNames.push(this.state.allEmployees[index].profile.name);
 
     Tracker.autorun(() => {
       Meteor.call('projects.addEmployee', this.state.projectId, this.state.allEmployees[index]._id, (err) => {
         if (err) {
           console.log(err);
         } else {
-          this.setState({ Employees: arr });
+          this.setState({ Employees: arrIds, EmployeeNames: arrNames });
         }
       });
     });
@@ -143,12 +164,12 @@ const ProjectDetail = React.createClass({
                   </TableRow>
                   <TableRow selectable={false}>
                     <TableRowColumn>
-                      <div>Managers: {this.state.Managers.join(', ')}</div>
+                      <div>Managers: {this.state.ManagerNames.join(', ')}</div>
                     </TableRowColumn>
                   </TableRow>
                   <TableRow>
                     <TableRowColumn>
-                      <div>Employees: {this.state.Employees.join(', ')}</div>
+                      <div>Employees: {this.state.EmployeeNames.join(', ')}</div>
                     </TableRowColumn>
                   </TableRow>
                   <TableRow>
@@ -185,3 +206,6 @@ const ProjectDetail = React.createClass({
 });
 
 module.exports = ProjectDetail;
+
+
+// <div>Managers: {this.state.Managers.join(', ')}</div>
