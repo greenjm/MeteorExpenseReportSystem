@@ -23,7 +23,6 @@ const React = require('react');
 const sub = Meteor.subscribe('projects');
 const userSub = Meteor.subscribe('users');
 
-// Styles
 const paperStyle = {
   height: '35px',
   lineHeight: '35px',
@@ -119,26 +118,6 @@ const AdminDashboard = React.createClass({
     this.createItem(projectName, 4);
   },
 
-  showForm() {
-    document.getElementById('projectForm').style.display = 'block';
-  },
-
-  hideForm() {
-    document.getElementById('projectForm').style.display = 'none';
-    document.getElementById('name').value = '';
-    document.getElementById('project').value = '';
-  },
-
-  showUserForm() {
-    document.getElementById('userForm').style.display = 'block';
-  },
-
-  hideUserForm() {
-    document.getElementById('userForm').style.display = 'none';
-    document.getElementById('userName').value = '';
-    document.getElementById('userID').value = '';
-  },
-
   // User Dialog functions
   emptyUserFieldError() {
     if (this.state.newUserEmail === '') {
@@ -170,10 +149,12 @@ const AdminDashboard = React.createClass({
   },
 
   closeUserDialog() {
-    this.setState({ newUserDialogOpen: false,
-                    newUserName: '',
-                    newUserEmail: '',
-                    isAdmin: false });
+    this.setState({
+      newUserDialogOpen: false,
+      newUserName: '',
+      newUserEmail: '',
+      isAdmin: false,
+    });
   },
 
   openUserDialog() {
@@ -207,14 +188,13 @@ const AdminDashboard = React.createClass({
       this.emptyProjectFieldError();
       return;
     }
-    Meteor.call('projects.create', this.state.newProjectName, this.state.projectManager, (err, res) => {
-      if (err != null) {
+    Meteor.call('projects.create', this.state.newProjectName, this.state.projectManager, (err) => {
+      if (err) {
         this.setState({ dialogError: `Error: ${err.error}. Reason: ${err.reason}` });
         return;
       }
-      if (res) {
-        this.setState({ dialogError: '', newProjectName: '', projectManager: '' });
-      }
+
+      this.setState({ dialogError: '', newProjectName: '', projectManager: '' });
       this.closeProjectDialog();
     });
   },
@@ -237,7 +217,7 @@ const AdminDashboard = React.createClass({
 
   createUserMenuItem(item) {
     return (
-      <MenuItem value={item._id} primaryText={item.profile.name} />
+      <MenuItem value={item._id} key={item._id} primaryText={item.profile.name} />
     );
   },
 
@@ -278,9 +258,7 @@ const AdminDashboard = React.createClass({
           <Grid>
             <Row>
               <Col xs={12} sm={12} md={6} lg={6}>
-                <Table
-                  selectable={false}
-                >
+                <Table selectable={false}>
                   <TableHeader displaySelectAll={false}>
                     <TableRow selectable={false}>
                       <TableHeaderColumn colSpan="3" style={{ textAlign: 'center' }}>
@@ -303,9 +281,7 @@ const AdminDashboard = React.createClass({
                 </Table>
               </Col>
               <Col xs={12} sm={12} md={6} lg={6}>
-                <Table
-                  selectable={false}
-                >
+                <Table selectable={false}>
                   <TableHeader displaySelectAll={false}>
                     <TableRow selectable={false}>
                       <TableHeaderColumn colSpan="2" style={{ textAlign: 'center' }}>
@@ -390,7 +366,7 @@ const AdminDashboard = React.createClass({
           <div style={{ color: 'red' }}>{this.state.dialogError}</div>
         </Dialog>
       </div>
-      );
+    );
   },
 });
 
