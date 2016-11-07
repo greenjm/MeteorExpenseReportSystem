@@ -7,13 +7,11 @@ import Paper from 'material-ui/Paper';
 import '../../api/projects/projects.js';
 import Header from './header.jsx';
 
-
 /* global Projects:true*/
 /* eslint no-undef: "error"*/
 
 const React = require('react');
 
-// Styles
 const paperStyle = {
   height: '35px',
   lineHeight: '35px',
@@ -46,7 +44,6 @@ const ProjectDetail = React.createClass({
     Tracker.autorun(() => {
       Meteor.subscribe('projectGet', this.state.projectId, () => {
         const project = Projects.findOne(this.state.projectId);
-
         this.setState({
           Name: project.name,
           Managers: project.managers,
@@ -95,28 +92,16 @@ const ProjectDetail = React.createClass({
   editProject() {
     if (this.state.Active) {
       Tracker.autorun(() => {
-        Meteor.call('projects.activate', this.state.projectId, (err) => {
-          if (err) {
-            console.log(err);
-          }
-        });
+        Meteor.call('projects.activate', this.state.projectId);
       });
     } else {
       Tracker.autorun(() => {
-        Meteor.call('projects.deactivate', this.state.projectId, (err) => {
-          if (err) {
-            console.log(err);
-          }
-        });
+        Meteor.call('projects.deactivate', this.state.projectId);
       });
     }
 
     Tracker.autorun(() => {
-      Meteor.call('projects.editName', this.state.projectId, this.state.Name, (err) => {
-        if (err) {
-          console.log(err);
-        }
-      });
+      Meteor.call('projects.editName', this.state.projectId, this.state.Name);
     });
   },
 
@@ -133,9 +118,7 @@ const ProjectDetail = React.createClass({
 
     Tracker.autorun(() => {
       Meteor.call('projects.addEmployee', this.state.projectId, this.state.allEmployees[index]._id, (err) => {
-        if (err) {
-          console.log(err);
-        } else {
+        if (!err) {
           this.setState({ Employees: arrIds, EmployeeNames: arrNames });
         }
       });
@@ -206,6 +189,3 @@ const ProjectDetail = React.createClass({
 });
 
 module.exports = ProjectDetail;
-
-
-// <div>Managers: {this.state.Managers.join(', ')}</div>

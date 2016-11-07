@@ -15,10 +15,8 @@ import Header from './header.jsx';
 
 const React = require('react');
 
-// Subscriptions
 const projectSub = Meteor.subscribe('projects');
 
-// Styles
 const paperStyle = {
   height: '35px',
   lineHeight: '35px',
@@ -69,6 +67,7 @@ const SubmitRequest = React.createClass({
 
   submitRequest() {
     this.setState({ dialogError: '' });
+
     const requiredError = 'This field is required.';
     const numError = 'You must enter a number.';
     let hasError = false;

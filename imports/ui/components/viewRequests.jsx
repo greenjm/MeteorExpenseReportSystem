@@ -31,7 +31,6 @@ const ViewRequests = React.createClass({
   componentWillMount() {
     Tracker.autorun(() => {
       Meteor.subscribe('requests', () => {
-        console.log(Requests.find().fetch());
         this.setState({ requests: Requests.find().fetch() });
       });
     });
