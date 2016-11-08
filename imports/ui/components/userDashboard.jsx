@@ -53,17 +53,15 @@ const UserDashboard = React.createClass({
     hashHistory.push('/submitRequest');
   },
 
-<<<<<<< HEAD
   manageRequests() {
     hashHistory.push('/manageRequests');
-=======
+
   viewRequests() {
     hashHistory.push('/viewRequests');
   },
 
   submitReport() {
     hashHistory.push('/submitReport');
->>>>>>> 0bbe2bcc8bc9cd902e8078a3f12f429001853d25
   },
 
   render() {
