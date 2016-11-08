@@ -61,10 +61,10 @@ const SubmitReport = React.createClass({
   },
 
   submitReport() {
-    let acceptedRequests = [];
-    for (let i = 0; i < requests.length; i += 1) {
-      if (requests[i].stat) {
-        acceptedRequests.push(requests[i]);
+    const acceptedRequests = [];
+    for (let i = 0; i < this.state.requests.length; i += 1) {
+      if (this.state.requests[i].stat) {
+        acceptedRequests.push(this.state.requests[i]);
       }
     }
     // TODO:
