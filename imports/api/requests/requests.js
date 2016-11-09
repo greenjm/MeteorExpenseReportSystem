@@ -32,10 +32,10 @@ Factory.define('request', Requests, {
   userId: () => '',
   projectId: () => '',
   bornOn: () => new Date(),
-  description: () => faker.lorem.sentence(),
+  description: () => faker.lorem.sentence(5),
   estCost: () => 1.00,
-  vendor: () => faker.lorem.word(),
-  partNo: () => faker.lorem.word(),
+  vendor: () => faker.lorem.word,
+  partNo: () => faker.lorem.word,
   quantity: () => 1,
   unitCost: () => 1.00,
 });
