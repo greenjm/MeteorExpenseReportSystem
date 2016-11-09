@@ -50,12 +50,14 @@ const AdminDashboard = React.createClass({
       projectNames: [],
       projectIds: [],
       users: [],
-      newUserDialogOpen: false,
+      editUserDialogOpen: false,
       newProjectDialogOpen: false,
-      newUserEmail: '',
-      newUserName: '',
-      emailError: '',
+      editUserId: '',
+      userName: '',
       userNameError: '',
+      autoInternet: false,
+      autoPhone: false,
+      emailError: '',
       isAdmin: false,
       dialogError: '',
       newProjectName: '',
@@ -94,7 +96,7 @@ const AdminDashboard = React.createClass({
         <TableRowColumn>{item.profile.name}</TableRowColumn>
         <TableRowColumn>{item.emails[0].address}</TableRowColumn>
         <TableRowColumn style={actionsColStyle}>
-          <FloatingActionButton mini zDepth={1}>
+          <FloatingActionButton mini zDepth={1} onTouchTap={() => this.editUser(item)}>
             <i className="material-icons">edit</i>
           </FloatingActionButton>
         </TableRowColumn>
@@ -128,23 +130,27 @@ const AdminDashboard = React.createClass({
     if (this.state.newUserName === '') {
       this.setState({ userNameError: 'This field is required.' });
     }
-  },
 
   submitUser() {
-    if (this.state.newUserEmail === '' || this.state.newUserName === '') {
-      this.emptyUserFieldError();
+    if (this.state.userName === '') {
+      this.setState({ userNameError: 'This field is required.' });
       return;
     }
-    Meteor.call('users.new', this.state.newUserEmail,
-      this.state.newUserName,
-      this.state.isAdmin,
+    const profile = {
+      name: this.state.userName,
+      autoInternet: this.state.autoInternet,
+      autoPhone: this.state.autoPhone,
+      isAdmin: this.state.isAdmin,
+    };
+    Meteor.call('users.update', this.state.editUserId,
+      profile,
       (error, result) => {
         if (error != null) {
           this.setState({ dialogError: `Error: ${error.error}. Reason: ${error.reason}` });
           return;
         }
         if (result) {
-          this.setState({ dialogError: '', newUserName: '', newUserEmail: '', isAdmin: false });
+          this.setState({ dialogError: '' });
         }
         this.closeUserDialog();
       });
@@ -161,15 +167,32 @@ const AdminDashboard = React.createClass({
 
   // State Bindings
   openUserDialog() {
-    this.setState({ newUserDialogOpen: true });
+    this.setState({ editUserDialogOpen: true });
   },
 
-  handleEmailChange(event) {
-    this.setState({ newUserEmail: event.target.value, emailError: '' });
+  editUser(user) {
+    this.setState({
+      editUserId: user._id,
+      userName: user.profile.name,
+      userNameError: '',
+      autoInternet: user.profile.autoInternet,
+      autoPhone: user.profile.autoPhone,
+      isAdmin: user.profile.isAdmin,
+      dialogError: '',
+    });
+    this.openUserDialog();
   },
 
   handleUserNameChange(event) {
-    this.setState({ newUserName: event.target.value, userNameError: '' });
+    this.setState({ userName: event.target.value, userNameError: '' });
+  },
+
+  handleAutoInternetChange() {
+    this.setState({ autoInternet: !this.state.autoInternet });
+  },
+
+  handleAutoPhoneChange() {
+    this.setState({ autoPhone: !this.state.autoPhone });
   },
 
   handleIsAdminChange() {
@@ -182,6 +205,22 @@ const AdminDashboard = React.createClass({
 
   openProjectDialog() {
     this.setState({ newProjectDialogOpen: true });
+  },
+
+  handleProjectNameChange(event) {
+    this.setState({ newProjectName: event.target.value, projectNameError: '' });
+  },
+
+  handleManagerChange(event, index, value) {
+    this.setState({ projectManager: value, managerError: '' });
+  },
+
+  closeProjectDialog() {
+    this.setState({ newProjectDialogOpen: false });
+  },
+
+  openProjectDialog() {
+    this.setState({ newProjectDialogOpen: true, dialogError: '' });
   },
 
   handleProjectNameChange(event) {
@@ -232,7 +271,7 @@ const AdminDashboard = React.createClass({
         onTouchTap={this.closeUserDialog}
       />,
       <FlatButton
-        label="Add"
+        label="Save"
         primary
         onTouchTap={this.submitUser}
       />,
@@ -263,12 +302,6 @@ const AdminDashboard = React.createClass({
               <Col xs={12} sm={12} md={6} lg={6}>
                 <Table selectable={false}>
                   <TableHeader displaySelectAll={false}>
-                    <TableRow selectable={false}>
-                      <TableHeaderColumn colSpan="3" style={{ textAlign: 'center' }}>
-                        <RaisedButton label="New" primary style={tableHeaderButtonStyle} onTouchTap={this.openUserDialog} />
-                        Users
-                      </TableHeaderColumn>
-                    </TableRow>
                     <TableRow selectable={false}>
                       <TableHeaderColumn>Name</TableHeaderColumn>
                       <TableHeaderColumn>Email</TableHeaderColumn>
@@ -308,30 +341,36 @@ const AdminDashboard = React.createClass({
             </Row>
           </Grid>
         </div>
+
         <Dialog
-          title="Add New User"
+          title="Edit User"
           actions={userDialogActions}
           modal={false}
-          open={this.state.newUserDialogOpen}
+          open={this.state.editUserDialogOpen}
           onRequestClose={this.closeUserDialog}
         >
-          <TextField
-            hintText="email"
-            floatingLabelText="Email Address"
-            fullWidth
-            value={this.state.newUserEmail}
-            errorText={this.state.emailError}
-            name="newUserEmail"
-            onChange={this.handleEmailChange}
-          />
           <TextField
             hintText="name"
             floatingLabelText="Full Name"
             fullWidth
-            value={this.state.newUserName}
+            value={this.state.userName}
             errorText={this.state.userNameError}
-            name="newUserEmail"
+            name="userName"
             onChange={this.handleUserNameChange}
+          />
+          <br />
+          <Toggle
+            label="Auto Internet?"
+            style={switchStyle}
+            toggled={this.state.autoInternet}
+            onToggle={this.handleAutoInternetChange}
+          />
+          <br />
+          <Toggle
+            label="Auto Phone?"
+            style={switchStyle}
+            toggled={this.state.autoPhone}
+            onToggle={this.handleAutoPhoneChange}
           />
           <br />
           <Toggle
@@ -356,7 +395,7 @@ const AdminDashboard = React.createClass({
             fullWidth
             value={this.state.newProjectName}
             errorText={this.state.projectNameError}
-            name="newUserEmail"
+            name="newProjectName"
             onChange={this.handleProjectNameChange}
           />
           <SelectField
