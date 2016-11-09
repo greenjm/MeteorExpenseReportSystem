@@ -12,10 +12,10 @@ Meteor.publish('requests', function requestsPublish() {
     return null;
   }
 
-  // if (currentUser.profile.isAdmin) {
-  //   const reports = Reports.find();
-  //   return reports;
-  // }
+  if (currentUser.profile.isAdmin) {
+    const requests = Requests.find();
+    return requests;
+  }
 
   const requests = Requests.find({ userId: this.userId });
   return requests;
