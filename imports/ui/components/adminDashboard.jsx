@@ -20,9 +20,11 @@ import Header from './header.jsx';
 
 const React = require('react');
 
+// Subscriptions
 const sub = Meteor.subscribe('projects');
 const userSub = Meteor.subscribe('users');
 
+// Styles
 const paperStyle = {
   height: '35px',
   lineHeight: '35px',
@@ -157,6 +159,7 @@ const AdminDashboard = React.createClass({
     });
   },
 
+  // State Bindings
   openUserDialog() {
     this.setState({ newUserDialogOpen: true });
   },
@@ -171,6 +174,22 @@ const AdminDashboard = React.createClass({
 
   handleIsAdminChange() {
     this.setState({ isAdmin: !this.state.isAdmin });
+  },
+
+  closeProjectDialog() {
+    this.setState({ newProjectDialogOpen: false });
+  },
+
+  openProjectDialog() {
+    this.setState({ newProjectDialogOpen: true });
+  },
+
+  handleProjectNameChange(event) {
+    this.setState({ newProjectName: event.target.value, projectNameError: '' });
+  },
+
+  handleManagerChange(event, index, value) {
+    this.setState({ projectManager: value, managerError: '' });
   },
 
   // Project Dialog functions
@@ -197,22 +216,6 @@ const AdminDashboard = React.createClass({
       this.setState({ dialogError: '', newProjectName: '', projectManager: '' });
       this.closeProjectDialog();
     });
-  },
-
-  closeProjectDialog() {
-    this.setState({ newProjectDialogOpen: false });
-  },
-
-  openProjectDialog() {
-    this.setState({ newProjectDialogOpen: true });
-  },
-
-  handleProjectNameChange(event) {
-    this.setState({ newProjectName: event.target.value, projectNameError: '' });
-  },
-
-  handleManagerChange(event, index, value) {
-    this.setState({ projectManager: value, managerError: '' });
   },
 
   createUserMenuItem(item) {

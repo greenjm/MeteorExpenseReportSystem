@@ -6,6 +6,7 @@ import TextField from 'material-ui/TextField';
 
 const React = require('react');
 
+// Styles
 const cardStyle = {
   width: '35%',
   margin: 'auto',
@@ -71,6 +72,7 @@ const Login = React.createClass({
     this.setState({ username: '', password: '', passwordError: 'Either email or password is incorrect.' });
   },
 
+  // State Bindings
   handleUsernameChange(event) {
     this.setState({ username: event.target.value, usernameError: '' });
   },

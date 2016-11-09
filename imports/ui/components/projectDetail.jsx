@@ -12,6 +12,7 @@ import Header from './header.jsx';
 
 const React = require('react');
 
+// Styles
 const paperStyle = {
   height: '35px',
   lineHeight: '35px',
@@ -81,6 +82,7 @@ const ProjectDetail = React.createClass({
       </TableRow>);
   },
 
+  // State Bindings
   toggleActive() {
     this.setState({ Active: !this.state.Active });
   },

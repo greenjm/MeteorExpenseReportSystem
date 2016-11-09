@@ -17,6 +17,7 @@ const React = require('react');
 
 const projectSub = Meteor.subscribe('projects');
 
+// Styles
 const paperStyle = {
   height: '35px',
   lineHeight: '35px',
@@ -143,6 +144,7 @@ const SubmitRequest = React.createClass({
       });
   },
 
+  // State Bindings
   // Project select methods
   handleProjectSelect(event, index, value) {
     this.setState({ projectSelected: value, projectSelectedError: '' });
