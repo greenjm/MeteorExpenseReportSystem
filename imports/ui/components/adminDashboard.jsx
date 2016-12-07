@@ -130,6 +130,7 @@ const AdminDashboard = React.createClass({
     if (this.state.newUserName === '') {
       this.setState({ userNameError: 'This field is required.' });
     }
+  },
 
   submitUser() {
     if (this.state.userName === '') {
@@ -197,22 +198,6 @@ const AdminDashboard = React.createClass({
 
   handleIsAdminChange() {
     this.setState({ isAdmin: !this.state.isAdmin });
-  },
-
-  closeProjectDialog() {
-    this.setState({ newProjectDialogOpen: false });
-  },
-
-  openProjectDialog() {
-    this.setState({ newProjectDialogOpen: true });
-  },
-
-  handleProjectNameChange(event) {
-    this.setState({ newProjectName: event.target.value, projectNameError: '' });
-  },
-
-  handleManagerChange(event, index, value) {
-    this.setState({ projectManager: value, managerError: '' });
   },
 
   closeProjectDialog() {
