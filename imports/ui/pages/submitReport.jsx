@@ -84,7 +84,7 @@ const SubmitReport = React.createClass({
   render() {
     return (
       <div>
-        <Header isAdmine={this.props.isAdmin} />
+        <Header isAdmin={this.props.isAdmin} />
         <Paper style={paperStyle} zDepth={1}>Expense Requests</Paper>
         <br />
         <br />
