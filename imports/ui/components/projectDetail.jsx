@@ -7,7 +7,6 @@ import Paper from 'material-ui/Paper';
 import '../../api/projects/projects.js';
 import Header from './header.jsx';
 
-
 /* global Projects:true*/
 /* eslint no-undef: "error"*/
 
@@ -33,7 +32,9 @@ const ProjectDetail = React.createClass({
       projectId: this.props.location.query.id,
       Name: '',
       Managers: [],
+      ManagerNames: [],
       Employees: [],
+      EmployeeNames: [],
       BornOn: '',
       Active: '',
       allEmployees: [],
@@ -47,7 +48,9 @@ const ProjectDetail = React.createClass({
         this.setState({
           Name: project.name,
           Managers: project.managers,
+          ManagerNames: this.getNames(project.managers),
           Employees: project.employees,
+          EmployeeNames: this.getNames(project.employees),
           BornOn: project.bornOn.toString(),
           Active: !!project.isActive,
         });
@@ -58,6 +61,20 @@ const ProjectDetail = React.createClass({
     });
   },
 
+  getNames(people) {
+    const ans = [];
+
+    if (people) {
+      for (let x = 0; x < people.length; x += 1) {
+        Meteor.call('users.getOne', people[x], (err, res) => {
+          ans.push(res.username);
+        });
+      }
+    }
+
+    return ans;
+  },
+
   createUserRow(item) {
     return (
       <TableRow key={item._id} selectable={false}>
@@ -65,6 +82,7 @@ const ProjectDetail = React.createClass({
       </TableRow>);
   },
 
+  // State Bindings
   toggleActive() {
     this.setState({ Active: !this.state.Active });
   },
@@ -76,28 +94,16 @@ const ProjectDetail = React.createClass({
   editProject() {
     if (this.state.Active) {
       Tracker.autorun(() => {
-        Meteor.call('projects.activate', this.state.projectId, (err) => {
-          if (err) {
-            console.log(err);
-          }
-        });
+        Meteor.call('projects.activate', this.state.projectId);
       });
     } else {
       Tracker.autorun(() => {
-        Meteor.call('projects.deactivate', this.state.projectId, (err) => {
-          if (err) {
-            console.log(err);
-          }
-        });
+        Meteor.call('projects.deactivate', this.state.projectId);
       });
     }
 
     Tracker.autorun(() => {
-      Meteor.call('projects.editName', this.state.projectId, this.state.Name, (err) => {
-        if (err) {
-          console.log(err);
-        }
-      });
+      Meteor.call('projects.editName', this.state.projectId, this.state.Name);
     });
   },
 
@@ -107,15 +113,15 @@ const ProjectDetail = React.createClass({
 
   addEmployee() {
     const index = document.getElementById('employeeList').selectedIndex;
-    const arr = this.state.Employees.slice();
-    arr.push(this.state.allEmployees[index].profile.name);
+    const arrIds = this.state.Employees.slice();
+    const arrNames = this.state.EmployeeNames.slice();
+    arrIds.push(this.state.allEmployees[index].profile._id);
+    arrNames.push(this.state.allEmployees[index].profile.name);
 
     Tracker.autorun(() => {
       Meteor.call('projects.addEmployee', this.state.projectId, this.state.allEmployees[index]._id, (err) => {
-        if (err) {
-          console.log(err);
-        } else {
-          this.setState({ Employees: arr });
+        if (!err) {
+          this.setState({ Employees: arrIds, EmployeeNames: arrNames });
         }
       });
     });
@@ -143,12 +149,12 @@ const ProjectDetail = React.createClass({
                   </TableRow>
                   <TableRow selectable={false}>
                     <TableRowColumn>
-                      <div>Managers: {this.state.Managers.join(', ')}</div>
+                      <div>Managers: {this.state.ManagerNames.join(', ')}</div>
                     </TableRowColumn>
                   </TableRow>
                   <TableRow>
                     <TableRowColumn>
-                      <div>Employees: {this.state.Employees.join(', ')}</div>
+                      <div>Employees: {this.state.EmployeeNames.join(', ')}</div>
                     </TableRowColumn>
                   </TableRow>
                   <TableRow>
