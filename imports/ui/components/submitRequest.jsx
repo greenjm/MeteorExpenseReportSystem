@@ -15,7 +15,6 @@ import Header from './header.jsx';
 
 const React = require('react');
 
-// Subscriptions
 const projectSub = Meteor.subscribe('projects');
 
 // Styles
@@ -69,6 +68,7 @@ const SubmitRequest = React.createClass({
 
   submitRequest() {
     this.setState({ dialogError: '' });
+
     const requiredError = 'This field is required.';
     const numError = 'You must enter a number.';
     let hasError = false;
@@ -151,6 +151,7 @@ const SubmitRequest = React.createClass({
       });
   },
 
+  // State Bindings
   // Project select methods
   handleProjectSelect(event, index, value) {
     this.setState({ projectSelected: value, projectSelectedError: '' });

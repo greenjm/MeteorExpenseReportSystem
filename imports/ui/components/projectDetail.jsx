@@ -13,7 +13,6 @@ import MenuItem from 'material-ui/MenuItem';
 import '../../api/projects/projects.js';
 import Header from './header.jsx';
 
-
 /* global Projects:true*/
 /* eslint no-undef: "error"*/
 
@@ -39,7 +38,9 @@ const ProjectDetail = React.createClass({
       projectId: this.props.location.query.id,
       Name: '',
       Managers: [],
+      ManagerNames: [],
       Employees: [],
+      EmployeeNames: [],
       BornOn: '',
       Active: '',
       allEmployees: [],
@@ -56,16 +57,31 @@ const ProjectDetail = React.createClass({
         this.setState({
           Name: project.name,
           Managers: project.managers,
+          ManagerNames: this.getNames(project.managers),
           Employees: project.employees,
+          EmployeeNames: this.getNames(project.employees),
           BornOn: project.bornOn.toString(),
           Active: !!project.isActive,
         });
         Meteor.subscribe('users', () => {
-          console.log(Meteor.users.find().fetch());
           this.setState({ allEmployees: Meteor.users.find().fetch() });
         });
       });
     });
+  },
+
+  getNames(people) {
+    const ans = [];
+
+    if (people) {
+      for (let x = 0; x < people.length; x += 1) {
+        Meteor.call('users.getOne', people[x], (err, res) => {
+          ans.push(res.profile.name);
+        });
+      }
+    }
+
+    return ans;
   },
 
   createUserRow(item) {
@@ -75,8 +91,10 @@ const ProjectDetail = React.createClass({
       </TableRow>);
   },
 
+  // State Bindings
   toggleActive() {
-    this.setState({ Active: !this.state.Active });
+    const toggled = this.state.Active;
+    this.setState({ Active: !toggled });
   },
 
   changeName(event) {
@@ -90,48 +108,50 @@ const ProjectDetail = React.createClass({
   editProject() {
     if (this.state.Active) {
       Tracker.autorun(() => {
-        Meteor.call('projects.activate', this.state.projectId, (err) => {
-          if (err) {
-            console.log(err);
-          }
-        });
+        Meteor.call('projects.activate', this.state.projectId);
       });
     } else {
       Tracker.autorun(() => {
-        Meteor.call('projects.deactivate', this.state.projectId, (err) => {
-          if (err) {
-            console.log(err);
-          }
-        });
+        Meteor.call('projects.deactivate', this.state.projectId);
       });
     }
 
+    if (this.state.employeeSelected) {
+      this.addEmployee();
+    }
+
     Tracker.autorun(() => {
-      Meteor.call('projects.editName', this.state.projectId, this.state.Name, (err) => {
-        if (err) {
-          console.log(err);
-        }
-      });
+      Meteor.call('projects.editName', this.state.projectId, this.state.Name);
     });
   },
 
   createEmployeeMenuItem(item) {
     return (
-      <MenuItem value={item.profile.name} primaryText={item.name} key={item._id} />
+      <MenuItem value={item._id} primaryText={item.profile.name} key={item._id} />
     );
   },
 
   addEmployee() {
     const selected = this.state.employeeSelected;
-    const arr = this.state.Employees.slice();
-    arr.push(selected.profile.name);
+    let index = -1;
+
+    for (let x = 0; x < this.state.allEmployees.length; x += 1) {
+      if (selected === this.state.allEmployees[x]._id) {
+        index = x;
+        break;
+      }
+    }
+
+    const arrIds = this.state.Employees.slice();
+    const arrNames = this.state.EmployeeNames.slice();
+
+    arrIds.push(this.state.allEmployees[index].profile._id);
+    arrNames.push(this.state.allEmployees[index].profile.name);
 
     Tracker.autorun(() => {
-      Meteor.call('projects.addEmployee', this.state.projectId, this.state.allEmployees[index]._id, (err) => {
-        if (err) {
-          console.log(err);
-        } else {
-          this.setState({ Employees: arr });
+      Meteor.call('projects.addEmployee', this.state.projectId, selected, (err) => {
+        if (!err) {
+          this.setState({ Employees: arrIds, EmployeeNames: arrNames });
         }
       });
     });
@@ -152,7 +172,7 @@ const ProjectDetail = React.createClass({
           <Row>
             <Col xs={12} sm={12} md={12} lg={12}>
               <Paper style={{ textAlign: 'center', padding: '10px' }} zDepth={1}>
-                <form onSubmit={this.submitRequest}>
+                <form onSubmit={this.editProject}>
                   <TextField
                     hintText="Name"
                     value={this.state.Name}
@@ -162,13 +182,13 @@ const ProjectDetail = React.createClass({
                   />
                   <TextField
                     hintText="Managers"
-                    value={this.state.Managers.join(', ')}
+                    value={this.state.ManagerNames.join(', ')}
                     fullWidth
                     readOnly
                   />
                   <TextField
                     hintText="Employees"
-                    value={this.state.Employees.join(', ')}
+                    value={this.state.EmployeeNames.join(', ')}
                     fullWidth
                     readOnly
                   />
@@ -176,15 +196,17 @@ const ProjectDetail = React.createClass({
                     hintText="Start Date"
                     value={this.state.BornOn}
                     fullWidth
+                    readOnly
                   />
                   <Checkbox
                     label="Active"
                     checked={!!this.state.Active}
+                    onClick={this.toggleActive}
                   />
                   <SelectField
                     floatingLabelText="Add Employee"
                     value={this.state.employeeSelected}
-                    onChange={this.addEmployee}
+                    onChange={this.handleEmployeeSelect}
                     errorText={this.state.employeeSelectedError}
                     fullWidth
                   >

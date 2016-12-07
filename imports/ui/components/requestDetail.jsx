@@ -13,6 +13,7 @@ import '../../api/requests/requests.js';
 
 const React = require('react');
 
+// Styles
 const paperStyle = {
   height: '35px',
   lineHeight: '35px',
@@ -64,6 +65,7 @@ const RequestDetail = React.createClass({
     });
   },
 
+  // State Bindings
   changeDescription(e) {
     this.setState({ description: e.target.value });
   },
