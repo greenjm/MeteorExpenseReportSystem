@@ -1,5 +1,4 @@
 import { Meteor } from 'meteor/meteor';
-import { Tracker } from 'meteor/tracker';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
 import { hashHistory } from 'react-router';
 import TextField from 'material-ui/TextField';
@@ -8,15 +7,9 @@ import SelectField from 'material-ui/SelectField';
 import Snackbar from 'material-ui/Snackbar';
 import MenuItem from 'material-ui/MenuItem';
 import Paper from 'material-ui/Paper';
-import Header from './header.jsx';
-
-/* global Projects:true*/
-/* eslint no-undef: "error"*/
+import Header from '../components/header.jsx';
 
 const React = require('react');
-
-// Subscriptions
-const projectSub = Meteor.subscribe('projects');
 
 // Styles
 const paperStyle = {
@@ -27,6 +20,11 @@ const paperStyle = {
 };
 
 const SubmitRequest = React.createClass({
+  propTypes: {
+    projects: React.PropTypes.array,
+    isAdmin: React.PropTypes.bool,
+  },
+
   getInitialState() {
     return {
       projects: [],
@@ -50,16 +48,19 @@ const SubmitRequest = React.createClass({
   },
 
   componentWillMount() {
-    Tracker.autorun(() => {
-      const user = Meteor.user();
-      const profileExists = user && user.profile;
-      if (profileExists) {
-        this.setState({ name: user.profile.name });
-      }
-      if (projectSub.ready()) {
-        const projs = Projects.find({ employees: Meteor.userId() }).fetch();
-        this.setState({ projects: projs });
-      }
+    this.setState({
+      projects: this.props.projects,
+    });
+  },
+
+  componentWillReceiveProps(nextProps) {
+    if (!nextProps.user) {
+      hashHistory.push('/');
+    }
+
+    const projectsChange = this.state.projects !== nextProps.projects;
+    this.setState({
+      projects: projectsChange ? nextProps.projects : this.state.projects,
     });
   },
 
@@ -226,7 +227,7 @@ const SubmitRequest = React.createClass({
   render() {
     return (
       <div>
-        <Header />
+        <Header isAdmin={this.props.isAdmin} />
         <Paper style={paperStyle} zDepth={1}>Submit a new Request</Paper>
         <br />
         <br />

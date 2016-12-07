@@ -1,11 +1,12 @@
 import { Meteor } from 'meteor/meteor';
+import { hashHistory } from 'react-router';
 import { Tracker } from 'meteor/tracker';
 import { Table, TableHeader, TableRow, TableRowColumn }
   from 'material-ui/Table';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
 import Paper from 'material-ui/Paper';
 import '../../api/projects/projects.js';
-import Header from './header.jsx';
+import Header from '../components/header.jsx';
 
 
 /* global Projects:true*/
@@ -40,21 +41,24 @@ const ProjectDetail = React.createClass({
     };
   },
 
-  componentWillMount() {
-    Tracker.autorun(() => {
-      Meteor.subscribe('projectGet', this.state.projectId, () => {
-        const project = Projects.findOne(this.state.projectId);
-        this.setState({
-          Name: project.name,
-          Managers: project.managers,
-          Employees: project.employees,
-          BornOn: project.bornOn.toString(),
-          Active: !!project.isActive,
-        });
-        Meteor.subscribe('users', () => {
-          this.setState({ allEmployees: Meteor.users.find().fetch() });
-        });
-      });
+  componentWillReceiveProps(nextProps) {
+    if (!nextProps.user || !nextProps.isAdmin) {
+      hashHistory.push('/');
+    }
+
+    const nameChange = this.state.Name !== nextProps.name;
+    const managersChange = this.state.Managers !== nextProps.manager;
+    const employeesChange = this.state.Employees !== nextProps.employees;
+    const bornOnChange = this.state.BornOn !== nextProps.bornOn;
+    const activeChange = this.state.Active !== nextProps.isActive;
+    const allEmployeeChange = this.state.allEmployees !== nextProps.users;
+    this.setState({
+      Name: nameChange ? nextProps.name : this.state.Name,
+      Managers: managersChange ? nextProps.managers : this.state.Managers,
+      Employees: employeesChange ? nextProps.employees : this.state.Employees,
+      BornOn: bornOnChange ? nextProps.bornOn.toString() : this.state.BornOn,
+      Active: activeChange ? nextProps.isActive : this.state.Active,
+      allEmployees: allEmployeeChange ? nextProps.users : this.state.allEmployees,
     });
   },
 
@@ -124,7 +128,7 @@ const ProjectDetail = React.createClass({
   render() {
     return (
       <div>
-        <Header />
+        <Header isAdmin={this.props.isAdmin} />
         <Paper style={paperStyle} zDepth={1}>Project Detail: {this.state.Name}</Paper>
         <br />
         <br />

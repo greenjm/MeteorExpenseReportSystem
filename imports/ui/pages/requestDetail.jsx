@@ -2,10 +2,9 @@ import { Table, TableRow, TableRowColumn, TableBody }
   from 'material-ui/Table';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
 import Paper from 'material-ui/Paper';
+import { hashHistory } from 'react-router';
 
-import { Meteor } from 'meteor/meteor';
-import { Tracker } from 'meteor/tracker';
-import Header from './header.jsx';
+import Header from '../components/header.jsx';
 import '../../api/requests/requests.js';
 
 /* global Requests:true*/
@@ -33,34 +32,40 @@ const RequestDetail = React.createClass({
       estCost: 0,
       partNo: '',
       quantity: 0,
-      unitcost: 0,
+      unitCost: 0,
       vendor: '',
     };
   },
 
   componentWillMount() {
-    Tracker.autorun(() => {
-      Meteor.subscribe('requests', () => {
-        const reqs = Requests.find().fetch();
-        const id = this.props.location.query.id;
-        let req = null;
-        for (let x = 0; x < reqs.length; x += 1) {
-          if (reqs[x]._id === id) {
-            req = reqs[x];
-            break;
-          }
-        }
-        if (req) {
-          this.setState({
-            description: req.description,
-            estCost: req.estCost,
-            partNo: req.partNo,
-            quantity: req.quantity,
-            unitCost: req.unitCost,
-            vendor: req.vendor,
-          });
-        }
-      });
+    this.setState({
+      description: this.props.description,
+      estCost: this.props.estCost,
+      partNo: this.props.partNo,
+      quantity: this.props.quantity,
+      unitCost: this.props.unitCost,
+      vendor: this.props.vendor,
+    });
+  },
+
+  componentWillReceiveProps(nextProps) {
+    if (!nextProps.user || (!nextProps.requestOwned && !nextProps.isAdmin)) {
+      hashHistory.push('/');
+    }
+
+    const descChange = this.state.description !== nextProps.description;
+    const estCostChange = this.state.estCost !== nextProps.estCost;
+    const partNoChange = this.state.partNo !== nextProps.partNo;
+    const quantityChange = this.state.quantity !== nextProps.quantity;
+    const unitCostChange = this.state.unitCost !== nextProps.unitCost;
+    const vendorChange = this.state.vendor !== nextProps.vendor;
+    this.setState({
+      description: descChange ? nextProps.description : this.state.description,
+      estCost: estCostChange ? nextProps.estCost : this.state.estCost,
+      partNo: partNoChange ? nextProps.partNo : this.state.partNo,
+      quantity: quantityChange ? nextProps.quantity : this.state.quantity,
+      unitCost: unitCostChange ? nextProps.unitCost : this.state.unitCost,
+      vendor: vendorChange ? nextProps.vendor : this.state.vendor,
     });
   },
 

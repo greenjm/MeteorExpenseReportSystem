@@ -4,9 +4,8 @@ import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
 import Paper from 'material-ui/Paper';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 
-import { Meteor } from 'meteor/meteor';
-import { Tracker } from 'meteor/tracker';
-import Header from './header.jsx';
+import { hashHistory } from 'react-router';
+import Header from '../components/header.jsx';
 import '../../api/requests/requests.js';
 
 /* global Requests:true*/
@@ -21,7 +20,15 @@ const paperStyle = {
   paddingLeft: '24px',
 };
 
-const ViewRequests = React.createClass({
+const SubmitReport = React.createClass({
+  propTypes() {
+    return {
+      location: React.object,
+      requests: React.PropTypes.array,
+      isAdmin: React.PropTypes.bool,
+    };
+  },
+
   getInitialState() {
     return {
       requests: [],
@@ -29,16 +36,21 @@ const ViewRequests = React.createClass({
   },
 
   componentWillMount() {
-    Tracker.autorun(() => {
-      Meteor.subscribe('requests', () => {
-        console.log(Requests.find().fetch());
-        this.setState({ requests: Requests.find().fetch() });
-      });
-    });
+    this.setState({ requests: this.props.requests });
+  },
+
+  componentWillReceiveProps(nextProps) {
+    if (!nextProps.user) {
+      hashHistory.push('/');
+    }
+
+    if (this.state.requests !== nextProps.requests) {
+      this.setState({ requests: nextProps.requests });
+    }
   },
 
   showRequest(data, index) {
-    const url = `/#/viewRequests/request?id=${data._id}`;
+    const url = `/#/viewRequests/${data._id}`;
     return (
       <TableRow key={index}>
         <TableRowColumn>{index}</TableRowColumn>
@@ -54,10 +66,25 @@ const ViewRequests = React.createClass({
     );
   },
 
+  submitReport() {
+    const acceptedRequests = [];
+    for (let i = 0; i < this.state.requests.length; i += 1) {
+      if (this.state.requests[i].stat) {
+        acceptedRequests.push(this.state.requests[i]);
+      }
+    }
+    // TODO:
+    // Now send the accepted requests in an api call to the server
+  },
+
+  cancel() {
+    hashHistory.push('/dashboard');
+  },
+
   render() {
     return (
       <div>
-        <Header />
+        <Header isAdmine={this.props.isAdmin} />
         <Paper style={paperStyle} zDepth={1}>Expense Requests</Paper>
         <br />
         <br />
@@ -67,6 +94,12 @@ const ViewRequests = React.createClass({
               <Table>
                 <TableBody displayRowCheckbox={false}>
                   {this.state.requests.map(this.showRequest)}
+                  <TableRow selectable={false}>
+                    <TableRowColumn>
+                      <button onClick={this.submitReport}>Submit Expense Report</button>
+                      <button onClick={this.cancel}>Cancel</button>
+                    </TableRowColumn>
+                  </TableRow>
                 </TableBody>
               </Table>
             </Col>
@@ -77,4 +110,4 @@ const ViewRequests = React.createClass({
   },
 });
 
-module.exports = ViewRequests;
+module.exports = SubmitReport;
