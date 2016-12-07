@@ -44,6 +44,8 @@ const SubmitRequest = React.createClass({
       unitCostError: '',
       partNum: '',
       partNumError: '',
+      fileUrl: '',
+      fileUrlError: '',
       dialogError: '',
       snackbarOpen: false,
     };
@@ -124,6 +126,7 @@ const SubmitRequest = React.createClass({
       this.state.partNum,
       qtyNum,
       +unitCostNum.toFixed(2),
+      this.state.fileUrl,
       (error, result) => {
         if (error != null) {
           this.setState({ dialogError: `Error: ${error.error}. Reason: ${error.reason}` });
@@ -138,6 +141,7 @@ const SubmitRequest = React.createClass({
             partNum: '',
             qty: '',
             unitCost: '',
+            fileUrl: '',
             snackbarOpen: true,
           });
         }
@@ -213,6 +217,11 @@ const SubmitRequest = React.createClass({
     this.setState({ partNumError: err });
   },
 
+  // File URL methods
+  handleFileUrlChange(event) {
+    this.setState({ fileUrl: event.target.value, fileUrlError: '' });
+  },
+
   // Snackbar methods
   handleSnackbarAction() {
     // TODO: change to request view when ready
@@ -285,6 +294,13 @@ const SubmitRequest = React.createClass({
                       value={this.state.partNum}
                       onChange={this.handlePartNumChange}
                       errorText={this.state.partNumError}
+                      fullWidth
+                    />
+                    <TextField
+                      hintText="File URL (optional)"
+                      value={this.state.fileUrl}
+                      onChange={this.handleFileUrlChange}
+                      errorText={this.state.fileUrlError}
                       fullWidth
                     />
                     <div style={{ color: 'red' }}>{this.state.dialogError}</div>

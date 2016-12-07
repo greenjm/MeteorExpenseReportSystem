@@ -38,6 +38,7 @@ const RequestDetail = React.createClass({
       vendor: '',
       status: null,
       statMsg: '',
+      fileUrl: '',
     };
   },
 
@@ -64,6 +65,7 @@ const RequestDetail = React.createClass({
             vendor: request.vendor,
             status: request.status ? 'Approved' : 'Rejected',
             statMsg: request.statMsg,
+            fileUrl: request.fileUrl,
           });
         }
       });
@@ -94,6 +96,10 @@ const RequestDetail = React.createClass({
     this.setState({ vendor: e.target.value });
   },
 
+  changeFileUrl(e) {
+    this.setState({ fileUrl: e.target.value });
+  },
+
   editRequest() {
     // not sure what the api endpoint is for editing a request
     const req = {
@@ -105,6 +111,7 @@ const RequestDetail = React.createClass({
       vendor: this.state.vendor,
       status: this.state.status,
       statMsg: this.state.statMsg,
+      fileUrl: this.state.fileUrl,
     };
 
     console.log(req);
@@ -169,6 +176,14 @@ const RequestDetail = React.createClass({
                     </TableRowColumn>
                     <TableRowColumn>
                       <input name="name" type="text" value={this.state.vendor} onChange={this.changeVendor} />
+                    </TableRowColumn>
+                  </TableRow>
+                  <TableRow selectable={false}>
+                    <TableRowColumn>
+                      <label htmlFor="name">File URL</label>
+                    </TableRowColumn>
+                    <TableRowColumn>
+                      <input name="name" type="text" value={this.state.fileUrl} onChange={this.changeFileUrl} />
                     </TableRowColumn>
                   </TableRow>
                   <TableRow selectable={false}>
