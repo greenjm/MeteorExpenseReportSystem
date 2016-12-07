@@ -72,14 +72,17 @@ const SubmitRequest = React.createClass({
     const requiredError = 'This field is required.';
     const numError = 'You must enter a number.';
     let hasError = false;
+
     if (this.state.projectSelected === '') {
       this.projectError(requiredError);
       hasError = true;
     }
+
     if (this.state.description === '') {
       this.descriptionError(requiredError);
       hasError = true;
     }
+
     const estimatedCostNum = +this.state.estimatedCost;
     if (this.state.estimatedCost === '') {
       this.estimateError(requiredError);
@@ -88,10 +91,12 @@ const SubmitRequest = React.createClass({
       this.estimateError(numError);
       hasError = true;
     }
+
     if (this.state.vendor === '') {
       this.vendorError(requiredError);
       hasError = true;
     }
+
     const qtyNum = +this.state.qty;
     if (this.state.qty === '') {
       this.qtyError(requiredError);
@@ -100,6 +105,7 @@ const SubmitRequest = React.createClass({
       this.qtyError(numError);
       hasError = true;
     }
+
     const unitCostNum = +this.state.unitCost;
     if (this.state.unitCost === '') {
       this.unitCostError(requiredError);
@@ -108,6 +114,7 @@ const SubmitRequest = React.createClass({
       this.unitCostError(numError);
       hasError = true;
     }
+
     if (this.state.partNum === '') {
       this.partNumError(requiredError);
       hasError = true;
@@ -141,7 +148,7 @@ const SubmitRequest = React.createClass({
             snackbarOpen: true,
           });
         }
-      });
+    });
   },
 
   // Project select methods
@@ -188,7 +195,16 @@ const SubmitRequest = React.createClass({
 
   // Quantity methods
   handleQtyChange(event) {
-    this.setState({ qty: event.target.value, qtyError: '' });
+    const newState = {};
+
+    if (this.state.unitCost) {
+      newState.estimatedCost = this.state.unitCost * event.target.value;
+    }
+
+    newState.qty = event.target.value;
+    newState.qtyError = '';
+
+    this.setState(newState);
   },
 
   qtyError(err) {
@@ -197,7 +213,16 @@ const SubmitRequest = React.createClass({
 
   // Unit cost methods
   handleUnitCostChange(event) {
-    this.setState({ unitCost: event.target.value, unitCostError: '' });
+    const newState = {};
+
+    if (this.state.qty) {
+      newState.estimatedCost = this.state.qty * event.target.value;
+    }
+
+    newState.unitCost = event.target.value;
+    newState.unitCostError = '';
+
+    this.setState(newState);
   },
 
   unitCostError(err) {
@@ -224,6 +249,11 @@ const SubmitRequest = React.createClass({
   },
 
   render() {
+    let noProjectsError = '';
+    if (!this.state.projects) {
+      noProjectsError = 'You are not a member of any projects! Contact an admin or your manager to be added to a project.';
+    }
+
     return (
       <div>
         <Header />
@@ -234,13 +264,13 @@ const SubmitRequest = React.createClass({
           <Grid>
             <Row>
               <Col xs={12} sm={12} md={12} lg={12}>
-                <Paper style={{ textAlign: 'center' }} zDepth={1}>
+                <Paper style={{ textAlign: 'center', padding: '10px' }} zDepth={1}>
                   <form onSubmit={this.submitRequest}>
                     <SelectField
                       floatingLabelText="Select Project"
                       value={this.state.projectSelected}
                       onChange={this.handleProjectSelect}
-                      errorText={this.state.projectSelectedError}
+                      errorText={noProjectsError}
                       fullWidth
                     >
                       {this.state.projects.map(this.createProjectMenuItem)}
@@ -253,11 +283,11 @@ const SubmitRequest = React.createClass({
                       fullWidth
                     />
                     <TextField
-                      hintText="Estimated Cost"
+                      hintText="Total Cost"
                       value={this.state.estimatedCost}
-                      onChange={this.handleEstimateChange}
                       errorText={this.state.estimatedCostError}
                       fullWidth
+                      readOnly
                     />
                     <TextField
                       hintText="Vendor Name"
@@ -288,7 +318,7 @@ const SubmitRequest = React.createClass({
                       fullWidth
                     />
                     <div style={{ color: 'red' }}>{this.state.dialogError}</div>
-                    <div style={{ float: 'right' }}>
+                    <div style={{ float: 'right', margin: '10px'}}>
                       <FlatButton label="Cancel" onTouchTap={this.cancelRequest} />
                       <FlatButton type="submit" label="Submit" primary />
                     </div>
