@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-import { Tracker } from 'meteor/tracker';
+import { hashHistory } from 'react-router';
 import Paper from 'material-ui/Paper';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
   from 'material-ui/Table';
@@ -13,15 +13,12 @@ import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
 import '../../api/projects/projects.js';
-import Header from './header.jsx';
+import Header from '../components/header.jsx';
 
 /* global Projects:true*/
 /* eslint no-undef: "error"*/
 
 const React = require('react');
-
-const sub = Meteor.subscribe('projects');
-const userSub = Meteor.subscribe('users');
 
 // Styles
 const paperStyle = {
@@ -44,6 +41,10 @@ const switchStyle = {
 };
 
 const AdminDashboard = React.createClass({
+  propTypes: {
+    isAdmin: React.PropTypes.bool,
+  },
+
   getInitialState() {
     return {
       projectNames: [],
@@ -66,27 +67,27 @@ const AdminDashboard = React.createClass({
     };
   },
 
-  componentWillMount() {
-    Tracker.autorun(() => {
-      if (sub.ready()) {
-        const projects = Projects.find().fetch();
-        const projectNames = [];
-        const projectIds = [];
-        for (let i = 0; i < projects.length; i += 1) {
-          projectNames.push(projects[i].name);
-          projectIds.push(projects[i]._id);
-        }
-        this.setState({ projectNames, projectIds });
+  componentWillReceiveProps(nextProps) {
+    if (!nextProps.user || !nextProps.isAdmin) {
+      hashHistory.push('/');
+    }
+
+    if (nextProps.projectReady) {
+      const projectNames = [];
+      const projectIds = [];
+      for (let i = 0; i < nextProps.projects.length; i += 1) {
+        projectNames.push(nextProps.projects[i].name);
+        projectIds.push(nextProps.projects[i]._id);
       }
-      if (userSub.ready()) {
-        const users = Meteor.users.find().fetch();
-        const userList = [];
-        for (let i = 0; i < users.length; i += 1) {
-          userList.push(users[i]);
-        }
-        this.setState({ users: userList });
+      this.setState({ projectNames, projectIds });
+    }
+    if (nextProps.userReady) {
+      const userList = [];
+      for (let i = 0; i < nextProps.users.length; i += 1) {
+        userList.push(nextProps.users[i]);
       }
-    });
+      this.setState({ users: userList });
+    }
   },
 
   createUserRow(item) {
@@ -286,7 +287,7 @@ const AdminDashboard = React.createClass({
 
     return (
       <div>
-        <Header />
+        <Header isAdmin={this.props.isAdmin} />
         <Paper style={paperStyle} zDepth={1}>Admin Dashboard</Paper>
         <br />
         <br />

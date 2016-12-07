@@ -25,6 +25,11 @@ const cardStyle = {
 // Done
 
 const Login = React.createClass({
+  propTypes: {
+    user: React.PropTypes.bool,
+    isAdmin: React.PropTypes.bool,
+  },
+
   getInitialState() {
     return {
       username: '',
@@ -34,6 +39,15 @@ const Login = React.createClass({
     };
   },
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.user) {
+      if (nextProps.isAdmin) {
+        hashHistory.push('/adminDashboard');
+      } else {
+        hashHistory.push('/dashboard');
+      }
+    }
+  },
 
   login(e) {
     e.preventDefault();

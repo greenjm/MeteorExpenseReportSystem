@@ -10,10 +10,10 @@ const React = require('react');
 const ReactDOM = require('react-dom');
 const Router = require('react-router').Router;
 const Route = require('react-router').Route;
-const Login = require('../../ui/components/login.jsx');
-const AdminDashboard = require('../../ui/components/adminDashboard.jsx');
+const LoginContainer = require('../../ui/components/loginContainer.jsx');
+const AdminDashboardContainer = require('../../ui/components/adminDashboardContainer.jsx');
 const ProjectDetail = require('../../ui/components/projectDetail.jsx');
-const UserDashboard = require('../../ui/components/userDashboard.jsx');
+const UserDashboardContainer = require('../../ui/components/userDashboardContainer.jsx');
 const SubmitRequest = require('../../ui/components/submitRequest.jsx');
 const ViewRequests = require('../../ui/components/viewRequests.jsx');
 const SubmitReport = require('../../ui/components/submitReport.jsx');
@@ -24,10 +24,10 @@ Meteor.startup(() => {
   ReactDOM.render((
     <MuiThemeProvider>
       <Router history={hashHistory}>
-        <Route path="/adminDashboard" component={AdminDashboard} />
-        <Route path="/dashboard" component={UserDashboard} />
+        <Route path="/adminDashboard" component={AdminDashboardContainer} />
+        <Route path="/dashboard" component={UserDashboardContainer} />
         <Route path="/project*" component={ProjectDetail} />
-        <Route path="/" component={Login} />
+        <Route path="/" component={LoginContainer} />
         <Route path="/submitRequest" component={SubmitRequest} />
         <Route path="/viewRequests" component={ViewRequests} />
         <Route path="/submitReport" component={SubmitReport} />

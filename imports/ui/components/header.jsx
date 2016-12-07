@@ -2,7 +2,6 @@
 // at the top of their render()
 import { hashHistory } from 'react-router';
 import { Meteor } from 'meteor/meteor';
-import { Tracker } from 'meteor/tracker';
 import AppBar from 'material-ui/AppBar';
 import IconButton from 'material-ui/IconButton';
 import IconMenu from 'material-ui/IconMenu';
@@ -12,6 +11,10 @@ import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 const React = require('react');
 
 const Header = React.createClass({
+  propTypes: {
+    isAdmin: React.PropTypes.bool,
+  },
+
   getInitialState() {
     return {
       userDashLink: <MenuItem primaryText="User Dashboard" onTouchTap={this.userDash} />,
@@ -19,15 +22,10 @@ const Header = React.createClass({
     };
   },
 
-  componentWillMount() {
-    Tracker.autorun(() => {
-      const user = Meteor.user();
-      const profile = user && user.profile;
-      const isAdmin = profile && user.profile.isAdmin;
-      if (isAdmin) {
-        this.setState({ adminDashLink: <MenuItem primaryText="Admin Dashboard" onTouchTap={this.adminDash} /> });
-      }
-    });
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.isAdmin) {
+      this.setState({ adminDashLink: <MenuItem primaryText="Admin Dashboard" onTouchTap={this.adminDash} /> });
+    }
   },
 
   userDash() {
