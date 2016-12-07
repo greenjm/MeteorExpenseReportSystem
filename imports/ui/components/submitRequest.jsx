@@ -148,7 +148,7 @@ const SubmitRequest = React.createClass({
             snackbarOpen: true,
           });
         }
-    });
+      });
   },
 
   // Project select methods
@@ -318,7 +318,7 @@ const SubmitRequest = React.createClass({
                       fullWidth
                     />
                     <div style={{ color: 'red' }}>{this.state.dialogError}</div>
-                    <div style={{ float: 'right', margin: '10px'}}>
+                    <div style={{ float: 'right', margin: '10px' }}>
                       <FlatButton label="Cancel" onTouchTap={this.cancelRequest} />
                       <FlatButton type="submit" label="Submit" primary />
                     </div>
