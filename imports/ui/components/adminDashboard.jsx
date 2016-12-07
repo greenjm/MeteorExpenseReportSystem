@@ -326,6 +326,30 @@ const AdminDashboard = React.createClass({
                   </TableBody>
                 </Table>
               </Col>
+              <Col xs={12} sm={12} md={6} lg={6}>
+                <Table
+                  selectable={false}
+                >
+                  <TableHeader displaySelectAll={false}>
+                    <TableRow selectable={false}>
+                      <TableHeaderColumn colSpan="2" style={{ textAlign: 'center' }}>
+                        <RaisedButton label="New" primary style={tableHeaderButtonStyle} onTouchTap={this.openRequestDialog} />
+                        Requests
+                      </TableHeaderColumn>
+                    </TableRow>
+                    <TableRow selectable={false}>
+                      <TableHeaderColumn>Name</TableHeaderColumn>
+                      <TableHeaderColumn>Actions</TableHeaderColumn>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody
+                    showRowHover
+                    displayRowCheckbox={false}
+                  >
+                    
+                  </TableBody>
+                </Table>
+              </Col>
             </Row>
           </Grid>
         </div>

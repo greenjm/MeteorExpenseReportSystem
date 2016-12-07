@@ -5,6 +5,7 @@ import { hashHistory } from 'react-router';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
   from 'material-ui/Table';
 import FlatButton from 'material-ui/FlatButton';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import MenuItem from 'material-ui/MenuItem';
@@ -41,23 +42,21 @@ const ManageRequests = React.createClass({
   getInitialState() {
     return {
       requests: [],
+      requestId: '',
       userId: '',
       users: [],
       requestDialogOpen: false,
       status: false,
       statMsg: '',
-
     };
   },
 
   componentWillMount() {
     Tracker.autorun(() => {
-      if (requestSub.ready()) {
-        const requests = Requests.find().fetch();
-        for(let i = 0; i<requests.length; i+=1){
-          requests.push()
-        }
-      }
+      Meteor.subscribe('requests', () => {
+        console.log(Requests.find().fetch());
+        this.setState({ requests: Requests.find().fetch() });
+      });
     });
   },
 
@@ -90,22 +89,63 @@ const ManageRequests = React.createClass({
       </TableRow>);
   },
 
+  removeItem(index) {
+    // const filteredRequests = this.state.requests.filter((requests, i) => {
+    //     i == index;
+    //   });
+    const filteredRequests=[];
+    for (var i = this.state.requests.length - 1; i >= 0; i--) {
+      if(i!=index){
+        filteredRequests.push(this.state.requests[i]);
+        console.log("index: "+ index);
+        console.log("i: "+ i);
+      }
+    }
+
+    this.setState({
+      requests: filteredRequests,
+    });
+  },
+
+  denialChange(e){
+    this.setState({ statMsg: e.target.value });
+  },
+
   handleConfirmPress() {
+    this.removeItem(this.state.requestId);
     this.setState({ requestDialogOpen: false,
                     status: true,
-
     });
   },
 
   handleDenyPress() {
+    console.log("requestId: "+ this.state.requestId);
+    this.removeItem(this.state.requestId);
+
     this.setState({ requestDialogOpen: false,
-      statMsg: document.getElementById('denialText')});
+                    status: false,
+    });
   },
 
   handleCancelPress(){
     this.setState({ requestDialogOpen: false,
                     statMsg: '',
-    })
+    });
+  },
+
+  showRequest(data, index) {
+    // const url = `/#/viewRequests/request?id=${data._id}`;
+    return (
+      <TableRow key={index}>
+        <TableRowColumn>{index}</TableRowColumn>
+        <TableRowColumn>{data.description}</TableRowColumn>
+        <TableRowColumn>
+            <FloatingActionButton mini zDepth={1} onTouchTap={this.openRequestDialog}>
+              <i className="material-icons">search</i>
+            </FloatingActionButton>
+        </TableRowColumn>
+      </TableRow>
+    );
   },
 
   render() {
@@ -125,61 +165,51 @@ const ManageRequests = React.createClass({
         primary
         onTouchTap={this.handleCancelPress}
       />,
-
   ];
-
-    return (
+return(
+    <div>
       <div>
         <Header />
-        <Paper style={paperStyle} zDepth={1}>Manage Requests</Paper>
-        <div>
-          <Grid>
-            <Row>
-              <Col>
-                <Table
-                  selectable={false}
-                >
-                <TableHeader displaySelectAll={false}>
-                    <TableRow selectable={false}>
-                      <TableHeaderColumn colSpan="3" style={{ textAlign: 'center' }}>
-                      <RaisedButton label="New" primary style={tableHeaderButtonStyle} onTouchTap={this.openRequestDialog} />
-                        Requests
-                      </TableHeaderColumn>
-                    </TableRow>
-                    <TableRow selectable={false}>
-                      <TableHeaderColumn>Name</TableHeaderColumn>
-                      <TableHeaderColumn>Email</TableHeaderColumn>
-                      <TableHeaderColumn>Actions</TableHeaderColumn>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody
-                    showRowHover
-                    displayRowCheckbox={false}
-                  >
-                    {this.state.users.map(this.createUserRow)}
-                  </TableBody>
-                </Table>
-              </Col>
-            </Row>
-          </Grid>
-        </div>
-        <div>
-          <Dialog
-            title="Respond to request"
-            actions={requestDialogActions}
-            modal={false}
-            open={this.state.requestDialogOpen} >
-            <TextField
-            name="denialText"
-            hintText="Reasons for denial"
-            floatingLabelText="Denial Message"
-            fullWidth
-            />
-          </Dialog>
-        </div>
-
+        <Paper style={paperStyle} zDepth={1}>Expense Requests</Paper>
+        <br />
+        <br />
+        <Grid>
+          <Row>
+            <Col xs={12} sm={12} md={12} lg={12}>
+              <Table>
+                <TableBody displayRowCheckbox={false}>
+                  {this.state.requests.map(this.showRequest)}
+                </TableBody>
+              </Table>
+            </Col>
+          </Row>
+        </Grid>
       </div>
-      );
+      <div>
+        <Dialog
+          title="Respond to request"
+          actions={requestDialogActions}
+          modal={false}
+          open={this.state.requestDialogOpen} >
+
+          <TextField
+            name="statusMessage"
+            value={this.state.statMsg}
+            readOnly
+          />
+
+          <TextField
+          name="denialText"
+          hintText="Reasons for denial"
+          floatingLabelText="Denial Message"
+          onChange={this.denialChange}
+          fullWidth
+          />
+
+        </Dialog>
+      </div>
+      </div>
+    );
   },
 });
 

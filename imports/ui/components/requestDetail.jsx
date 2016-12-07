@@ -29,35 +29,41 @@ const RequestDetail = React.createClass({
 
   getInitialState() {
     return {
+      requestId: this.props.location.query.id,
       description: '',
       estCost: 0,
       partNo: '',
       quantity: 0,
       unitcost: 0,
       vendor: '',
+      status: null,
+      statMsg: '',
     };
   },
 
   componentWillMount() {
     Tracker.autorun(() => {
-      Meteor.subscribe('requests', () => {
-        const reqs = Requests.find().fetch();
-        const id = this.props.location.query.id;
-        let req = null;
-        for (let x = 0; x < reqs.length; x += 1) {
-          if (reqs[x]._id === id) {
-            req = reqs[x];
-            break;
-          }
-        }
-        if (req) {
+      Meteor.subscribe('requestOne', this.state.requestId, () => {
+        const request = Requests.findOne(this.state.requestId);
+        // const reqs = Requests.find().fetch();
+        // const id = this.props.location.query.id;
+        // let req = null;
+        // for (let x = 0; x < reqs.length; x += 1) {
+        //   if (reqs[x]._id === id) {
+        //     req = reqs[x];
+        //     break;
+        //   }
+        // }
+        if (request) {
           this.setState({
-            description: req.description,
-            estCost: req.estCost,
-            partNo: req.partNo,
-            quantity: req.quantity,
-            unitCost: req.unitCost,
-            vendor: req.vendor,
+            description: request.description,
+            estCost: request.estCost,
+            partNo: request.partNo,
+            quantity: request.quantity,
+            unitCost: request.unitCost,
+            vendor: request.vendor,
+            status: request.status ? 'Approved' : 'Rejected',
+            statMsg: request.statMsg,
           });
         }
       });
@@ -97,6 +103,8 @@ const RequestDetail = React.createClass({
       quantity: this.state.quantity,
       unitCost: this.state.unitCost,
       vendor: this.state.vendor,
+      status: this.state.status,
+      statMsg: this.state.statMsg,
     };
 
     console.log(req);
@@ -165,8 +173,24 @@ const RequestDetail = React.createClass({
                   </TableRow>
                   <TableRow selectable={false}>
                     <TableRowColumn>
-                      <button onClick={this.editRequest}>Save Changes</button>
+                      <label htmlFor="name">Status</label>
                     </TableRowColumn>
+                    <TableRowColumn>
+                      <input name="name" type="text" value={this.state.status} disabled />
+                    </TableRowColumn>
+                  </TableRow>
+                  <TableRow selectable={false}>
+                    <TableRowColumn>
+                      <label htmlFor="name">Status Message</label>
+                    </TableRowColumn>
+                    <TableRowColumn>
+                      <input name="name" type="text" value={this.state.statMsg} disabled />
+                    </TableRowColumn>
+                  </TableRow>
+                  <TableRow selectable={false}>
+                    <TableRowColumn>
+                      <button onClick={this.editRequest}>Save Changes</button>
+                    </TableRowColumn>                  
                   </TableRow>
                 </TableBody>
               </Table>

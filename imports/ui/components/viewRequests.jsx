@@ -50,6 +50,7 @@ const ViewRequests = React.createClass({
             </FloatingActionButton>
           </a>
         </TableRowColumn>
+        <TableRowColumn>{data.statMsg}</TableRowColumn>
       </TableRow>
     );
   },

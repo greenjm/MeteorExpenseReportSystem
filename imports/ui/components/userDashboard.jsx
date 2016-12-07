@@ -55,6 +55,7 @@ const UserDashboard = React.createClass({
 
   manageRequests() {
     hashHistory.push('/manageRequests');
+  },
 
   viewRequests() {
     hashHistory.push('/viewRequests');
