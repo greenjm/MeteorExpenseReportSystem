@@ -1,10 +1,10 @@
 import { Table, TableRow, TableRowColumn, TableBody }
   from 'material-ui/Table';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
-import { hashHistory } from 'react-router';
 import Paper from 'material-ui/Paper';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 
+import { hashHistory } from 'react-router';
 import Header from '../components/header.jsx';
 import '../../api/requests/requests.js';
 
@@ -13,7 +13,6 @@ import '../../api/requests/requests.js';
 
 const React = require('react');
 
-// Styles
 const paperStyle = {
   height: '35px',
   lineHeight: '35px',
@@ -21,10 +20,13 @@ const paperStyle = {
   paddingLeft: '24px',
 };
 
-const ViewRequests = React.createClass({
-  propTypes: {
-    requests: React.PropTypes.array,
-    isAdmin: React.PropTypes.bool,
+const SubmitReport = React.createClass({
+  propTypes() {
+    return {
+      location: React.object,
+      requests: React.PropTypes.array,
+      isAdmin: React.PropTypes.bool,
+    };
   },
 
   getInitialState() {
@@ -35,11 +37,6 @@ const ViewRequests = React.createClass({
 
   componentWillMount() {
     this.setState({ requests: this.props.requests });
-    /* Tracker.autorun(() => {
-      Meteor.subscribe('requests', () => {
-        this.setState({ requests: Requests.find().fetch() });
-      });
-    }); */
   },
 
   componentWillReceiveProps(nextProps) {
@@ -69,6 +66,21 @@ const ViewRequests = React.createClass({
     );
   },
 
+  submitReport() {
+    const acceptedRequests = [];
+    for (let i = 0; i < this.state.requests.length; i += 1) {
+      if (this.state.requests[i].stat) {
+        acceptedRequests.push(this.state.requests[i]);
+      }
+    }
+    // TODO:
+    // Now send the accepted requests in an api call to the server
+  },
+
+  cancel() {
+    hashHistory.push('/dashboard');
+  },
+
   render() {
     return (
       <div>
@@ -82,6 +94,12 @@ const ViewRequests = React.createClass({
               <Table>
                 <TableBody displayRowCheckbox={false}>
                   {this.state.requests.map(this.showRequest)}
+                  <TableRow selectable={false}>
+                    <TableRowColumn>
+                      <button onClick={this.submitReport}>Submit Expense Report</button>
+                      <button onClick={this.cancel}>Cancel</button>
+                    </TableRowColumn>
+                  </TableRow>
                 </TableBody>
               </Table>
             </Col>
@@ -92,4 +110,4 @@ const ViewRequests = React.createClass({
   },
 });
 
-module.exports = ViewRequests;
+module.exports = SubmitReport;

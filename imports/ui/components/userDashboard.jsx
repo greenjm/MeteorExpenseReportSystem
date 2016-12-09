@@ -138,7 +138,7 @@ const UserDashboard = React.createClass({
           </Grid>
         </div>
       </div>
-    );
+      );
   },
 });
 

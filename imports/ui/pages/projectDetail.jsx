@@ -1,13 +1,17 @@
 import { Meteor } from 'meteor/meteor';
 import { hashHistory } from 'react-router';
 import { Tracker } from 'meteor/tracker';
-import { Table, TableHeader, TableRow, TableRowColumn }
+import { TableRow, TableRowColumn }
   from 'material-ui/Table';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
 import Paper from 'material-ui/Paper';
+import FlatButton from 'material-ui/FlatButton';
+import TextField from 'material-ui/TextField';
+import SelectField from 'material-ui/SelectField';
+import Checkbox from 'material-ui/Checkbox';
+import MenuItem from 'material-ui/MenuItem';
 import '../../api/projects/projects.js';
 import Header from '../components/header.jsx';
-
 
 /* global Projects:true*/
 /* eslint no-undef: "error"*/
@@ -34,10 +38,15 @@ const ProjectDetail = React.createClass({
       projectId: this.props.location.query.id,
       Name: '',
       Managers: [],
+      ManagerNames: [],
       Employees: [],
+      EmployeeNames: [],
       BornOn: '',
       Active: '',
       allEmployees: [],
+      nameError: '',
+      employeeSelected: '',
+      employeeSelectedError: '',
     };
   },
 
@@ -62,6 +71,20 @@ const ProjectDetail = React.createClass({
     });
   },
 
+  getNames(people) {
+    const ans = [];
+
+    if (people) {
+      for (let x = 0; x < people.length; x += 1) {
+        Meteor.call('users.getOne', people[x], (err, res) => {
+          ans.push(res.profile.name);
+        });
+      }
+    }
+
+    return ans;
+  },
+
   createUserRow(item) {
     return (
       <TableRow key={item._id} selectable={false}>
@@ -69,60 +92,74 @@ const ProjectDetail = React.createClass({
       </TableRow>);
   },
 
+  // State Bindings
   toggleActive() {
-    this.setState({ Active: !this.state.Active });
+    const toggled = this.state.Active;
+    this.setState({ Active: !toggled });
   },
 
   changeName(event) {
     this.setState({ Name: event.target.value });
   },
 
+  handleEmployeeSelect(event, index, value) {
+    this.setState({ employeeSelected: value, employeeSelectedError: '' });
+  },
+
   editProject() {
     if (this.state.Active) {
       Tracker.autorun(() => {
-        Meteor.call('projects.activate', this.state.projectId, (err) => {
-          if (err) {
-            console.log(err);
-          }
-        });
+        Meteor.call('projects.activate', this.state.projectId);
       });
     } else {
       Tracker.autorun(() => {
-        Meteor.call('projects.deactivate', this.state.projectId, (err) => {
-          if (err) {
-            console.log(err);
-          }
-        });
+        Meteor.call('projects.deactivate', this.state.projectId);
       });
     }
 
+    if (this.state.employeeSelected) {
+      this.addEmployee();
+    }
+
     Tracker.autorun(() => {
-      Meteor.call('projects.editName', this.state.projectId, this.state.Name, (err) => {
-        if (err) {
-          console.log(err);
-        }
-      });
+      Meteor.call('projects.editName', this.state.projectId, this.state.Name);
     });
   },
 
-  showEmployee(item, i) {
-    return (<option key={i}>{item.profile.name}</option>);
+  createEmployeeMenuItem(item) {
+    return (
+      <MenuItem value={item._id} primaryText={item.profile.name} key={item._id} />
+    );
   },
 
   addEmployee() {
-    const index = document.getElementById('employeeList').selectedIndex;
-    const arr = this.state.Employees.slice();
-    arr.push(this.state.allEmployees[index].profile.name);
+    const selected = this.state.employeeSelected;
+    let index = -1;
+
+    for (let x = 0; x < this.state.allEmployees.length; x += 1) {
+      if (selected === this.state.allEmployees[x]._id) {
+        index = x;
+        break;
+      }
+    }
+
+    const arrIds = this.state.Employees.slice();
+    const arrNames = this.state.EmployeeNames.slice();
+
+    arrIds.push(this.state.allEmployees[index].profile._id);
+    arrNames.push(this.state.allEmployees[index].profile.name);
 
     Tracker.autorun(() => {
-      Meteor.call('projects.addEmployee', this.state.projectId, this.state.allEmployees[index]._id, (err) => {
-        if (err) {
-          console.log(err);
-        } else {
-          this.setState({ Employees: arr });
+      Meteor.call('projects.addEmployee', this.state.projectId, selected, (err) => {
+        if (!err) {
+          this.setState({ Employees: arrIds, EmployeeNames: arrNames });
         }
       });
     });
+  },
+
+  cancelEdit() {
+    hashHistory.push('/dashboard');
   },
 
   render() {
@@ -135,51 +172,54 @@ const ProjectDetail = React.createClass({
         <Grid>
           <Row>
             <Col xs={12} sm={12} md={12} lg={12}>
-              <Table>
-                <TableHeader displaySelectAll={false}>
-                  <TableRow>
-                    <TableRowColumn>
-                      <div>
-                        <label htmlFor="name">Name: </label>
-                        <input name="name" type="text" value={this.state.Name} onChange={this.changeName} />
-                      </div>
-                    </TableRowColumn>
-                  </TableRow>
-                  <TableRow selectable={false}>
-                    <TableRowColumn>
-                      <div>Managers: {this.state.Managers.join(', ')}</div>
-                    </TableRowColumn>
-                  </TableRow>
-                  <TableRow>
-                    <TableRowColumn>
-                      <div>Employees: {this.state.Employees.join(', ')}</div>
-                    </TableRowColumn>
-                  </TableRow>
-                  <TableRow>
-                    <TableRowColumn>
-                      <label htmlFor="active">Active: </label>
-                      <input name="active" type="checkbox" checked={this.state.Active} onClick={this.toggleActive} />
-                    </TableRowColumn>
-                  </TableRow>
-                  <TableRow>
-                    <TableRowColumn>
-                      <div>Start Date: {this.state.BornOn}</div>
-                    </TableRowColumn>
-                  </TableRow>
-                  <TableRow>
-                    <TableRowColumn>
-                      <div>
-                        Add Employees: <select id="employeeList">{this.state.allEmployees.map(this.showEmployee)}</select> <button onClick={this.addEmployee}>Add Employee</button>
-                      </div>
-                    </TableRowColumn>
-                  </TableRow>
-                  <TableRow>
-                    <TableRowColumn>
-                      <button onClick={this.editProject}>Save Changes</button>
-                    </TableRowColumn>
-                  </TableRow>
-                </TableHeader>
-              </Table>
+              <Paper style={{ textAlign: 'center', padding: '10px' }} zDepth={1}>
+                <form onSubmit={this.editProject}>
+                  <TextField
+                    hintText="Name"
+                    value={this.state.Name}
+                    onChange={this.changeName}
+                    errorText={this.state.nameError}
+                    fullWidth
+                  />
+                  <TextField
+                    hintText="Managers"
+                    value={this.state.ManagerNames.join(', ')}
+                    fullWidth
+                    readOnly
+                  />
+                  <TextField
+                    hintText="Employees"
+                    value={this.state.EmployeeNames.join(', ')}
+                    fullWidth
+                    readOnly
+                  />
+                  <TextField
+                    hintText="Start Date"
+                    value={this.state.BornOn}
+                    fullWidth
+                    readOnly
+                  />
+                  <Checkbox
+                    label="Active"
+                    checked={!!this.state.Active}
+                    onClick={this.toggleActive}
+                  />
+                  <SelectField
+                    floatingLabelText="Add Employee"
+                    value={this.state.employeeSelected}
+                    onChange={this.handleEmployeeSelect}
+                    errorText={this.state.employeeSelectedError}
+                    fullWidth
+                  >
+                    {this.state.allEmployees.map(this.createEmployeeMenuItem)}
+                  </SelectField>
+                  <div style={{ color: 'red' }}>{this.state.dialogError}</div>
+                  <div style={{ float: 'right', margin: '10px' }}>
+                    <FlatButton label="Cancel" onTouchTap={this.cancelEdit} />
+                    <FlatButton type="submit" label="Submit" primary />
+                  </div>
+                </form>
+              </Paper>
             </Col>
           </Row>
         </Grid>
