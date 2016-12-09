@@ -1,5 +1,3 @@
-import { Meteor } from 'meteor/meteor';
-import { Tracker } from 'meteor/tracker';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
 import { hashHistory } from 'react-router';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -9,7 +7,7 @@ import Description from 'material-ui/svg-icons/action/description';
 import Assignment from 'material-ui/svg-icons/action/assignment';
 import DeveloperBoard from 'material-ui/svg-icons/hardware/developer-board';
 import ViewList from 'material-ui/svg-icons/action/view-list';
-import Header from './header.jsx';
+import Header from '../components/header.jsx';
 
 const React = require('react');
 
@@ -33,6 +31,11 @@ const buttonStyle = {
 };
 
 const UserDashboard = React.createClass({
+  propTypes: {
+    isAdmin: React.PropTypes.bool,
+    name: React.PropTypes.string,
+  },
+
   getInitialState() {
     return {
       name: '',
@@ -40,17 +43,22 @@ const UserDashboard = React.createClass({
   },
 
   componentWillMount() {
-    Tracker.autorun(() => {
-      const user = Meteor.user();
-      const profileExists = user && user.profile;
-      if (profileExists) {
-        this.setState({ name: user.profile.name });
-      }
-    });
+    this.setState({ name: this.props.name });
+  },
+
+  componentWillReceiveProps(nextProps) {
+    if (!nextProps.user) {
+      hashHistory.push('/');
+    }
+    this.setState({ name: nextProps.name });
   },
 
   submitRequest() {
     hashHistory.push('/submitRequest');
+  },
+
+  manageRequests() {
+    hashHistory.push('/manageRequests');
   },
 
   viewRequests() {
@@ -64,7 +72,7 @@ const UserDashboard = React.createClass({
   render() {
     return (
       <div>
-        <Header />
+        <Header isAdmin={this.props.isAdmin} />
         <Paper style={paperStyle} zDepth={1}>User Dashboard</Paper>
         <br />
         <br />
@@ -128,6 +136,7 @@ const UserDashboard = React.createClass({
                   style={buttonStyle}
                   icon={<ViewList />}
                   secondary
+                  onTouchTap={this.manageRequests}
                 />
               </Col>
             </Row>

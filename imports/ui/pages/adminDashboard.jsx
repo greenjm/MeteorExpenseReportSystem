@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-import { Tracker } from 'meteor/tracker';
+import { hashHistory } from 'react-router';
 import Paper from 'material-ui/Paper';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
   from 'material-ui/Table';
@@ -13,16 +13,12 @@ import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
 import '../../api/projects/projects.js';
-import Header from './header.jsx';
+import Header from '../components/header.jsx';
 
 /* global Projects:true*/
 /* eslint no-undef: "error"*/
 
 const React = require('react');
-
-// Subscriptions
-const sub = Meteor.subscribe('projects');
-const userSub = Meteor.subscribe('users');
 
 // Styles
 const paperStyle = {
@@ -45,6 +41,10 @@ const switchStyle = {
 };
 
 const AdminDashboard = React.createClass({
+  propTypes: {
+    isAdmin: React.PropTypes.bool,
+  },
+
   getInitialState() {
     return {
       projectNames: [],
@@ -67,27 +67,27 @@ const AdminDashboard = React.createClass({
     };
   },
 
-  componentWillMount() {
-    Tracker.autorun(() => {
-      if (sub.ready()) {
-        const projects = Projects.find().fetch();
-        const projectNames = [];
-        const projectIds = [];
-        for (let i = 0; i < projects.length; i += 1) {
-          projectNames.push(projects[i].name);
-          projectIds.push(projects[i]._id);
-        }
-        this.setState({ projectNames, projectIds });
+  componentWillReceiveProps(nextProps) {
+    if (!nextProps.user || !nextProps.isAdmin) {
+      hashHistory.push('/');
+    }
+
+    if (nextProps.projectReady) {
+      const projectNames = [];
+      const projectIds = [];
+      for (let i = 0; i < nextProps.projects.length; i += 1) {
+        projectNames.push(nextProps.projects[i].name);
+        projectIds.push(nextProps.projects[i]._id);
       }
-      if (userSub.ready()) {
-        const users = Meteor.users.find().fetch();
-        const userList = [];
-        for (let i = 0; i < users.length; i += 1) {
-          userList.push(users[i]);
-        }
-        this.setState({ users: userList });
+      this.setState({ projectNames, projectIds });
+    }
+    if (nextProps.userReady) {
+      const userList = [];
+      for (let i = 0; i < nextProps.users.length; i += 1) {
+        userList.push(nextProps.users[i]);
       }
-    });
+      this.setState({ users: userList });
+    }
   },
 
   createUserRow(item) {
@@ -104,7 +104,7 @@ const AdminDashboard = React.createClass({
   },
 
   createProjectRow(item, index) {
-    const url = `/#/project?id=${this.state.projectIds[index]}`;
+    const url = `/#/project/${this.state.projectIds[index]}`;
     return (
       <TableRow key={this.state.projectIds[index]} selectable={false}>
         <TableRowColumn>{item}</TableRowColumn>
@@ -130,6 +130,12 @@ const AdminDashboard = React.createClass({
     if (this.state.newUserName === '') {
       this.setState({ userNameError: 'This field is required.' });
     }
+  },
+
+  hideUserForm() {
+    document.getElementById('userForm').style.display = 'none';
+    document.getElementById('userName').value = '';
+    document.getElementById('userID').value = '';
   },
 
   submitUser() {
@@ -159,7 +165,7 @@ const AdminDashboard = React.createClass({
 
   closeUserDialog() {
     this.setState({
-      newUserDialogOpen: false,
+      editUserDialogOpen: false,
       newUserName: '',
       newUserEmail: '',
       isAdmin: false,
@@ -170,6 +176,23 @@ const AdminDashboard = React.createClass({
   openUserDialog() {
     this.setState({ editUserDialogOpen: true });
   },
+
+  closeProjectDialog() {
+    this.setState({ newProjectDialogOpen: false });
+  },
+
+  openProjectDialog() {
+    this.setState({ newProjectDialogOpen: true, dialogError: '' });
+  },
+
+  handleProjectNameChange(event) {
+    this.setState({ newProjectName: event.target.value, projectNameError: '' });
+  },
+
+  handleManagerChange(event, index, value) {
+    this.setState({ projectManager: value, managerError: '' });
+  },
+
 
   editUser(user) {
     this.setState({
@@ -200,22 +223,6 @@ const AdminDashboard = React.createClass({
     this.setState({ isAdmin: !this.state.isAdmin });
   },
 
-  closeProjectDialog() {
-    this.setState({ newProjectDialogOpen: false });
-  },
-
-  openProjectDialog() {
-    this.setState({ newProjectDialogOpen: true, dialogError: '' });
-  },
-
-  handleProjectNameChange(event) {
-    this.setState({ newProjectName: event.target.value, projectNameError: '' });
-  },
-
-  handleManagerChange(event, index, value) {
-    this.setState({ projectManager: value, managerError: '' });
-  },
-
   // Project Dialog functions
   emptyProjectFieldError() {
     if (this.state.newProjectName === '') {
@@ -232,12 +239,12 @@ const AdminDashboard = React.createClass({
       return;
     }
     Meteor.call('projects.create', this.state.newProjectName, this.state.projectManager, (err) => {
-      if (err) {
+      if (err != null) {
         this.setState({ dialogError: `Error: ${err.error}. Reason: ${err.reason}` });
         return;
       }
-
       this.setState({ dialogError: '', newProjectName: '', projectManager: '' });
+
       this.closeProjectDialog();
     });
   },
@@ -277,7 +284,7 @@ const AdminDashboard = React.createClass({
 
     return (
       <div>
-        <Header />
+        <Header isAdmin={this.props.isAdmin} />
         <Paper style={paperStyle} zDepth={1}>Admin Dashboard</Paper>
         <br />
         <br />
@@ -321,6 +328,28 @@ const AdminDashboard = React.createClass({
                   >
                     {this.state.projectNames.map(this.createProjectRow)}
                   </TableBody>
+                </Table>
+              </Col>
+              <Col xs={12} sm={12} md={6} lg={6}>
+                <Table
+                  selectable={false}
+                >
+                  <TableHeader displaySelectAll={false}>
+                    <TableRow selectable={false}>
+                      <TableHeaderColumn colSpan="2" style={{ textAlign: 'center' }}>
+                        <RaisedButton label="New" primary style={tableHeaderButtonStyle} onTouchTap={this.openRequestDialog} />
+                        Requests
+                      </TableHeaderColumn>
+                    </TableRow>
+                    <TableRow selectable={false}>
+                      <TableHeaderColumn>Name</TableHeaderColumn>
+                      <TableHeaderColumn>Actions</TableHeaderColumn>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody
+                    showRowHover
+                    displayRowCheckbox={false}
+                  />
                 </Table>
               </Col>
             </Row>

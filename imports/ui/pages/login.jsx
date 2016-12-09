@@ -17,6 +17,11 @@ const cardStyle = {
 };
 
 const Login = React.createClass({
+  propTypes: {
+    user: React.PropTypes.bool,
+    isAdmin: React.PropTypes.bool,
+  },
+
   getInitialState() {
     return {
       username: '',
@@ -24,6 +29,16 @@ const Login = React.createClass({
       usernameError: '',
       passwordError: '',
     };
+  },
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.user) {
+      if (nextProps.isAdmin) {
+        hashHistory.push('/adminDashboard');
+      } else {
+        hashHistory.push('/dashboard');
+      }
+    }
   },
 
   login(e) {
@@ -69,7 +84,7 @@ const Login = React.createClass({
   },
 
   loginFailure() {
-    this.setState({ username: '', password: '', passwordError: 'Either email or password is incorrect.' });
+    this.setState({ passwordError: 'Either email or password is incorrect.' });
   },
 
   // State Bindings

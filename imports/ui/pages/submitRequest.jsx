@@ -1,5 +1,4 @@
 import { Meteor } from 'meteor/meteor';
-import { Tracker } from 'meteor/tracker';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
 import { hashHistory } from 'react-router';
 import TextField from 'material-ui/TextField';
@@ -8,14 +7,9 @@ import SelectField from 'material-ui/SelectField';
 import Snackbar from 'material-ui/Snackbar';
 import MenuItem from 'material-ui/MenuItem';
 import Paper from 'material-ui/Paper';
-import Header from './header.jsx';
-
-/* global Projects:true*/
-/* eslint no-undef: "error"*/
+import Header from '../components/header.jsx';
 
 const React = require('react');
-
-const projectSub = Meteor.subscribe('projects');
 
 // Styles
 const paperStyle = {
@@ -26,6 +20,11 @@ const paperStyle = {
 };
 
 const SubmitRequest = React.createClass({
+  propTypes: {
+    projects: React.PropTypes.array,
+    isAdmin: React.PropTypes.bool,
+  },
+
   getInitialState() {
     return {
       projects: [],
@@ -43,22 +42,27 @@ const SubmitRequest = React.createClass({
       unitCostError: '',
       partNum: '',
       partNumError: '',
+      fileUrl: '',
+      fileUrlError: '',
       dialogError: '',
       snackbarOpen: false,
     };
   },
 
   componentWillMount() {
-    Tracker.autorun(() => {
-      const user = Meteor.user();
-      const profileExists = user && user.profile;
-      if (profileExists) {
-        this.setState({ name: user.profile.name });
-      }
-      if (projectSub.ready()) {
-        const projs = Projects.find({ employees: Meteor.userId() }).fetch();
-        this.setState({ projects: projs });
-      }
+    this.setState({
+      projects: this.props.projects,
+    });
+  },
+
+  componentWillReceiveProps(nextProps) {
+    if (!nextProps.user) {
+      hashHistory.push('/');
+    }
+
+    const projectsChange = this.state.projects !== nextProps.projects;
+    this.setState({
+      projects: projectsChange ? nextProps.projects : this.state.projects,
     });
   },
 
@@ -76,10 +80,12 @@ const SubmitRequest = React.createClass({
       this.projectError(requiredError);
       hasError = true;
     }
+
     if (this.state.description === '') {
       this.descriptionError(requiredError);
       hasError = true;
     }
+
     const estimatedCostNum = +this.state.estimatedCost;
     if (this.state.estimatedCost === '') {
       this.estimateError(requiredError);
@@ -88,10 +94,12 @@ const SubmitRequest = React.createClass({
       this.estimateError(numError);
       hasError = true;
     }
+
     if (this.state.vendor === '') {
       this.vendorError(requiredError);
       hasError = true;
     }
+
     const qtyNum = +this.state.qty;
     if (this.state.qty === '') {
       this.qtyError(requiredError);
@@ -100,6 +108,7 @@ const SubmitRequest = React.createClass({
       this.qtyError(numError);
       hasError = true;
     }
+
     const unitCostNum = +this.state.unitCost;
     if (this.state.unitCost === '') {
       this.unitCostError(requiredError);
@@ -108,6 +117,7 @@ const SubmitRequest = React.createClass({
       this.unitCostError(numError);
       hasError = true;
     }
+
     if (this.state.partNum === '') {
       this.partNumError(requiredError);
       hasError = true;
@@ -124,6 +134,7 @@ const SubmitRequest = React.createClass({
       this.state.partNum,
       qtyNum,
       +unitCostNum.toFixed(2),
+      this.state.fileUrl,
       (error, result) => {
         if (error != null) {
           this.setState({ dialogError: `Error: ${error.error}. Reason: ${error.reason}` });
@@ -138,6 +149,7 @@ const SubmitRequest = React.createClass({
             partNum: '',
             qty: '',
             unitCost: '',
+            fileUrl: '',
             snackbarOpen: true,
           });
         }
@@ -189,7 +201,16 @@ const SubmitRequest = React.createClass({
 
   // Quantity methods
   handleQtyChange(event) {
-    this.setState({ qty: event.target.value, qtyError: '' });
+    const newState = {};
+
+    if (this.state.unitCost) {
+      newState.estimatedCost = this.state.unitCost * event.target.value;
+    }
+
+    newState.qty = event.target.value;
+    newState.qtyError = '';
+
+    this.setState(newState);
   },
 
   qtyError(err) {
@@ -198,7 +219,16 @@ const SubmitRequest = React.createClass({
 
   // Unit cost methods
   handleUnitCostChange(event) {
-    this.setState({ unitCost: event.target.value, unitCostError: '' });
+    const newState = {};
+
+    if (this.state.qty) {
+      newState.estimatedCost = this.state.qty * event.target.value;
+    }
+
+    newState.unitCost = event.target.value;
+    newState.unitCostError = '';
+
+    this.setState(newState);
   },
 
   unitCostError(err) {
@@ -214,6 +244,11 @@ const SubmitRequest = React.createClass({
     this.setState({ partNumError: err });
   },
 
+  // File URL methods
+  handleFileUrlChange(event) {
+    this.setState({ fileUrl: event.target.value, fileUrlError: '' });
+  },
+
   // Snackbar methods
   handleSnackbarAction() {
     // TODO: change to request view when ready
@@ -225,9 +260,14 @@ const SubmitRequest = React.createClass({
   },
 
   render() {
+    let noProjectsError = '';
+    if (!this.state.projects) {
+      noProjectsError = 'You are not a member of any projects! Contact an admin or your manager to be added to a project.';
+    }
+
     return (
       <div>
-        <Header />
+        <Header isAdmin={this.props.isAdmin} />
         <Paper style={paperStyle} zDepth={1}>Submit a new Request</Paper>
         <br />
         <br />
@@ -235,13 +275,13 @@ const SubmitRequest = React.createClass({
           <Grid>
             <Row>
               <Col xs={12} sm={12} md={12} lg={12}>
-                <Paper style={{ textAlign: 'center' }} zDepth={1}>
+                <Paper style={{ textAlign: 'center', padding: '10px' }} zDepth={1}>
                   <form onSubmit={this.submitRequest}>
                     <SelectField
                       floatingLabelText="Select Project"
                       value={this.state.projectSelected}
                       onChange={this.handleProjectSelect}
-                      errorText={this.state.projectSelectedError}
+                      errorText={noProjectsError}
                       fullWidth
                     >
                       {this.state.projects.map(this.createProjectMenuItem)}
@@ -254,11 +294,12 @@ const SubmitRequest = React.createClass({
                       fullWidth
                     />
                     <TextField
-                      hintText="Estimated Cost"
+                      hintText="Total Cost"
                       value={this.state.estimatedCost}
                       onChange={this.handleEstimateChange}
                       errorText={this.state.estimatedCostError}
                       fullWidth
+                      readOnly
                     />
                     <TextField
                       hintText="Vendor Name"
@@ -288,8 +329,15 @@ const SubmitRequest = React.createClass({
                       errorText={this.state.partNumError}
                       fullWidth
                     />
+                    <TextField
+                      hintText="File URL (optional)"
+                      value={this.state.fileUrl}
+                      onChange={this.handleFileUrlChange}
+                      errorText={this.state.fileUrlError}
+                      fullWidth
+                    />
                     <div style={{ color: 'red' }}>{this.state.dialogError}</div>
-                    <div style={{ float: 'right' }}>
+                    <div style={{ float: 'right', margin: '10px' }}>
                       <FlatButton label="Cancel" onTouchTap={this.cancelRequest} />
                       <FlatButton type="submit" label="Submit" primary />
                     </div>

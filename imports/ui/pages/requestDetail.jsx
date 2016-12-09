@@ -2,10 +2,9 @@ import { Table, TableRow, TableRowColumn, TableBody }
   from 'material-ui/Table';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
 import Paper from 'material-ui/Paper';
+import { hashHistory } from 'react-router';
 
-import { Meteor } from 'meteor/meteor';
-import { Tracker } from 'meteor/tracker';
-import Header from './header.jsx';
+import Header from '../components/header.jsx';
 import '../../api/requests/requests.js';
 
 /* global Requests:true*/
@@ -30,38 +29,48 @@ const RequestDetail = React.createClass({
 
   getInitialState() {
     return {
+      requestId: this.props.location.query.id,
       description: '',
       estCost: 0,
       partNo: '',
       quantity: 0,
-      unitcost: 0,
+      unitCost: 0,
       vendor: '',
+      status: null,
+      statMsg: '',
+      fileUrl: '',
     };
   },
 
   componentWillMount() {
-    Tracker.autorun(() => {
-      Meteor.subscribe('requests', () => {
-        const reqs = Requests.find().fetch();
-        const id = this.props.location.query.id;
-        let req = null;
-        for (let x = 0; x < reqs.length; x += 1) {
-          if (reqs[x]._id === id) {
-            req = reqs[x];
-            break;
-          }
-        }
-        if (req) {
-          this.setState({
-            description: req.description,
-            estCost: req.estCost,
-            partNo: req.partNo,
-            quantity: req.quantity,
-            unitCost: req.unitCost,
-            vendor: req.vendor,
-          });
-        }
-      });
+    this.setState({
+      description: this.props.description,
+      estCost: this.props.estCost,
+      partNo: this.props.partNo,
+      quantity: this.props.quantity,
+      unitCost: this.props.unitCost,
+      vendor: this.props.vendor,
+    });
+  },
+
+  componentWillReceiveProps(nextProps) {
+    if (!nextProps.user || (!nextProps.requestOwned && !nextProps.isAdmin)) {
+      hashHistory.push('/');
+    }
+
+    const descChange = this.state.description !== nextProps.description;
+    const estCostChange = this.state.estCost !== nextProps.estCost;
+    const partNoChange = this.state.partNo !== nextProps.partNo;
+    const quantityChange = this.state.quantity !== nextProps.quantity;
+    const unitCostChange = this.state.unitCost !== nextProps.unitCost;
+    const vendorChange = this.state.vendor !== nextProps.vendor;
+    this.setState({
+      description: descChange ? nextProps.description : this.state.description,
+      estCost: estCostChange ? nextProps.estCost : this.state.estCost,
+      partNo: partNoChange ? nextProps.partNo : this.state.partNo,
+      quantity: quantityChange ? nextProps.quantity : this.state.quantity,
+      unitCost: unitCostChange ? nextProps.unitCost : this.state.unitCost,
+      vendor: vendorChange ? nextProps.vendor : this.state.vendor,
     });
   },
 
@@ -79,15 +88,29 @@ const RequestDetail = React.createClass({
   },
 
   changeQuantity(e) {
-    this.setState({ quantity: e.target.value });
+    const newState = {
+      quantity: e.target.value,
+      estCost: this.state.unitCost * e.target.value,
+    };
+
+    this.setState(newState);
   },
 
   changeUnitCost(e) {
-    this.setState({ unitCost: e.target.value });
+    const newState = {
+      unitCost: e.target.value,
+      estCost: this.state.quantity * e.target.value,
+    };
+
+    this.setState(newState);
   },
 
   changeVendor(e) {
     this.setState({ vendor: e.target.value });
+  },
+
+  changeFileUrl(e) {
+    this.setState({ fileUrl: e.target.value });
   },
 
   editRequest() {
@@ -99,6 +122,9 @@ const RequestDetail = React.createClass({
       quantity: this.state.quantity,
       unitCost: this.state.unitCost,
       vendor: this.state.vendor,
+      status: this.state.status,
+      statMsg: this.state.statMsg,
+      fileUrl: this.state.fileUrl,
     };
 
     console.log(req);
@@ -127,10 +153,10 @@ const RequestDetail = React.createClass({
                   </TableRow>
                   <TableRow selectable={false}>
                     <TableRowColumn>
-                      <label htmlFor="name">Estimated Cost</label>
+                      <label htmlFor="name">Total Cost</label>
                     </TableRowColumn>
                     <TableRowColumn>
-                      <input name="name" type="text" value={this.state.estCost} onChange={this.changeEstCost} />
+                      <div>{this.state.estCost}</div>
                     </TableRowColumn>
                   </TableRow>
                   <TableRow selectable={false}>
@@ -163,6 +189,30 @@ const RequestDetail = React.createClass({
                     </TableRowColumn>
                     <TableRowColumn>
                       <input name="name" type="text" value={this.state.vendor} onChange={this.changeVendor} />
+                    </TableRowColumn>
+                  </TableRow>
+                  <TableRow selectable={false}>
+                    <TableRowColumn>
+                      <label htmlFor="name">File URL</label>
+                    </TableRowColumn>
+                    <TableRowColumn>
+                      <input name="name" type="text" value={this.state.fileUrl} onChange={this.changeFileUrl} />
+                    </TableRowColumn>
+                  </TableRow>
+                  <TableRow selectable={false}>
+                    <TableRowColumn>
+                      <label htmlFor="name">Status</label>
+                    </TableRowColumn>
+                    <TableRowColumn>
+                      <input name="name" type="text" value={this.state.status} disabled />
+                    </TableRowColumn>
+                  </TableRow>
+                  <TableRow selectable={false}>
+                    <TableRowColumn>
+                      <label htmlFor="name">Status Message</label>
+                    </TableRowColumn>
+                    <TableRowColumn>
+                      <input name="name" type="text" value={this.state.statMsg} disabled />
                     </TableRowColumn>
                   </TableRow>
                   <TableRow selectable={false}>

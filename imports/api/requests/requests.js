@@ -26,6 +26,7 @@ Requests.schema = new SimpleSchema({
   quantity: { type: Number, defaultValue: 1 },
   unitCost: { type: Number, decimal: true },
   receipt: { type: String, optional: true },
+  fileUrl: { type: String, defaultValue: '' },
 });
 
 Factory.define('request', Requests, {
