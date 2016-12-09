@@ -13,6 +13,7 @@ import '../../api/requests/requests.js';
 
 const React = require('react');
 
+// Styles
 const paperStyle = {
   height: '35px',
   lineHeight: '35px',
@@ -34,12 +35,6 @@ const ViewRequests = React.createClass({
 
   componentWillMount() {
     this.setState({ requests: this.props.requests });
-    /* Tracker.autorun(() => {
-      Meteor.subscribe('requests', () => {
-        console.log(Requests.find().fetch());
-        this.setState({ requests: Requests.find().fetch() });
-      });
-    }); */
   },
 
   componentWillReceiveProps(nextProps) {

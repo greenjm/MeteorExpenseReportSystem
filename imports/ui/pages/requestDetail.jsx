@@ -12,6 +12,7 @@ import '../../api/requests/requests.js';
 
 const React = require('react');
 
+// Styles
 const paperStyle = {
   height: '35px',
   lineHeight: '35px',
@@ -73,6 +74,7 @@ const RequestDetail = React.createClass({
     });
   },
 
+  // State Bindings
   changeDescription(e) {
     this.setState({ description: e.target.value });
   },
@@ -86,11 +88,21 @@ const RequestDetail = React.createClass({
   },
 
   changeQuantity(e) {
-    this.setState({ quantity: e.target.value });
+    const newState = {
+      quantity: e.target.value,
+      estCost: this.state.unitCost * e.target.value,
+    };
+
+    this.setState(newState);
   },
 
   changeUnitCost(e) {
-    this.setState({ unitCost: e.target.value });
+    const newState = {
+      unitCost: e.target.value,
+      estCost: this.state.quantity * e.target.value,
+    };
+
+    this.setState(newState);
   },
 
   changeVendor(e) {
@@ -141,10 +153,10 @@ const RequestDetail = React.createClass({
                   </TableRow>
                   <TableRow selectable={false}>
                     <TableRowColumn>
-                      <label htmlFor="name">Estimated Cost</label>
+                      <label htmlFor="name">Total Cost</label>
                     </TableRowColumn>
                     <TableRowColumn>
-                      <input name="name" type="text" value={this.state.estCost} onChange={this.changeEstCost} />
+                      <div>{this.state.estCost}</div>
                     </TableRowColumn>
                   </TableRow>
                   <TableRow selectable={false}>
@@ -206,7 +218,7 @@ const RequestDetail = React.createClass({
                   <TableRow selectable={false}>
                     <TableRowColumn>
                       <button onClick={this.editRequest}>Save Changes</button>
-                    </TableRowColumn>                  
+                    </TableRowColumn>
                   </TableRow>
                 </TableBody>
               </Table>

@@ -122,18 +122,14 @@ const AdminDashboard = React.createClass({
     this.createItem(projectName, 4);
   },
 
-  showForm() {
-    document.getElementById('projectForm').style.display = 'block';
-  },
-
-  hideForm() {
-    document.getElementById('projectForm').style.display = 'none';
-    document.getElementById('name').value = '';
-    document.getElementById('project').value = '';
-  },
-
-  showUserForm() {
-    document.getElementById('userForm').style.display = 'block';
+  // User Dialog functions
+  emptyUserFieldError() {
+    if (this.state.newUserEmail === '') {
+      this.setState({ emailError: 'This field is required.' });
+    }
+    if (this.state.newUserName === '') {
+      this.setState({ userNameError: 'This field is required.' });
+    }
   },
 
   hideUserForm() {
@@ -168,17 +164,35 @@ const AdminDashboard = React.createClass({
   },
 
   closeUserDialog() {
-    this.setState({ editUserDialogOpen: false,
-                    editUserId: '',
-                    userName: '',
-                    autoInternet: false,
-                    autoPhone: false,
-                    isAdmin: false });
+    this.setState({
+      editUserDialogOpen: false,
+      newUserName: '',
+      newUserEmail: '',
+      isAdmin: false,
+    });
   },
 
+  // State Bindings
   openUserDialog() {
     this.setState({ editUserDialogOpen: true });
   },
+
+  closeProjectDialog() {
+    this.setState({ newProjectDialogOpen: false });
+  },
+
+  openProjectDialog() {
+    this.setState({ newProjectDialogOpen: true, dialogError: '' });
+  },
+
+  handleProjectNameChange(event) {
+    this.setState({ newProjectName: event.target.value, projectNameError: '' });
+  },
+
+  handleManagerChange(event, index, value) {
+    this.setState({ projectManager: value, managerError: '' });
+  },
+
 
   editUser(user) {
     this.setState({
@@ -224,37 +238,20 @@ const AdminDashboard = React.createClass({
       this.emptyProjectFieldError();
       return;
     }
-    Meteor.call('projects.create', this.state.newProjectName, this.state.projectManager, (err, res) => {
+    Meteor.call('projects.create', this.state.newProjectName, this.state.projectManager, (err) => {
       if (err != null) {
         this.setState({ dialogError: `Error: ${err.error}. Reason: ${err.reason}` });
         return;
       }
-      if (res) {
-        this.setState({ dialogError: '', newProjectName: '', projectManager: '' });
-      }
+      this.setState({ dialogError: '', newProjectName: '', projectManager: '' });
+
       this.closeProjectDialog();
     });
   },
 
-  closeProjectDialog() {
-    this.setState({ newProjectDialogOpen: false });
-  },
-
-  openProjectDialog() {
-    this.setState({ newProjectDialogOpen: true, dialogError: '' });
-  },
-
-  handleProjectNameChange(event) {
-    this.setState({ newProjectName: event.target.value, projectNameError: '' });
-  },
-
-  handleManagerChange(event, index, value) {
-    this.setState({ projectManager: value, managerError: '' });
-  },
-
   createUserMenuItem(item) {
     return (
-      <MenuItem value={item._id} primaryText={item.profile.name} />
+      <MenuItem value={item._id} key={item._id} primaryText={item.profile.name} />
     );
   },
 
@@ -295,9 +292,7 @@ const AdminDashboard = React.createClass({
           <Grid>
             <Row>
               <Col xs={12} sm={12} md={6} lg={6}>
-                <Table
-                  selectable={false}
-                >
+                <Table selectable={false}>
                   <TableHeader displaySelectAll={false}>
                     <TableRow selectable={false}>
                       <TableHeaderColumn>Name</TableHeaderColumn>
@@ -314,9 +309,7 @@ const AdminDashboard = React.createClass({
                 </Table>
               </Col>
               <Col xs={12} sm={12} md={6} lg={6}>
-                <Table
-                  selectable={false}
-                >
+                <Table selectable={false}>
                   <TableHeader displaySelectAll={false}>
                     <TableRow selectable={false}>
                       <TableHeaderColumn colSpan="2" style={{ textAlign: 'center' }}>
@@ -356,9 +349,7 @@ const AdminDashboard = React.createClass({
                   <TableBody
                     showRowHover
                     displayRowCheckbox={false}
-                  >
-                    
-                  </TableBody>
+                  />
                 </Table>
               </Col>
             </Row>
@@ -431,7 +422,7 @@ const AdminDashboard = React.createClass({
           <div style={{ color: 'red' }}>{this.state.dialogError}</div>
         </Dialog>
       </div>
-      );
+    );
   },
 });
 

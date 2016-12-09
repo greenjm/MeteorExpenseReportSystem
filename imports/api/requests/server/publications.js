@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-// import { check } from 'meteor/check';
+import { check } from 'meteor/check';
 import '../requests.js';
 
 /* global Requests:true*/
@@ -22,8 +22,10 @@ Meteor.publish('requests', function requestsPublish() {
 });
 
 Meteor.publish('requestOne', function retrieveRequest(requestId) {
+  check(requestId, String);
+
   const currentUser = Meteor.users.findOne(this.userId);
-    if (currentUser == null || currentUser.profile == null) {
+  if (currentUser == null || currentUser.profile == null) {
     return null;
   }
 
