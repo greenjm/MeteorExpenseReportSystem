@@ -90,9 +90,6 @@ const ManageRequests = React.createClass({
   },
 
   removeItem(index) {
-    // const filteredRequests = this.state.requests.filter((requests, i) => {
-    //     i == index;
-    //   });
     const filteredRequests=[];
     for (var i = this.state.requests.length - 1; i >= 0; i--) {
       if(i!=index){
@@ -101,7 +98,6 @@ const ManageRequests = React.createClass({
         console.log("i: "+ i);
       }
     }
-
     this.setState({
       requests: filteredRequests,
     });
@@ -111,16 +107,17 @@ const ManageRequests = React.createClass({
     this.setState({ statMsg: e.target.value });
   },
 
-  handleConfirmPress() {
-    this.removeItem(this.state.requestId);
+  handleConfirmPress(e) {
+    console.log("Confirm target index: "+ e.target.value);
+    this.removeItem(e.target.index);
     this.setState({ requestDialogOpen: false,
                     status: true,
     });
   },
 
-  handleDenyPress() {
-    console.log("requestId: "+ this.state.requestId);
-    this.removeItem(this.state.requestId);
+  handleDenyPress(e) {
+    console.log("Deny target index: "+ e.target.value);
+    this.removeItem(e.target.index);
 
     this.setState({ requestDialogOpen: false,
                     status: false,
