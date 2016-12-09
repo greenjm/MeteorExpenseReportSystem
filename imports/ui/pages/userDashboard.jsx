@@ -57,6 +57,10 @@ const UserDashboard = React.createClass({
     hashHistory.push('/submitRequest');
   },
 
+  manageRequests() {
+    hashHistory.push('/manageRequests');
+  },
+
   viewRequests() {
     hashHistory.push('/viewRequests');
   },
@@ -132,13 +136,14 @@ const UserDashboard = React.createClass({
                   style={buttonStyle}
                   icon={<ViewList />}
                   secondary
+                  onTouchTap={this.manageRequests}
                 />
               </Col>
             </Row>
           </Grid>
         </div>
       </div>
-    );
+      );
   },
 });
 

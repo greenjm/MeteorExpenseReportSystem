@@ -12,7 +12,6 @@ import '../../api/requests/requests.js';
 
 const React = require('react');
 
-// Styles
 const paperStyle = {
   height: '35px',
   lineHeight: '35px',
@@ -29,12 +28,16 @@ const RequestDetail = React.createClass({
 
   getInitialState() {
     return {
+      requestId: this.props.location.query.id,
       description: '',
       estCost: 0,
       partNo: '',
       quantity: 0,
       unitCost: 0,
       vendor: '',
+      status: null,
+      statMsg: '',
+      fileUrl: '',
     };
   },
 
@@ -70,9 +73,12 @@ const RequestDetail = React.createClass({
     });
   },
 
-  // State Bindings
   changeDescription(e) {
     this.setState({ description: e.target.value });
+  },
+
+  changeEstCost(e) {
+    this.setState({ estCost: e.target.value });
   },
 
   changePartNo(e) {
@@ -80,25 +86,19 @@ const RequestDetail = React.createClass({
   },
 
   changeQuantity(e) {
-    const newState = {
-      quantity: e.target.value,
-      estCost: this.state.unitCost * e.target.value,
-    };
-
-    this.setState(newState);
+    this.setState({ quantity: e.target.value });
   },
 
   changeUnitCost(e) {
-    const newState = {
-      unitCost: e.target.value,
-      estCost: this.state.quantity * e.target.value,
-    };
-
-    this.setState(newState);
+    this.setState({ unitCost: e.target.value });
   },
 
   changeVendor(e) {
     this.setState({ vendor: e.target.value });
+  },
+
+  changeFileUrl(e) {
+    this.setState({ fileUrl: e.target.value });
   },
 
   editRequest() {
@@ -110,6 +110,9 @@ const RequestDetail = React.createClass({
       quantity: this.state.quantity,
       unitCost: this.state.unitCost,
       vendor: this.state.vendor,
+      status: this.state.status,
+      statMsg: this.state.statMsg,
+      fileUrl: this.state.fileUrl,
     };
 
     console.log(req);
@@ -138,10 +141,10 @@ const RequestDetail = React.createClass({
                   </TableRow>
                   <TableRow selectable={false}>
                     <TableRowColumn>
-                      <label htmlFor="name">Total Cost</label>
+                      <label htmlFor="name">Estimated Cost</label>
                     </TableRowColumn>
                     <TableRowColumn>
-                      <div>{this.state.estCost}</div>
+                      <input name="name" type="text" value={this.state.estCost} onChange={this.changeEstCost} />
                     </TableRowColumn>
                   </TableRow>
                   <TableRow selectable={false}>
@@ -178,8 +181,32 @@ const RequestDetail = React.createClass({
                   </TableRow>
                   <TableRow selectable={false}>
                     <TableRowColumn>
-                      <button onClick={this.editRequest}>Save Changes</button>
+                      <label htmlFor="name">File URL</label>
                     </TableRowColumn>
+                    <TableRowColumn>
+                      <input name="name" type="text" value={this.state.fileUrl} onChange={this.changeFileUrl} />
+                    </TableRowColumn>
+                  </TableRow>
+                  <TableRow selectable={false}>
+                    <TableRowColumn>
+                      <label htmlFor="name">Status</label>
+                    </TableRowColumn>
+                    <TableRowColumn>
+                      <input name="name" type="text" value={this.state.status} disabled />
+                    </TableRowColumn>
+                  </TableRow>
+                  <TableRow selectable={false}>
+                    <TableRowColumn>
+                      <label htmlFor="name">Status Message</label>
+                    </TableRowColumn>
+                    <TableRowColumn>
+                      <input name="name" type="text" value={this.state.statMsg} disabled />
+                    </TableRowColumn>
+                  </TableRow>
+                  <TableRow selectable={false}>
+                    <TableRowColumn>
+                      <button onClick={this.editRequest}>Save Changes</button>
+                    </TableRowColumn>                  
                   </TableRow>
                 </TableBody>
               </Table>

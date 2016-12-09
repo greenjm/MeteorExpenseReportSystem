@@ -1,3 +1,8 @@
+// This file represents the login page, both its markup and its logic.
+// The render() function shows the basic login form and binds its variables to the state.
+// When the login button is clicked, the login function is called, which calls the API
+// and then callsthe appropriate function success/fail depending on the server response.
+
 import { hashHistory } from 'react-router';
 import { Meteor } from 'meteor/meteor';
 import { Card, CardActions, CardHeader, CardText } from 'material-ui/Card';
@@ -6,7 +11,8 @@ import TextField from 'material-ui/TextField';
 
 const React = require('react');
 
-// Styles
+// Inline Styles
+
 const cardStyle = {
   width: '35%',
   margin: 'auto',
@@ -15,6 +21,8 @@ const cardStyle = {
   left: '0',
   right: '0',
 };
+
+// Done
 
 const Login = React.createClass({
   propTypes: {
@@ -30,7 +38,7 @@ const Login = React.createClass({
       passwordError: '',
     };
   },
-  
+
   componentWillReceiveProps(nextProps) {
     if (nextProps.user) {
       if (nextProps.isAdmin) {
@@ -84,10 +92,9 @@ const Login = React.createClass({
   },
 
   loginFailure() {
-    this.setState({ username: '', password: '', passwordError: 'Either email or password is incorrect.' });
+    this.setState({ passwordError: 'Either email or password is incorrect.' });
   },
 
-  // State Bindings
   handleUsernameChange(event) {
     this.setState({ username: event.target.value, usernameError: '' });
   },

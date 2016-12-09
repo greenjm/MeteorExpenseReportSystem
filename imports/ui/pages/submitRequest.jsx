@@ -42,6 +42,8 @@ const SubmitRequest = React.createClass({
       unitCostError: '',
       partNum: '',
       partNumError: '',
+      fileUrl: '',
+      fileUrlError: '',
       dialogError: '',
       snackbarOpen: false,
     };
@@ -70,21 +72,17 @@ const SubmitRequest = React.createClass({
 
   submitRequest() {
     this.setState({ dialogError: '' });
-
     const requiredError = 'This field is required.';
     const numError = 'You must enter a number.';
     let hasError = false;
-
     if (this.state.projectSelected === '') {
       this.projectError(requiredError);
       hasError = true;
     }
-
     if (this.state.description === '') {
       this.descriptionError(requiredError);
       hasError = true;
     }
-
     const estimatedCostNum = +this.state.estimatedCost;
     if (this.state.estimatedCost === '') {
       this.estimateError(requiredError);
@@ -93,12 +91,10 @@ const SubmitRequest = React.createClass({
       this.estimateError(numError);
       hasError = true;
     }
-
     if (this.state.vendor === '') {
       this.vendorError(requiredError);
       hasError = true;
     }
-
     const qtyNum = +this.state.qty;
     if (this.state.qty === '') {
       this.qtyError(requiredError);
@@ -107,7 +103,6 @@ const SubmitRequest = React.createClass({
       this.qtyError(numError);
       hasError = true;
     }
-
     const unitCostNum = +this.state.unitCost;
     if (this.state.unitCost === '') {
       this.unitCostError(requiredError);
@@ -116,7 +111,6 @@ const SubmitRequest = React.createClass({
       this.unitCostError(numError);
       hasError = true;
     }
-
     if (this.state.partNum === '') {
       this.partNumError(requiredError);
       hasError = true;
@@ -133,6 +127,7 @@ const SubmitRequest = React.createClass({
       this.state.partNum,
       qtyNum,
       +unitCostNum.toFixed(2),
+      this.state.fileUrl,
       (error, result) => {
         if (error != null) {
           this.setState({ dialogError: `Error: ${error.error}. Reason: ${error.reason}` });
@@ -147,13 +142,13 @@ const SubmitRequest = React.createClass({
             partNum: '',
             qty: '',
             unitCost: '',
+            fileUrl: '',
             snackbarOpen: true,
           });
         }
       });
   },
 
-  // State Bindings
   // Project select methods
   handleProjectSelect(event, index, value) {
     this.setState({ projectSelected: value, projectSelectedError: '' });
@@ -198,16 +193,7 @@ const SubmitRequest = React.createClass({
 
   // Quantity methods
   handleQtyChange(event) {
-    const newState = {};
-
-    if (this.state.unitCost) {
-      newState.estimatedCost = this.state.unitCost * event.target.value;
-    }
-
-    newState.qty = event.target.value;
-    newState.qtyError = '';
-
-    this.setState(newState);
+    this.setState({ qty: event.target.value, qtyError: '' });
   },
 
   qtyError(err) {
@@ -216,16 +202,7 @@ const SubmitRequest = React.createClass({
 
   // Unit cost methods
   handleUnitCostChange(event) {
-    const newState = {};
-
-    if (this.state.qty) {
-      newState.estimatedCost = this.state.qty * event.target.value;
-    }
-
-    newState.unitCost = event.target.value;
-    newState.unitCostError = '';
-
-    this.setState(newState);
+    this.setState({ unitCost: event.target.value, unitCostError: '' });
   },
 
   unitCostError(err) {
@@ -241,6 +218,11 @@ const SubmitRequest = React.createClass({
     this.setState({ partNumError: err });
   },
 
+  // File URL methods
+  handleFileUrlChange(event) {
+    this.setState({ fileUrl: event.target.value, fileUrlError: '' });
+  },
+
   // Snackbar methods
   handleSnackbarAction() {
     // TODO: change to request view when ready
@@ -252,11 +234,6 @@ const SubmitRequest = React.createClass({
   },
 
   render() {
-    let noProjectsError = '';
-    if (!this.state.projects) {
-      noProjectsError = 'You are not a member of any projects! Contact an admin or your manager to be added to a project.';
-    }
-
     return (
       <div>
         <Header isAdmin={this.props.isAdmin} />
@@ -267,13 +244,13 @@ const SubmitRequest = React.createClass({
           <Grid>
             <Row>
               <Col xs={12} sm={12} md={12} lg={12}>
-                <Paper style={{ textAlign: 'center', padding: '10px' }} zDepth={1}>
+                <Paper style={{ textAlign: 'center' }} zDepth={1}>
                   <form onSubmit={this.submitRequest}>
                     <SelectField
                       floatingLabelText="Select Project"
                       value={this.state.projectSelected}
                       onChange={this.handleProjectSelect}
-                      errorText={noProjectsError}
+                      errorText={this.state.projectSelectedError}
                       fullWidth
                     >
                       {this.state.projects.map(this.createProjectMenuItem)}
@@ -286,11 +263,11 @@ const SubmitRequest = React.createClass({
                       fullWidth
                     />
                     <TextField
-                      hintText="Total Cost"
+                      hintText="Estimated Cost"
                       value={this.state.estimatedCost}
+                      onChange={this.handleEstimateChange}
                       errorText={this.state.estimatedCostError}
                       fullWidth
-                      readOnly
                     />
                     <TextField
                       hintText="Vendor Name"
@@ -320,8 +297,15 @@ const SubmitRequest = React.createClass({
                       errorText={this.state.partNumError}
                       fullWidth
                     />
+                    <TextField
+                      hintText="File URL (optional)"
+                      value={this.state.fileUrl}
+                      onChange={this.handleFileUrlChange}
+                      errorText={this.state.fileUrlError}
+                      fullWidth
+                    />
                     <div style={{ color: 'red' }}>{this.state.dialogError}</div>
-                    <div style={{ float: 'right', margin: '10px' }}>
+                    <div style={{ float: 'right' }}>
                       <FlatButton label="Cancel" onTouchTap={this.cancelRequest} />
                       <FlatButton type="submit" label="Submit" primary />
                     </div>
