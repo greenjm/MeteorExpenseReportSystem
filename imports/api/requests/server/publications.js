@@ -2,7 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import '../requests.js';
 
-/* global Requests:true*/
+/* global Requests Projects:true*/
 /* eslint no-undef: "error"*/
 
 Meteor.publish('requests', function requestsPublish() {
@@ -17,7 +17,13 @@ Meteor.publish('requests', function requestsPublish() {
     return requests;
   }
 
-  const requests = Requests.find({ userId: this.userId });
+  const projectIds = Projects.find({ managers: this.userId }, { _id: 1 }).fetch();
+
+  const requests = Requests.find({ $or:
+    [{ userId: this.userId },
+      { projectId: { $in: projectIds },
+    }],
+  });
   return requests;
 });
 
