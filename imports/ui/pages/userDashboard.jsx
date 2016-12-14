@@ -73,7 +73,29 @@ const UserDashboard = React.createClass({
     if (!nextProps.user) {
       hashHistory.push('/');
     }
-    this.setState({ name: nextProps.name });
+
+    const nameChange = this.state.name !== nextProps.name;
+    const employeeProjectsChange = this.state.employeeProjects !== nextProps.employeeProjects;
+    const managerProjectsChange = this.state.managerProjects !== nextProps.managerProjects;
+    const myRequestsChange = this.state.myRequests !== nextProps.myRequests;
+    const managerRequestsChange = this.state.managerRequests !== nextProps.managerRequests;
+    const usersChange = this.state.users !== nextProps.users;
+    const isManagerChange = this.state.isManager !== nextProps.isManager;
+    const isEmployeeChange = this.state.isEmployee !== nextProps.isEmployee;
+
+    this.setState({
+      name: nameChange ? nextProps.name : this.state.name,
+      employeeProjects: employeeProjectsChange ?
+        nextProps.employeeProjects : this.state.employeeProjects,
+      managerProjects: managerProjectsChange ?
+        nextProps.managerProjects : this.state.managerProjects,
+      myRequests: myRequestsChange ? nextProps.myRequests : this.state.myRequests,
+      managerRequests: managerRequestsChange ?
+        nextProps.managerRequests : this.state.managerRequests,
+      users: usersChange ? nextProps.users : this.state.users,
+      isManager: isManagerChange ? nextProps.isManager : this.state.isManager,
+      isEmployee: isEmployeeChange ? nextProps.isEmployee : this.state.isEmployee,
+    });
   },
 
   submitRequest() {
