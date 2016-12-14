@@ -22,8 +22,11 @@ const UserDashboardContainer = createContainer(() => {
   let userReady = null;
 
   // Projects and Requests
-  const projects = projectReady && Projects.find().fetch();
-  const requests = requestReady && Requests.find().fetch();
+  const employeeProjects = projectReady && user && Projects.find({ employees: user._Id }).fetch();
+  const managerProjects = projectReady && user && Projects.find({ employees: user._Id }).fetch();
+  const myRequests = requestReady && user && Requests.find({ userId: user._Id }).fetch();
+  const managerRequests = requestReady && user &&
+    Requests.find({ userId: { $not: user._id } }).fetch();
   const requestUserIds = requestReady && Requests.find({}, { _id: 0, userId: 1 }).fetch();
   let users = [];
   if (requestUserIds) {
@@ -33,15 +36,17 @@ const UserDashboardContainer = createContainer(() => {
   }
 
   // Helper props
-  const isManager = projectReady && (Projects.find({ managers: this.userId }).count() > 0);
-  const isEmployee = projectReady && (Projects.find({ employees: this.userId }).count() > 0);
+  const isEmployee = employeeProjects && employeeProjects.length > 0;
+  const isManager = managerProjects && managerProjects.length > 0;
 
   return {
     user: !!user || false,
     isAdmin,
     name,
-    projects,
-    requests,
+    employeeProjects,
+    managerProjects,
+    myRequests,
+    managerRequests,
     users,
     isManager,
     isEmployee,

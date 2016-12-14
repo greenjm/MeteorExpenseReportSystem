@@ -34,16 +34,39 @@ const UserDashboard = React.createClass({
   propTypes: {
     isAdmin: React.PropTypes.bool,
     name: React.PropTypes.string,
+    employeeProjects: React.PropTypes.array,
+    managerProjects: React.PropTypes.array,
+    myRequests: React.PropTypes.array,
+    managerRequests: React.PropTypes.array,
+    users: React.PropTypes.array,
+    isManager: React.PropTypes.bool,
+    isEmployee: React.PropTypes.bool,
   },
 
   getInitialState() {
     return {
       name: '',
+      employeeProjects: [],
+      managerProjects: [],
+      myRequests: [],
+      managerRequests: [],
+      users: [],
+      isManager: false,
+      isEmployee: false,
     };
   },
 
   componentWillMount() {
-    this.setState({ name: this.props.name });
+    this.setState({
+      name: this.props.name,
+      employeeProjects: this.props.employeeProjects,
+      managerProjects: this.props.managerProjects,
+      myRequests: this.props.myRequests,
+      managerRequests: this.props.managerRequests,
+      users: this.props.users,
+      isManager: this.props.isManager,
+      isEmployee: this.props.isEmployee,
+    });
   },
 
   componentWillReceiveProps(nextProps) {
