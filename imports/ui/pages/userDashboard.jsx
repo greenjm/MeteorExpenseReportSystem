@@ -1,4 +1,3 @@
-import { Meteor } from 'meteor/meteor';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
   from 'material-ui/Table';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
@@ -8,11 +7,11 @@ import { Tabs, Tab } from 'material-ui/Tabs';
 import Paper from 'material-ui/Paper';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import Search from 'material-ui/svg-icons/action/search';
-import RaisedButton from 'material-ui/RaisedButton';
 // import Dialog from 'material-ui/Dialog';
 // import FlatButton from 'material-ui/FlatButton';
 // import TextField from 'material-ui/TextField';
 import Header from '../components/header.jsx';
+import ManagerView from '../components/managerView.jsx';
 
 const React = require('react');
 
@@ -22,163 +21,6 @@ const paperStyle = {
   lineHeight: '35px',
   fontFamily: 'Roboto,sans-serif',
   paddingLeft: '24px',
-};
-
-// function openRequestDialog() {
-//   this.setState({
-//     requestDialogOpen: true,
-//   });
-// }
-
-// function closeRequestDialog() {
-//   this.setState({
-//     requestDialogOpen: false,
-//   });
-// }
-
-// function serveRequest(request, index, approved, message) {
-//   Meteor.call('requests.statEdit', request._id, approved, message, (err) => {
-//     if (err) {
-//       console.log(err);
-//     }
- // else {
- //      this.removeItem(index);
- //    }
-//   });
-// }
-
-// function handleConfirmPress(req, index) {
-//   serveRequest(req, index, true, '');
-// }
-
-// function handleDenyPress(index) {
-//   setState({ requestDialogOpen: true, selected: index });
-// }
-
-// function denyRequest() {
-//   this.serveRequest(this.state.requests[this.state.selected],
-//     this.state.selected, false, this.state.statMsg);
-//   this.setState({
-//     statMsg: '',
-//     selected: -1,
-//     requestDialogOpen: false,
-//   });
-// }
-
-// function handleCancelPress() {
-//   this.setState({
-//     requestDialogOpen: false,
-//     statMsg: '',
-//   });
-// }
-
-function ManagerView(props) {
-  function createProjectRow(item) {
-    return (
-      <TableRow selectable={false}>
-        <TableRowColumn>{item.name}</TableRowColumn>
-        <TableRowColumn>
-          <FloatingActionButton mini style={{ margin: '3px' }} href={`/#/project/view/${item._id}`}>
-            <Search />
-          </FloatingActionButton>
-        </TableRowColumn>
-      </TableRow>
-    );
-  }
-
-  function createRequestRow(item, index) {
-    const url = `/#/requestDetail/${item._id}`;
-    let projectName = '';
-    for (let i = 0; i < props.projects.length; i += 1) {
-      const p = props.projects[i];
-      if (p._id === item.projectId) {
-        projectName = p.name;
-        break;
-      }
-    }
-
-    let status = '';
-    if (item.status === undefined) {
-      status = 'Pending';
-    } else if (item.status) {
-      status = 'Approved';
-    } else {
-      status = 'Denied';
-    }
-
-    return (
-      <TableRow key={index} selectable={false}>
-        <TableRowColumn>{projectName}</TableRowColumn>
-        <TableRowColumn>{status}</TableRowColumn>
-        <TableRowColumn>{item.statMsg}</TableRowColumn>
-        <TableRowColumn>{item.estCost}</TableRowColumn>
-        <TableRowColumn>
-          <a href={url}>
-            <FloatingActionButton mini style={{ margin: '3px' }}>
-              <Search />
-            </FloatingActionButton>
-          </a>
-        </TableRowColumn>
-      </TableRow>
-    );
-  }
-
-  return (
-    <div>
-      <Tabs>
-        <Tab label="Projects" >
-          <Table selectable={false}>
-            <TableHeader displaySelectAll={false}>
-              <TableRow selectable={false}>
-                <TableHeaderColumn>Project Name</TableHeaderColumn>
-                <TableHeaderColumn>Actions</TableHeaderColumn>
-              </TableRow>
-            </TableHeader>
-            <TableBody displayRowCheckbox={false}>
-              {props.projects.length > 0 ?
-                props.projects.map(createProjectRow) :
-                (
-                <TableRow selectable={false}>
-                  <TableRowColumn>You do not belong to any projects.</TableRowColumn>
-                  <TableRowColumn />
-                </TableRow>
-                )
-              }
-            </TableBody>
-          </Table>
-        </Tab>
-        <Tab label="Requests" >
-          <Table selectable={false}>
-            <TableHeader displaySelectAll={false}>
-              <TableRow selectable={false}>
-                <TableHeaderColumn>Project Name</TableHeaderColumn>
-                <TableHeaderColumn>Status</TableHeaderColumn>
-                <TableHeaderColumn>Status Message</TableHeaderColumn>
-                <TableHeaderColumn>Cost</TableHeaderColumn>
-                <TableHeaderColumn>Actions</TableHeaderColumn>
-              </TableRow>
-            </TableHeader>
-            <TableBody displayRowCheckbox={false}>
-              {props.requests.length > 0 ?
-                props.requests.map(createRequestRow) :
-                (
-                <TableRow selectable={false}>
-                  <TableRowColumn>You have not submitted any requests yet.</TableRowColumn>
-                  <TableRowColumn />
-                </TableRow>
-                )
-              }
-            </TableBody>
-          </Table>
-        </Tab>
-      </Tabs>
-    </div>
-  );
-}
-
-ManagerView.propTypes = {
-  projects: React.PropTypes.array,
-  requests: React.PropTypes.array,
 };
 
 function EmployeeView(props) {
