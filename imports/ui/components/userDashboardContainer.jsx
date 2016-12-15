@@ -22,17 +22,21 @@ const UserDashboardContainer = createContainer(() => {
   let userReady = null;
 
   // Projects and Requests
-  const employeeProjects = projectReady && user && Projects.find({ employees: user._Id }).fetch();
-  const managerProjects = projectReady && user && Projects.find({ employees: user._Id }).fetch();
-  const myRequests = requestReady && user && Requests.find({ userId: user._Id }).fetch();
-  const managerRequests = requestReady && user &&
-    Requests.find({ userId: { $not: user._id } }).fetch();
-  const requestUserIds = requestReady && Requests.find({}, { _id: 0, userId: 1 }).fetch();
+  const employeeProjects = (projectReady && user &&
+    Projects.find({ employees: user._Id }).fetch()) || [];
+  const managerProjects = (projectReady && user &&
+    Projects.find({ employees: user._Id }).fetch()) || [];
+  const myRequests = (requestReady && user &&
+    Requests.find({ userId: user._Id }).fetch()) || [];
+  const managerRequests = (requestReady && user &&
+    Requests.find({ userId: { $not: user._id } }).fetch()) || [];
+  const requestUserIds = requestReady &&
+    Requests.find({}, { fields: { userId: 1 } }).fetch();
   let users = [];
   if (requestUserIds) {
     userNameSub = Meteor.subscribe('usersNames', requestUserIds);
     userReady = userNameSub.ready();
-    users = userReady && Meteor.users.find().fetch();
+    users = (userReady && Meteor.users.find().fetch()) || [];
   }
 
   // Helper props

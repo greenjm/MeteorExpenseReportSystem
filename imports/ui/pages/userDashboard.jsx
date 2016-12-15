@@ -1,6 +1,8 @@
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
 import { hashHistory } from 'react-router';
 import RaisedButton from 'material-ui/RaisedButton';
+import Toggle from 'material-ui/Toggle';
+import {Tabs, Tab} from 'material-ui/Tabs';
 import Paper from 'material-ui/Paper';
 import ActionReceipt from 'material-ui/svg-icons/action/receipt';
 import Description from 'material-ui/svg-icons/action/description';
@@ -30,6 +32,50 @@ const buttonStyle = {
   height: '50px',
 };
 
+function ManagerView() {
+  // TODO
+  return (<div />);
+}
+
+function EmployeeView() {
+  return (
+    <div>
+      <Tabs>
+        <Tab label="Projects" >
+          <div>
+            <h2>Tab One</h2>
+            <p>
+              This is an example tab.
+            </p>
+            <p>
+              You can put any sort of HTML or react component in here.
+              It even keeps the component state!
+            </p>
+          </div>
+        </Tab>
+        <Tab label="Requests" >
+          <div>
+            <h2>Tab Two</h2>
+            <p>
+              This is another example tab.
+            </p>
+          </div>
+        </Tab>
+        <Tab
+          label="Report"
+        >
+          <div>
+            <h2>Tab Three</h2>
+            <p>
+              This is a third example tab.
+            </p>
+          </div>
+        </Tab>
+      </Tabs>
+    </div>
+  );
+}
+
 const UserDashboard = React.createClass({
   propTypes: {
     isAdmin: React.PropTypes.bool,
@@ -53,6 +99,7 @@ const UserDashboard = React.createClass({
       users: [],
       isManager: false,
       isEmployee: false,
+      viewToggle: false,
     };
   },
 
@@ -66,6 +113,7 @@ const UserDashboard = React.createClass({
       users: this.props.users,
       isManager: this.props.isManager,
       isEmployee: this.props.isEmployee,
+      viewToggle: this.props.isManager && !this.props.isEmployee,
     });
   },
 
@@ -95,9 +143,16 @@ const UserDashboard = React.createClass({
       users: usersChange ? nextProps.users : this.state.users,
       isManager: isManagerChange ? nextProps.isManager : this.state.isManager,
       isEmployee: isEmployeeChange ? nextProps.isEmployee : this.state.isEmployee,
+      viewToggle: nextProps.isManager && !nextProps.isEmployee,
     });
   },
 
+  // Helpers
+  toggleView() {
+    this.setState({ viewToggle: !this.state.viewToggle });
+  },
+
+  // Links
   submitRequest() {
     hashHistory.push('/submitRequest');
   },
@@ -120,6 +175,26 @@ const UserDashboard = React.createClass({
         <Header isAdmin={this.props.isAdmin} />
         <Paper style={paperStyle} zDepth={1}>User Dashboard</Paper>
         <br />
+        <div style={{ float: 'right', marginRight: '10px' }}>
+          <Toggle
+            label={this.state.viewToggle ? 'Manager View' : 'Employee View'}
+            toggled={this.state.viewToggle}
+            onToggle={this.toggleView}
+          />
+        </div>
+        <br />
+        { this.state.viewToggle ? (
+          <ManagerView />
+        ) : (
+          <EmployeeView />
+        )
+        }
+      </div>
+    );
+  },
+});
+
+/*
         <br />
         <div>
           <Grid>
@@ -187,9 +262,6 @@ const UserDashboard = React.createClass({
             </Row>
           </Grid>
         </div>
-      </div>
-    );
-  },
-});
+        */
 
 module.exports = UserDashboard;

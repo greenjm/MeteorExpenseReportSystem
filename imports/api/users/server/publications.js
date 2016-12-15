@@ -42,7 +42,7 @@ Meteor.publish('usersInProject', function projectUsersPublish(projectId) {
 
 Meteor.publish('usersNames', function usersNamesPublish(userIdList) {
   // Given a list of userIds, return the name of those users
-  check(userIdList, Object);
+  check(userIdList, Array);
 
   const currentUser = Meteor.users.findOne(this.userId);
 
@@ -50,7 +50,12 @@ Meteor.publish('usersNames', function usersNamesPublish(userIdList) {
     return null;
   }
 
-  const find = { _id: { $in: userIdList } };
+  const ids = [];
+  for (let i = 0; i < userIdList.length; i += 1) {
+    ids.push(userIdList[i].userId);
+  }
+
+  const find = { _id: { $in: ids } };
   const projection = { 'profile.name': 1 };
   const names = Meteor.users.find(find, projection);
   return names;
