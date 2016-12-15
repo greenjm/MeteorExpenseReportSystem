@@ -52,10 +52,13 @@ Meteor.publish('usersNames', function usersNamesPublish(userIdList) {
 
   const ids = [];
   for (let i = 0; i < userIdList.length; i += 1) {
+    if (!userIdList[i].userId) {
+      break;
+    }
     ids.push(userIdList[i].userId);
   }
 
-  const find = { _id: { $in: ids } };
+  const find = { $or: [{ _id: { $in: ids } }, { _id: { $in: userIdList } }] };
   const projection = { 'profile.name': 1 };
   const names = Meteor.users.find(find, projection);
   return names;

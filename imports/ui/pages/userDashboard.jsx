@@ -78,11 +78,8 @@ function ManagerView(props) {
       <TableRow selectable={false}>
         <TableRowColumn>{item.name}</TableRowColumn>
         <TableRowColumn>
-          <FloatingActionButton mini style={{ margin: '3px' }}>
+          <FloatingActionButton mini style={{ margin: '3px' }} href={`/#/project/view/${item._id}`}>
             <Search />
-          </FloatingActionButton>
-          <FloatingActionButton mini style={{ margin: '3px' }}>
-            <ContentAdd />
           </FloatingActionButton>
         </TableRowColumn>
       </TableRow>
@@ -190,10 +187,10 @@ function EmployeeView(props) {
       <TableRow selectable={false}>
         <TableRowColumn>{item.name}</TableRowColumn>
         <TableRowColumn>
-          <FloatingActionButton mini style={{ margin: '3px' }}>
+          <FloatingActionButton mini style={{ margin: '3px' }} href={`/#/project/view/${item._id}`}>
             <Search />
           </FloatingActionButton>
-          <FloatingActionButton mini style={{ margin: '3px' }}>
+          <FloatingActionButton mini style={{ margin: '3px' }} href={`/#/submitRequest/${item._id}`}>
             <ContentAdd />
           </FloatingActionButton>
         </TableRowColumn>

@@ -6,7 +6,7 @@ import './requests.js';
 /* eslint no-undef: "error"*/
 
 Meteor.methods({
-  'requests.create': function createRequest(proj, desc, est, vend, prt, qty, unt, url) {
+  'requests.create': function createRequest(proj, desc, est, vend, prt, qty, unt) {
     const currentUserId = Meteor.userId();
     check(proj, String);
     check(desc, String);
@@ -15,7 +15,6 @@ Meteor.methods({
     check(prt, String);
     check(qty, Number);
     check(unt, Number);
-    check(url, String);
 
     const newReq = {
       userId: currentUserId,
@@ -27,7 +26,7 @@ Meteor.methods({
       partNo: prt,
       quantity: qty,
       unitCost: unt,
-      fileUrl: url,
+      fileUrl: '',
     };
 
     Requests.schema.validate(newReq);
