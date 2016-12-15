@@ -1,14 +1,6 @@
-import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
-  from 'material-ui/Table';
-import FloatingActionButton from 'material-ui/FloatingActionButton';
 import { hashHistory } from 'react-router';
 import Toggle from 'material-ui/Toggle';
-import { Tabs, Tab } from 'material-ui/Tabs';
 import Paper from 'material-ui/Paper';
-import Search from 'material-ui/svg-icons/action/search';
-// import Dialog from 'material-ui/Dialog';
-// import FlatButton from 'material-ui/FlatButton';
-// import TextField from 'material-ui/TextField';
 import Header from '../components/header.jsx';
 import ManagerView from '../components/managerView.jsx';
 import EmployeeView from '../components/employeeView.jsx';

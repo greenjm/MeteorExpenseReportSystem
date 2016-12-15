@@ -4,7 +4,6 @@ import { hashHistory } from 'react-router';
 import TextField from 'material-ui/TextField';
 import FlatButton from 'material-ui/FlatButton';
 import Snackbar from 'material-ui/Snackbar';
-import MenuItem from 'material-ui/MenuItem';
 import Paper from 'material-ui/Paper';
 import Header from '../components/header.jsx';
 

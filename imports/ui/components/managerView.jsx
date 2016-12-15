@@ -2,11 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
   from 'material-ui/Table';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
-import { hashHistory } from 'react-router';
-import Toggle from 'material-ui/Toggle';
 import { Tabs, Tab } from 'material-ui/Tabs';
-import Paper from 'material-ui/Paper';
-import ContentAdd from 'material-ui/svg-icons/content/add';
 import Search from 'material-ui/svg-icons/action/search';
 import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from 'material-ui/Dialog';
@@ -19,6 +15,8 @@ const ManagerView = React.createClass({
   propTypes: {
     projects: React.PropTypes.array,
     requests: React.PropTypes.array,
+    currentTab: React.PropTypes.number,
+    updateTab: React.PropTypes.any,
   },
 
   getInitialState() {
@@ -54,7 +52,7 @@ const ManagerView = React.createClass({
   },
 
   handleDenyPress(request) {
-    this.setState({ 
+    this.setState({
       requestDialogOpen: true,
       requestToDeny: request });
   },

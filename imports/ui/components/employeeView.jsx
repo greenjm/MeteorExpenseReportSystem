@@ -4,6 +4,7 @@ import FloatingActionButton from 'material-ui/FloatingActionButton';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import Search from 'material-ui/svg-icons/action/search';
+import { hashHistory } from 'react-router';
 
 const React = require('react');
 
@@ -32,15 +33,19 @@ const EmployeeView = React.createClass({
     });
   },
 
+  goTo(url) {
+    hashHistory.push(url);
+  },
+
   createProjectRow(item) {
     return (
       <TableRow selectable={false}>
         <TableRowColumn>{item.name}</TableRowColumn>
         <TableRowColumn>
-          <FloatingActionButton mini style={{ margin: '3px' }} href={`/#/project/view/${item._id}`}>
+          <FloatingActionButton mini style={{ margin: '3px' }} onTouchTap={() => { this.goTo(`/project/view/${item._id}`); }}>
             <Search />
           </FloatingActionButton>
-          <FloatingActionButton mini style={{ margin: '3px' }} href={`/#/submitRequest/${item._id}`}>
+          <FloatingActionButton mini style={{ margin: '3px' }} onTouchTap={() => { this.goTo(`/submitRequest/${item._id}`); }}>
             <ContentAdd />
           </FloatingActionButton>
         </TableRowColumn>
@@ -74,7 +79,7 @@ const EmployeeView = React.createClass({
         <TableRowColumn>{item.statMsg}</TableRowColumn>
         <TableRowColumn>{item.estCost}</TableRowColumn>
         <TableRowColumn>
-          <FloatingActionButton mini style={{ margin: '3px' }} href={`/#/requestDetail/${item._id}`}>
+          <FloatingActionButton mini style={{ margin: '3px' }} onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}>
             <Search />
           </FloatingActionButton>
         </TableRowColumn>
