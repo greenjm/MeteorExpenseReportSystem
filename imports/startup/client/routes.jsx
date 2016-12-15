@@ -15,7 +15,6 @@ const AdminDashboardContainer = require('../../ui/components/adminDashboardConta
 const ProjectDetailContainer = require('../../ui/components/projectDetailContainer.jsx');
 const UserDashboardContainer = require('../../ui/components/userDashboardContainer.jsx');
 const SubmitRequestContainer = require('../../ui/components/submitRequestContainer.jsx');
-const ViewRequestsContainer = require('../../ui/components/viewRequestsContainer.jsx');
 const SubmitReportContainer = require('../../ui/components/submitReportContainer.jsx');
 const RequestDetailContainer = require('../../ui/components/requestDetailContainer.jsx');
 const ManageRequests = require('../../ui/components/manageRequests.jsx');
@@ -30,7 +29,6 @@ Meteor.startup(() => {
         <Route path="/project/:mode/:projectId" component={ProjectDetailContainer} />
         <Route path="/" component={LoginContainer} />
         <Route path="/submitRequest/:projectId" component={SubmitRequestContainer} />
-        <Route path="/viewRequests" component={ViewRequestsContainer} />
         <Route path="/submitReport" component={SubmitReportContainer} />
         <Route path="/viewRequests/:requestId" component={RequestDetailContainer} />
         <Route path="/manageRequests" component={ManageRequests} />
