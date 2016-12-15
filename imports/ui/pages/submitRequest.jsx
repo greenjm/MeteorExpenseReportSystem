@@ -3,7 +3,6 @@ import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
 import { hashHistory } from 'react-router';
 import TextField from 'material-ui/TextField';
 import FlatButton from 'material-ui/FlatButton';
-import SelectField from 'material-ui/SelectField';
 import Snackbar from 'material-ui/Snackbar';
 import MenuItem from 'material-ui/MenuItem';
 import Paper from 'material-ui/Paper';
@@ -21,15 +20,13 @@ const paperStyle = {
 
 const SubmitRequest = React.createClass({
   propTypes: {
-    projects: React.PropTypes.array,
+    project: React.PropTypes.object,
     isAdmin: React.PropTypes.bool,
   },
 
   getInitialState() {
     return {
-      projects: [],
-      projectSelected: '',
-      projectSelectedError: '',
+      project: {},
       description: '',
       descriptionError: '',
       estimatedCost: '',
@@ -42,8 +39,6 @@ const SubmitRequest = React.createClass({
       unitCostError: '',
       partNum: '',
       partNumError: '',
-      fileUrl: '',
-      fileUrlError: '',
       dialogError: '',
       snackbarOpen: false,
     };
@@ -51,7 +46,7 @@ const SubmitRequest = React.createClass({
 
   componentWillMount() {
     this.setState({
-      projects: this.props.projects,
+      project: this.props.project,
     });
   },
 
@@ -60,9 +55,9 @@ const SubmitRequest = React.createClass({
       hashHistory.push('/');
     }
 
-    const projectsChange = this.state.projects !== nextProps.projects;
+    const projectsChange = this.state.project !== nextProps.project;
     this.setState({
-      projects: projectsChange ? nextProps.projects : this.state.projects,
+      project: projectsChange ? nextProps.project : this.state.project,
     });
   },
 
@@ -76,10 +71,6 @@ const SubmitRequest = React.createClass({
     const requiredError = 'This field is required.';
     const numError = 'You must enter a number.';
     let hasError = false;
-    if (this.state.projectSelected === '') {
-      this.projectError(requiredError);
-      hasError = true;
-    }
 
     if (this.state.description === '') {
       this.descriptionError(requiredError);
@@ -127,14 +118,13 @@ const SubmitRequest = React.createClass({
       return;
     }
 
-    Meteor.call('requests.create', this.state.projectSelected,
+    Meteor.call('requests.create', this.state.project._id,
       this.state.description,
       +estimatedCostNum.toFixed(2),
       this.state.vendor,
       this.state.partNum,
       qtyNum,
       +unitCostNum.toFixed(2),
-      this.state.fileUrl,
       (error, result) => {
         if (error != null) {
           this.setState({ dialogError: `Error: ${error.error}. Reason: ${error.reason}` });
@@ -142,14 +132,12 @@ const SubmitRequest = React.createClass({
         }
         if (result) {
           this.setState({
-            projectSelected: '',
             description: '',
             estimatedCost: '',
             vendor: '',
             partNum: '',
             qty: '',
             unitCost: '',
-            fileUrl: '',
             snackbarOpen: true,
           });
         }
@@ -157,21 +145,6 @@ const SubmitRequest = React.createClass({
   },
 
   // State Bindings
-  // Project select methods
-  handleProjectSelect(event, index, value) {
-    this.setState({ projectSelected: value, projectSelectedError: '' });
-  },
-
-  createProjectMenuItem(item) {
-    return (
-      <MenuItem value={item._id} primaryText={item.name} />
-    );
-  },
-
-  projectError(err) {
-    this.setState({ projectSelectedError: err });
-  },
-
   // Description methods
   handleDescriptionChange(event) {
     this.setState({ description: event.target.value, descriptionError: '' });
@@ -244,11 +217,6 @@ const SubmitRequest = React.createClass({
     this.setState({ partNumError: err });
   },
 
-  // File URL methods
-  handleFileUrlChange(event) {
-    this.setState({ fileUrl: event.target.value, fileUrlError: '' });
-  },
-
   // Snackbar methods
   handleSnackbarAction() {
     // TODO: change to request view when ready
@@ -260,11 +228,6 @@ const SubmitRequest = React.createClass({
   },
 
   render() {
-    let noProjectsError = '';
-    if (!this.state.projects) {
-      noProjectsError = 'You are not a member of any projects! Contact an admin or your manager to be added to a project.';
-    }
-
     return (
       <div>
         <Header isAdmin={this.props.isAdmin} />
@@ -277,15 +240,11 @@ const SubmitRequest = React.createClass({
               <Col xs={12} sm={12} md={12} lg={12}>
                 <Paper style={{ textAlign: 'center', padding: '10px' }} zDepth={1}>
                   <form onSubmit={this.submitRequest}>
-                    <SelectField
-                      floatingLabelText="Select Project"
-                      value={this.state.projectSelected}
-                      onChange={this.handleProjectSelect}
-                      errorText={noProjectsError}
+                    <TextField
+                      readOnly
+                      value={this.state.project.name}
                       fullWidth
-                    >
-                      {this.state.projects.map(this.createProjectMenuItem)}
-                    </SelectField>
+                    />
                     <TextField
                       hintText="Description"
                       value={this.state.description}
@@ -327,13 +286,6 @@ const SubmitRequest = React.createClass({
                       value={this.state.partNum}
                       onChange={this.handlePartNumChange}
                       errorText={this.state.partNumError}
-                      fullWidth
-                    />
-                    <TextField
-                      hintText="File URL (optional)"
-                      value={this.state.fileUrl}
-                      onChange={this.handleFileUrlChange}
-                      errorText={this.state.fileUrlError}
                       fullWidth
                     />
                     <div style={{ color: 'red' }}>{this.state.dialogError}</div>

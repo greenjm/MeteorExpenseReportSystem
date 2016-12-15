@@ -29,7 +29,7 @@ Meteor.startup(() => {
         <Route path="/dashboard" component={UserDashboardContainer} />
         <Route path="/project/:mode/:projectId" component={ProjectDetailContainer} />
         <Route path="/" component={LoginContainer} />
-        <Route path="/submitRequest" component={SubmitRequestContainer} />
+        <Route path="/submitRequest/:projectId" component={SubmitRequestContainer} />
         <Route path="/viewRequests" component={ViewRequestsContainer} />
         <Route path="/submitReport" component={SubmitReportContainer} />
         <Route path="/viewRequests/:requestId" component={RequestDetailContainer} />

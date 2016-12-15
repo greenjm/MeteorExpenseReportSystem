@@ -5,18 +5,19 @@ import SubmitRequestPage from '../pages/submitRequest.jsx';
 /* global Projects:true*/
 /* eslint no-undef: "error"*/
 
-const SubmitRequestContainer = createContainer(() => {
+const SubmitRequestContainer = createContainer(({ params }) => {
+  const { projectId } = params;
   const user = Meteor.user();
   const profile = user && user.profile;
   const isAdmin = profile && profile.isAdmin;
   const projectSub = Meteor.subscribe('projects');
   const projectReady = projectSub.ready();
-  const projects = projectReady && Projects.find({ employees: Meteor.userId() }).fetch();
+  const project = projectReady && Projects.findOne(projectId);
   return {
     user: !!user || false,
     isAdmin,
     projectReady,
-    projects: projects || [],
+    project: project || {},
   };
 }, SubmitRequestPage);
 
