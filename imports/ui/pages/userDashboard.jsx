@@ -1,8 +1,11 @@
+import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
+  from 'material-ui/Table';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
 import { hashHistory } from 'react-router';
 import RaisedButton from 'material-ui/RaisedButton';
 import Toggle from 'material-ui/Toggle';
-import {Tabs, Tab} from 'material-ui/Tabs';
+import { Tabs, Tab } from 'material-ui/Tabs';
 import Paper from 'material-ui/Paper';
 import ActionReceipt from 'material-ui/svg-icons/action/receipt';
 import Description from 'material-ui/svg-icons/action/description';
@@ -32,10 +35,74 @@ const buttonStyle = {
   height: '50px',
 };
 
-function ManagerView() {
-  // TODO
-  return (<div />);
+const tableHeaderButtonStyle = {
+  float: 'right',
+};
+
+const actionsColStyle = {
+  paddingLeft: '50px',
+};
+
+function  createProjectRow(item, index) {
+  const url = `/#/project/${this.state.projectIds[index]}`;
+  return (
+    <TableRow key={this.state.projectIds[index]} selectable={false}>
+      <TableRowColumn>{item}</TableRowColumn>
+      <TableRowColumn style={actionsColStyle}>
+        <a href={url}>
+          <FloatingActionButton mini zDepth={1}>
+            <i className="material-icons">search</i>
+          </FloatingActionButton>
+        </a>
+      </TableRowColumn>
+    </TableRow>);
 }
+
+function ManagerView(props) {
+  return (
+    <div>
+      <Tabs>
+        <Tab label="Projects" >
+          <div>
+            <Table selectable={false}>
+              <TableHeader displaySelectAll={false}>
+                <TableRow selectable={false}>
+                  <TableHeaderColumn colSpan="2" style={{ textAlign: 'center' }}>
+                    <RaisedButton label="New" primary style={tableHeaderButtonStyle} onTouchTap={this.openProjectDialog} />
+                    Projects
+                  </TableHeaderColumn>
+                </TableRow>
+                <TableRow selectable={false}>
+                  <TableHeaderColumn>Name</TableHeaderColumn>
+                  <TableHeaderColumn>Actions</TableHeaderColumn>
+                </TableRow>
+              </TableHeader>
+              <TableBody
+                showRowHover
+                displayRowCheckbox={false}
+              >
+                {props.projects.map(createProjectRow)}
+              </TableBody>
+            </Table>
+          </div>
+        </Tab>
+        <Tab label="Requests" >
+          <div>
+            <h2>Tab Two</h2>
+            <p>
+              This is another example tab.
+            </p>
+          </div>
+        </Tab>
+      </Tabs>
+    </div>
+  );
+}
+
+ManagerView.propTypes = {
+  projects: React.propTypes.array,
+  // requests: React.propTypes.array,
+};
 
 function EmployeeView() {
   return (
@@ -184,7 +251,10 @@ const UserDashboard = React.createClass({
         </div>
         <br />
         { this.state.viewToggle ? (
-          <ManagerView />
+          <ManagerView
+            projects={this.state.managerProjects}
+            requests={this.state.managerRequests}
+          />
         ) : (
           <EmployeeView />
         )
