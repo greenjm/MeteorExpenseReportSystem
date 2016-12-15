@@ -104,7 +104,7 @@ const AdminDashboard = React.createClass({
   },
 
   createProjectRow(item, index) {
-    const url = `/#/project/${this.state.projectIds[index]}`;
+    const url = `/#/project/edit/${this.state.projectIds[index]}`;
     return (
       <TableRow key={this.state.projectIds[index]} selectable={false}>
         <TableRowColumn>{item}</TableRowColumn>

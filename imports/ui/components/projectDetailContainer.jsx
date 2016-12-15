@@ -6,20 +6,28 @@ import ProjectDetailPage from '../pages/projectDetail.jsx';
 /* eslint no-undef: "error"*/
 
 const ProjectDetailContainer = createContainer(({ params }) => {
-  const { projectId } = params;
+  const projectId = params.projectId;
+  const mode = params.mode;
   const user = Meteor.user();
   const profile = user && user.profile;
   const isAdmin = profile && profile.isAdmin;
+
+  // Subscriptions
   const projectSub = Meteor.subscribe('projectGet', projectId);
-  const projectReady = projectSub.ready();
-  const project = projectReady && Projects.findOne(projectId);
   const userSub = Meteor.subscribe('users');
-  const userReady = userSub.ready();
+
+  // Ready
+  const projectReady = projectSub.ready();
+  const userReady = userSub && userSub.ready();
+
+  // Data
+  const project = projectReady && Projects.findOne(projectId);
   const users = userReady && Meteor.users.find().fetch();
   return {
     user: !!user || false,
     isAdmin,
     projectReady,
+    mode,
     name: project ? project.name : '',
     managers: project ? project.managers : [],
     employees: project ? project.employees : [],

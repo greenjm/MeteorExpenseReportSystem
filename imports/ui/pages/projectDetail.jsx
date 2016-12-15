@@ -48,45 +48,54 @@ const ProjectDetail = React.createClass({
       nameError: '',
       employeeSelected: '',
       employeeSelectedError: '',
+      mode: 'view',
     };
   },
 
   componentWillReceiveProps(nextProps) {
-    if (!nextProps.user || !nextProps.isAdmin) {
+    if (!nextProps.user || (!nextProps.isAdmin && nextProps.mode === 'edit')) {
       hashHistory.push('/');
     }
 
     const nameChange = this.state.Name !== nextProps.name;
-    const managersChange = this.state.Managers !== nextProps.manager;
+    const managersChange = this.state.Managers !== nextProps.managers;
     const employeesChange = this.state.Employees !== nextProps.employees;
     const bornOnChange = this.state.BornOn !== nextProps.bornOn;
     const activeChange = this.state.Active !== nextProps.isActive;
     const allEmployeeChange = this.state.allEmployees !== nextProps.users;
+
+    if (managersChange) {
+      this.getNames(nextProps.managers, 'ManagerNames');
+    }
+    if (employeesChange) {
+      this.getNames(nextProps.employees, 'EmployeeNames');
+    }
+
     this.setState({
       Name: nameChange ? nextProps.name : this.state.Name,
       Managers: managersChange ? nextProps.managers : this.state.Managers,
-      ManagerNames: managersChange ? this.getNames(nextProps.managers) : this.state.ManagerNames,
       Employees: employeesChange ? nextProps.employees : this.state.Employees,
-      EmployeeNames: employeesChange ? this.getNames(nextProps.employees)
-        : this.state.EmployeeNames,
       BornOn: bornOnChange ? nextProps.bornOn.toString() : this.state.BornOn,
       Active: activeChange ? nextProps.isActive : this.state.Active,
       allEmployees: allEmployeeChange ? nextProps.users : this.state.allEmployees,
+      mode: nextProps.mode,
     });
   },
 
-  getNames(people) {
+  getNames(people, stateField) {
     const ans = [];
+    const thisClass = this;
 
     if (people) {
       for (let x = 0; x < people.length; x += 1) {
         Meteor.call('users.getOne', people[x], (err, res) => {
           ans.push(res.profile.name);
+          const obj = {};
+          obj[stateField] = ans;
+          thisClass.setState(obj);
         });
       }
     }
-
-    return ans;
   },
 
   createUserRow(item) {
@@ -162,7 +171,7 @@ const ProjectDetail = React.createClass({
   },
 
   cancelEdit() {
-    hashHistory.push('/dashboard');
+    hashHistory.push('/adminDashboard');
   },
 
   render() {
@@ -183,6 +192,7 @@ const ProjectDetail = React.createClass({
                     onChange={this.changeName}
                     errorText={this.state.nameError}
                     fullWidth
+                    readOnly={this.state.mode === 'view'}
                   />
                   <TextField
                     hintText="Managers"
@@ -206,6 +216,7 @@ const ProjectDetail = React.createClass({
                     label="Active"
                     checked={!!this.state.Active}
                     onClick={this.toggleActive}
+                    disabled={this.state.mode === 'view'}
                   />
                   <SelectField
                     floatingLabelText="Add Employee"
@@ -213,14 +224,17 @@ const ProjectDetail = React.createClass({
                     onChange={this.handleEmployeeSelect}
                     errorText={this.state.employeeSelectedError}
                     fullWidth
+                    disabled={this.state.mode === 'view'}
                   >
                     {this.state.allEmployees.map(this.createEmployeeMenuItem)}
                   </SelectField>
                   <div style={{ color: 'red' }}>{this.state.dialogError}</div>
-                  <div style={{ float: 'right', margin: '10px' }}>
-                    <FlatButton label="Cancel" onTouchTap={this.cancelEdit} />
-                    <FlatButton type="submit" label="Submit" primary />
-                  </div>
+                  { this.state.mode === 'edit' &&
+                    <div style={{ float: 'right', margin: '10px' }}>
+                      <FlatButton label="Cancel" onTouchTap={this.cancelEdit} />
+                      <FlatButton type="submit" label="Submit" primary />
+                    </div>
+                  }
                 </form>
               </Paper>
             </Col>
