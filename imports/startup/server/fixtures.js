@@ -37,14 +37,17 @@ function seedUsers() {
 function seedProjects() {
   for (let i = 0; i < 5; i += 1) {
     let userIndex = i;
+    let empIndex = i + 1;
     if (userIndex >= Meteor.users.find().count()) {
       userIndex = 0;
+      empIndex = 0;
     }
     const user = Meteor.users.find().fetch()[userIndex];
+    const emp = Meteor.users.find().fetch()[empIndex];
     Projects.insert({
       name: `Test Project ${i}`,
       managers: [user._id],
-      employees: [],
+      employees: [emp._id],
       bornOn: new Date(),
       isActive: true,
       inactiveDate: null,

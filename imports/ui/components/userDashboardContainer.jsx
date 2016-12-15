@@ -25,7 +25,7 @@ const UserDashboardContainer = createContainer(() => {
   const employeeProjects = (projectReady && user &&
     Projects.find({ employees: user._id }).fetch()) || [];
   const managerProjects = (projectReady && user &&
-    Projects.find({ employees: user._id }).fetch()) || [];
+    Projects.find({ managers: user._id }).fetch()) || [];
   const myRequests = (requestReady && user &&
     Requests.find({ userId: user._id }).fetch()) || [];
   const managerRequests = (requestReady && user &&

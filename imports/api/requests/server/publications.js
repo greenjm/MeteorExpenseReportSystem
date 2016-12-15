@@ -17,7 +17,12 @@ Meteor.publish('requests', function requestsPublish() {
     return requests;
   }
 
-  const projectIds = Projects.find({ managers: this.userId }, { _id: 1 }).fetch();
+  const projects = Projects.find({ managers: this.userId }, { _id: 1 }).fetch();
+  const projectIds = [];
+
+  for (let i = 0; i < projects.length; i += 1) {
+    projectIds.push(projects[i]._id);
+  }
 
   const requests = Requests.find({ $or:
     [{ userId: this.userId },
