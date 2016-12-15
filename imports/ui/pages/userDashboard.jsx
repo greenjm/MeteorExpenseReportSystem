@@ -1,3 +1,4 @@
+import { Meteor } from 'meteor/meteor';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
   from 'material-ui/Table';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
@@ -7,6 +8,10 @@ import { Tabs, Tab } from 'material-ui/Tabs';
 import Paper from 'material-ui/Paper';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import Search from 'material-ui/svg-icons/action/search';
+import RaisedButton from 'material-ui/RaisedButton';
+// import Dialog from 'material-ui/Dialog';
+// import FlatButton from 'material-ui/FlatButton';
+// import TextField from 'material-ui/TextField';
 import Header from '../components/header.jsx';
 
 const React = require('react');
@@ -18,6 +23,54 @@ const paperStyle = {
   fontFamily: 'Roboto,sans-serif',
   paddingLeft: '24px',
 };
+
+// function openRequestDialog() {
+//   this.setState({
+//     requestDialogOpen: true,
+//   });
+// }
+
+// function closeRequestDialog() {
+//   this.setState({
+//     requestDialogOpen: false,
+//   });
+// }
+
+// function serveRequest(request, index, approved, message) {
+//   Meteor.call('requests.statEdit', request._id, approved, message, (err) => {
+//     if (err) {
+//       console.log(err);
+//     }
+ // else {
+ //      this.removeItem(index);
+ //    }
+//   });
+// }
+
+// function handleConfirmPress(req, index) {
+//   serveRequest(req, index, true, '');
+// }
+
+// function handleDenyPress(index) {
+//   setState({ requestDialogOpen: true, selected: index });
+// }
+
+// function denyRequest() {
+//   this.serveRequest(this.state.requests[this.state.selected],
+//     this.state.selected, false, this.state.statMsg);
+//   this.setState({
+//     statMsg: '',
+//     selected: -1,
+//     requestDialogOpen: false,
+//   });
+// }
+
+// function handleCancelPress() {
+//   this.setState({
+//     requestDialogOpen: false,
+//     statMsg: '',
+//   });
+// }
 
 function ManagerView(props) {
   function createProjectRow(item) {
@@ -36,7 +89,8 @@ function ManagerView(props) {
     );
   }
 
-  function createRequestRow(item) {
+  function createRequestRow(item, index) {
+    const url = `/#/requestDetail/${item._id}`;
     let projectName = '';
     for (let i = 0; i < props.projects.length; i += 1) {
       const p = props.projects[i];
@@ -56,15 +110,17 @@ function ManagerView(props) {
     }
 
     return (
-      <TableRow selectable={false}>
+      <TableRow key={index} selectable={false}>
         <TableRowColumn>{projectName}</TableRowColumn>
         <TableRowColumn>{status}</TableRowColumn>
         <TableRowColumn>{item.statMsg}</TableRowColumn>
         <TableRowColumn>{item.estCost}</TableRowColumn>
         <TableRowColumn>
-          <FloatingActionButton mini style={{ margin: '3px' }}>
-            <Search />
-          </FloatingActionButton>
+          <a href={url}>
+            <FloatingActionButton mini style={{ margin: '3px' }}>
+              <Search />
+            </FloatingActionButton>
+          </a>
         </TableRowColumn>
       </TableRow>
     );
@@ -272,6 +328,7 @@ const UserDashboard = React.createClass({
       isManager: false,
       isEmployee: false,
       viewToggle: false,
+      requestDialogOpen: false,
     };
   },
 

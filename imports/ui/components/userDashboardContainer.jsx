@@ -29,7 +29,7 @@ const UserDashboardContainer = createContainer(() => {
   const myRequests = (requestReady && user &&
     Requests.find({ userId: user._id }).fetch()) || [];
   const managerRequests = (requestReady && user &&
-    Requests.find({ userId: { $not: user._id } }).fetch()) || [];
+    Requests.find({ userId: { $not: user._id }, status: { $exists: false } }).fetch()) || [];
   const requestUserIds = requestReady &&
     Requests.find({}, { fields: { userId: 1 } }).fetch();
   let users = [];
