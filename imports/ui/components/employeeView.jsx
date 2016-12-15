@@ -74,7 +74,7 @@ const EmployeeView = React.createClass({
         <TableRowColumn>{item.statMsg}</TableRowColumn>
         <TableRowColumn>{item.estCost}</TableRowColumn>
         <TableRowColumn>
-          <FloatingActionButton mini style={{ margin: '3px' }}>
+          <FloatingActionButton mini style={{ margin: '3px' }} href={`/#/requestDetail/${item._id}`}>
             <Search />
           </FloatingActionButton>
         </TableRowColumn>
