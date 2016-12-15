@@ -1,4 +1,3 @@
-
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
   from 'material-ui/Table';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
@@ -125,8 +124,8 @@ function ManagerView(props) {
 }
 
 ManagerView.propTypes = {
-  projects: React.propTypes.array,
-  requests: React.propTypes.array,
+  projects: React.PropTypes.array,
+  requests: React.PropTypes.array,
 };
 
 function EmployeeView(props) {
