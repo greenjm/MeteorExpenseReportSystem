@@ -5,13 +5,13 @@ import { hashHistory } from 'react-router';
 import Toggle from 'material-ui/Toggle';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import Paper from 'material-ui/Paper';
-import ContentAdd from 'material-ui/svg-icons/content/add';
 import Search from 'material-ui/svg-icons/action/search';
 // import Dialog from 'material-ui/Dialog';
 // import FlatButton from 'material-ui/FlatButton';
 // import TextField from 'material-ui/TextField';
 import Header from '../components/header.jsx';
 import ManagerView from '../components/managerView.jsx';
+import EmployeeView from '../components/employeeView.jsx';
 
 const React = require('react');
 
@@ -21,126 +21,6 @@ const paperStyle = {
   lineHeight: '35px',
   fontFamily: 'Roboto,sans-serif',
   paddingLeft: '24px',
-};
-
-function EmployeeView(props) {
-  function createProjectRow(item) {
-    return (
-      <TableRow selectable={false}>
-        <TableRowColumn>{item.name}</TableRowColumn>
-        <TableRowColumn>
-          <FloatingActionButton mini style={{ margin: '3px' }} href={`/#/project/view/${item._id}`}>
-            <Search />
-          </FloatingActionButton>
-          <FloatingActionButton mini style={{ margin: '3px' }} href={`/#/submitRequest/${item._id}`}>
-            <ContentAdd />
-          </FloatingActionButton>
-        </TableRowColumn>
-      </TableRow>
-    );
-  }
-
-  function createRequestRow(item) {
-    let projectName = '';
-    for (let i = 0; i < props.projects.length; i += 1) {
-      const p = props.projects[i];
-      if (p._id === item.projectId) {
-        projectName = p.name;
-        break;
-      }
-    }
-
-    let status = '';
-    if (item.status === undefined) {
-      status = 'Pending';
-    } else if (item.status) {
-      status = 'Approved';
-    } else {
-      status = 'Denied';
-    }
-
-    return (
-      <TableRow selectable={false}>
-        <TableRowColumn>{projectName}</TableRowColumn>
-        <TableRowColumn>{status}</TableRowColumn>
-        <TableRowColumn>{item.statMsg}</TableRowColumn>
-        <TableRowColumn>{item.estCost}</TableRowColumn>
-        <TableRowColumn>
-          <FloatingActionButton mini style={{ margin: '3px' }}>
-            <Search />
-          </FloatingActionButton>
-        </TableRowColumn>
-      </TableRow>
-    );
-  }
-
-  return (
-    <div>
-      <Tabs>
-        <Tab label="Projects" >
-          <Table selectable={false}>
-            <TableHeader displaySelectAll={false}>
-              <TableRow selectable={false}>
-                <TableHeaderColumn>Project Name</TableHeaderColumn>
-                <TableHeaderColumn>Actions</TableHeaderColumn>
-              </TableRow>
-            </TableHeader>
-            <TableBody displayRowCheckbox={false}>
-              {props.projects.length > 0 ?
-                props.projects.map(createProjectRow) :
-                (
-                <TableRow selectable={false}>
-                  <TableRowColumn>You do not belong to any projects.</TableRowColumn>
-                  <TableRowColumn />
-                </TableRow>
-                )
-              }
-            </TableBody>
-          </Table>
-        </Tab>
-        <Tab label="Requests" >
-          <Table selectable={false}>
-            <TableHeader displaySelectAll={false}>
-              <TableRow selectable={false}>
-                <TableHeaderColumn>Project Name</TableHeaderColumn>
-                <TableHeaderColumn>Status</TableHeaderColumn>
-                <TableHeaderColumn>Status Message</TableHeaderColumn>
-                <TableHeaderColumn>Cost</TableHeaderColumn>
-                <TableHeaderColumn>Actions</TableHeaderColumn>
-              </TableRow>
-            </TableHeader>
-            <TableBody displayRowCheckbox={false}>
-              {props.requests.length > 0 ?
-                props.requests.map(createRequestRow) :
-                (
-                <TableRow selectable={false}>
-                  <TableRowColumn>You have not submitted any requests yet.</TableRowColumn>
-                  <TableRowColumn />
-                </TableRow>
-                )
-              }
-            </TableBody>
-          </Table>
-        </Tab>
-        <Tab
-          label="Report"
-        >
-          <div>
-            <h2>TODO</h2>
-            <p>
-              Still waiting on client feedback.
-              This tab may or may not exist in the future depending on necessity.
-            </p>
-          </div>
-        </Tab>
-      </Tabs>
-    </div>
-  );
-}
-
-EmployeeView.propTypes = {
-  projects: React.PropTypes.array,
-  requests: React.PropTypes.array,
 };
 
 const UserDashboard = React.createClass({
@@ -167,7 +47,8 @@ const UserDashboard = React.createClass({
       isManager: false,
       isEmployee: false,
       viewToggle: false,
-      requestDialogOpen: false,
+      currentEmployeeTab: 0,
+      currentManagerTab: 0,
     };
   },
 
@@ -181,7 +62,7 @@ const UserDashboard = React.createClass({
       users: this.props.users,
       isManager: this.props.isManager,
       isEmployee: this.props.isEmployee,
-      viewToggle: this.props.isManager && !this.props.isEmployee,
+      viewToggle: this.state.viewToggle || (this.props.isManager && !this.props.isEmployee),
     });
   },
 
@@ -211,13 +92,21 @@ const UserDashboard = React.createClass({
       users: usersChange ? nextProps.users : this.state.users,
       isManager: isManagerChange ? nextProps.isManager : this.state.isManager,
       isEmployee: isEmployeeChange ? nextProps.isEmployee : this.state.isEmployee,
-      viewToggle: nextProps.isManager && !nextProps.isEmployee,
+      viewToggle: this.state.viewToggle || (this.props.isManager && !this.props.isEmployee),
     });
   },
 
   // Helpers
   toggleView() {
     this.setState({ viewToggle: !this.state.viewToggle });
+  },
+
+  updateEmployeeTab(tab) {
+    this.setState({ currentEmployeeTab: +tab.props.index });
+  },
+
+  updateManagerTab(tab) {
+    this.setState({ currentManagerTab: +tab.props.index });
   },
 
   // Links
@@ -257,9 +146,16 @@ const UserDashboard = React.createClass({
           <ManagerView
             projects={this.state.managerProjects}
             requests={this.state.managerRequests}
+            currentTab={this.state.currentManagerTab}
+            updateTab={this.updateManagerTab}
           />
         ) : (
-          <EmployeeView projects={this.state.employeeProjects} requests={this.state.myRequests} />
+          <EmployeeView
+            projects={this.state.employeeProjects}
+            requests={this.state.myRequests}
+            currentTab={this.state.currentEmployeeTab}
+            updateTab={this.updateEmployeeTab}
+          />
         )
         }
       </div>
