@@ -1,14 +1,11 @@
-import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
 import { hashHistory } from 'react-router';
-import RaisedButton from 'material-ui/RaisedButton';
+import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn } from 'material-ui/Table';
 import Toggle from 'material-ui/Toggle';
-import {Tabs, Tab} from 'material-ui/Tabs';
+import { Tabs, Tab } from 'material-ui/Tabs';
 import Paper from 'material-ui/Paper';
-import ActionReceipt from 'material-ui/svg-icons/action/receipt';
-import Description from 'material-ui/svg-icons/action/description';
-import Assignment from 'material-ui/svg-icons/action/assignment';
-import DeveloperBoard from 'material-ui/svg-icons/hardware/developer-board';
-import ViewList from 'material-ui/svg-icons/action/view-list';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
+import ContentAdd from 'material-ui/svg-icons/content/add';
+import Search from 'material-ui/svg-icons/action/search';
 import Header from '../components/header.jsx';
 
 const React = require('react');
@@ -21,53 +18,118 @@ const paperStyle = {
   paddingLeft: '24px',
 };
 
-const leftColStyle = {
-  borderRight: '2px solid grey',
-};
-
-const buttonStyle = {
-  width: '100%',
-  fontSize: '2em',
-  marginTop: '10px',
-  height: '50px',
-};
-
 function ManagerView() {
   // TODO
   return (<div />);
 }
 
-function EmployeeView() {
+function EmployeeView(props) {
+  function createProjectRow(item) {
+    return (
+      <TableRow selectable={false}>
+        <TableRowColumn>{item.name}</TableRowColumn>
+        <TableRowColumn>
+          <FloatingActionButton mini style={{ margin: '3px' }}>
+            <Search />
+          </FloatingActionButton>
+          <FloatingActionButton mini style={{ margin: '3px' }}>
+            <ContentAdd />
+          </FloatingActionButton>
+        </TableRowColumn>
+      </TableRow>
+    );
+  }
+
+  function createRequestRow(item) {
+    let projectName = '';
+    for (let i = 0; i < props.projects.length; i += 1) {
+      const p = props.projects[i];
+      if (p._id === item.projectId) {
+        projectName = p.name;
+        break;
+      }
+    }
+
+    let status = '';
+    if (item.status === undefined) {
+      status = 'Pending';
+    } else if (item.status) {
+      status = 'Approved';
+    } else {
+      status = 'Denied';
+    }
+
+    return (
+      <TableRow selectable={false}>
+        <TableRowColumn>{projectName}</TableRowColumn>
+        <TableRowColumn>{status}</TableRowColumn>
+        <TableRowColumn>{item.statMsg}</TableRowColumn>
+        <TableRowColumn>{item.estCost}</TableRowColumn>
+        <TableRowColumn>
+          <FloatingActionButton mini style={{ margin: '3px' }}>
+            <Search />
+          </FloatingActionButton>
+        </TableRowColumn>
+      </TableRow>
+    );
+  }
+
   return (
     <div>
       <Tabs>
         <Tab label="Projects" >
-          <div>
-            <h2>Tab One</h2>
-            <p>
-              This is an example tab.
-            </p>
-            <p>
-              You can put any sort of HTML or react component in here.
-              It even keeps the component state!
-            </p>
-          </div>
+          <Table selectable={false}>
+            <TableHeader displaySelectAll={false}>
+              <TableRow selectable={false}>
+                <TableHeaderColumn>Project Name</TableHeaderColumn>
+                <TableHeaderColumn>Actions</TableHeaderColumn>
+              </TableRow>
+            </TableHeader>
+            <TableBody displayRowCheckbox={false}>
+              {props.projects.length > 0 ?
+                props.projects.map(createProjectRow) :
+                (
+                <TableRow selectable={false}>
+                  <TableRowColumn>You do not belong to any projects.</TableRowColumn>
+                  <TableRowColumn />
+                </TableRow>
+                )
+              }
+            </TableBody>
+          </Table>
         </Tab>
         <Tab label="Requests" >
-          <div>
-            <h2>Tab Two</h2>
-            <p>
-              This is another example tab.
-            </p>
-          </div>
+          <Table selectable={false}>
+            <TableHeader displaySelectAll={false}>
+              <TableRow selectable={false}>
+                <TableHeaderColumn>Project Name</TableHeaderColumn>
+                <TableHeaderColumn>Status</TableHeaderColumn>
+                <TableHeaderColumn>Status Message</TableHeaderColumn>
+                <TableHeaderColumn>Cost</TableHeaderColumn>
+                <TableHeaderColumn>Actions</TableHeaderColumn>
+              </TableRow>
+            </TableHeader>
+            <TableBody displayRowCheckbox={false}>
+              {props.requests.length > 0 ?
+                props.requests.map(createRequestRow) :
+                (
+                <TableRow selectable={false}>
+                  <TableRowColumn>You have not submitted any requests yet.</TableRowColumn>
+                  <TableRowColumn />
+                </TableRow>
+                )
+              }
+            </TableBody>
+          </Table>
         </Tab>
         <Tab
           label="Report"
         >
           <div>
-            <h2>Tab Three</h2>
+            <h2>TODO</h2>
             <p>
-              This is a third example tab.
+              Still waiting on client feedback.
+              This tab may or may not exist in the future depending on necessity.
             </p>
           </div>
         </Tab>
@@ -75,6 +137,11 @@ function EmployeeView() {
     </div>
   );
 }
+
+EmployeeView.propTypes = {
+  projects: React.PropTypes.array,
+  requests: React.PropTypes.array,
+};
 
 const UserDashboard = React.createClass({
   propTypes: {
@@ -175,18 +242,20 @@ const UserDashboard = React.createClass({
         <Header isAdmin={this.props.isAdmin} />
         <Paper style={paperStyle} zDepth={1}>User Dashboard</Paper>
         <br />
-        <div style={{ float: 'right', marginRight: '10px' }}>
-          <Toggle
-            label={this.state.viewToggle ? 'Manager View' : 'Employee View'}
-            toggled={this.state.viewToggle}
-            onToggle={this.toggleView}
-          />
-        </div>
+        {this.state.isManager &&
+          <div style={{ float: 'right', marginRight: '10px' }}>
+            <Toggle
+              label={this.state.viewToggle ? 'Manager View' : 'Employee View'}
+              toggled={this.state.viewToggle}
+              onToggle={this.toggleView}
+            />
+          </div>
+        }
         <br />
         { this.state.viewToggle ? (
           <ManagerView />
         ) : (
-          <EmployeeView />
+          <EmployeeView projects={this.state.employeeProjects} requests={this.state.myRequests} />
         )
         }
       </div>
