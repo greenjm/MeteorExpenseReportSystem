@@ -217,7 +217,8 @@ const RequestDetail = React.createClass({
                   </TableRow>
                   <TableRow selectable={false}>
                     <TableRowColumn>
-                      <button onClick={this.editRequest}>Save Changes</button>
+                      <button onClick={this.editRequest}>Save Changes</button>&nbsp;
+                      <button onClick={hashHistory.goBack}>Go Back</button>
                     </TableRowColumn>
                   </TableRow>
                 </TableBody>

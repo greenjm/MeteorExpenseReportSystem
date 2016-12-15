@@ -4,16 +4,19 @@ import { Table, TableBody, TableRow, TableRowColumn }
   from 'material-ui/Table';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
 import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import TextField from 'material-ui/TextField';
 import Paper from 'material-ui/Paper';
 import Dialog from 'material-ui/Dialog';
-import Header from './header.jsx';
+import { hashHistory } from 'react-router';
+import Header from '../components/header.jsx';
 import '../../api/requests/requests.js';
 
 
 /* global Requests:true*/
 /* eslint no-undef: "error"*/
+/* eslint jsx-no-bind: "warning"*/
 
 const React = require('react');
 
@@ -39,13 +42,21 @@ const ManageRequests = React.createClass({
       requestDialogOpen: false,
       status: false,
       statMsg: '',
+      selected: -1
     };
   },
 
   componentWillMount() {
     Tracker.autorun(() => {
       Meteor.subscribe('requests', () => {
-        this.setState({ requests: Requests.find().fetch() });
+        const requests = Requests.find().fetch();
+        const unapprovedRequests = [];
+        for (let x = 0; x < requests.length; x++) {
+          if (requests[x].status !== true && requests[x].status !== false) {
+            unapprovedRequests.push(requests[x]);
+          }
+        }
+        this.setState({ requests: unapprovedRequests });
       });
     });
   },
@@ -80,18 +91,14 @@ const ManageRequests = React.createClass({
   },
 
   removeItem(index) {
-    // const filteredRequests = this.state.requests.filter((requests, i) => {
-    //     i == index;
-    //   });
     const filteredRequests = [];
     for (let i = this.state.requests.length - 1; i >= 0; i -= 1) {
       if (i !== index) {
         filteredRequests.push(this.state.requests[i]);
       }
     }
-
     this.setState({
-      requests: filteredRequests,
+      requests: filteredRequests.reverse(),
     });
   },
 
@@ -99,37 +106,68 @@ const ManageRequests = React.createClass({
     this.setState({ statMsg: e.target.value });
   },
 
-  handleConfirmPress() {
-    this.removeItem(this.state.requestId);
-    this.setState({ requestDialogOpen: false,
-                    status: true,
-    });
+  handleConfirmPress(index) {
+    this.serveRequest(this.state.requests[index], index, true, '');
   },
 
-  handleDenyPress() {
-    this.removeItem(this.state.requestId);
+  serveRequest(request, index, approved, message) {
+    Meteor.call('requests.statEdit', request._id, approved, message, (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        this.removeItem(index);
+      }
+    })
+  },
 
-    this.setState({ requestDialogOpen: false,
-                    status: false,
+  handleDenyPress(index) {
+    this.setState({ requestDialogOpen: true, selected: index });
+  },
+
+  denyRequest() {
+    this.serveRequest(this.state.requests[this.state.selected], this.state.selected, false, this.state.statMsg);
+    this.setState({
+      statMsg: '',
+      selected: -1,
+      requestDialogOpen: false
     });
   },
 
   handleCancelPress() {
-    this.setState({ requestDialogOpen: false,
-                    statMsg: '',
+    this.setState({
+      requestDialogOpen: false,
+      statMsg: '',
     });
   },
 
   showRequest(data, index) {
-    // const url = `/#/viewRequests/request?id=${data._id}`;
+    const url = `/#/viewRequests/${data._id}`;
+
     return (
       <TableRow key={index}>
         <TableRowColumn>{index}</TableRowColumn>
         <TableRowColumn>{data.description}</TableRowColumn>
+        <TableRowColumn key={index}>
+          <RaisedButton
+            key={index}
+            label="Approve"
+            primary
+            onClick={this.handleConfirmPress.bind(this, index)}
+          />
+        </TableRowColumn>
         <TableRowColumn>
-          <FloatingActionButton mini zDepth={1} onTouchTap={this.openRequestDialog}>
-            <i className="material-icons">search</i>
-          </FloatingActionButton>
+          <RaisedButton
+            label="Deny"
+            primary
+            onTouchTap={this.handleDenyPress.bind(this, index)}
+          />
+        </TableRowColumn>
+        <TableRowColumn>
+          <a href={url}>
+              <RaisedButton
+                label="Details"
+            />
+          </a>
         </TableRowColumn>
       </TableRow>
     );
@@ -140,12 +178,7 @@ const ManageRequests = React.createClass({
       <FlatButton
         label="Confirm"
         primary
-        onTouchTap={this.handleConfirmPress}
-      />,
-      <FlatButton
-        label="Deny"
-        primary
-        onTouchTap={this.handleDenyPress}
+        onTouchTap={this.denyRequest}
       />,
       <FlatButton
         label="Cancel"
@@ -179,13 +212,6 @@ const ManageRequests = React.createClass({
             modal={false}
             open={this.state.requestDialogOpen}
           >
-
-            <TextField
-              name="statusMessage"
-              value={this.state.statMsg}
-              readOnly
-            />
-
             <TextField
               name="denialText"
               hintText="Reasons for denial"
@@ -193,8 +219,7 @@ const ManageRequests = React.createClass({
               onChange={this.denialChange}
               fullWidth
             />
-
-          </Dialog>
+          </Dialog>          
         </div>
       </div>
     );

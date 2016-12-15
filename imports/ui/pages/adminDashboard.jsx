@@ -20,6 +20,10 @@ import Header from '../components/header.jsx';
 
 const React = require('react');
 
+const sub = Meteor.subscribe('projects');
+const userSub = Meteor.subscribe('users');
+const reqSub = Meteor.subscribe('requests');
+
 // Styles
 const paperStyle = {
   height: '35px',
@@ -107,6 +111,21 @@ const AdminDashboard = React.createClass({
     const url = `/#/project/${this.state.projectIds[index]}`;
     return (
       <TableRow key={this.state.projectIds[index]} selectable={false}>
+        <TableRowColumn>{item}</TableRowColumn>
+        <TableRowColumn style={actionsColStyle}>
+          <a href={url}>
+            <FloatingActionButton mini zDepth={1}>
+              <i className="material-icons">search</i>
+            </FloatingActionButton>
+          </a>
+        </TableRowColumn>
+      </TableRow>);
+  },
+
+  createRequestRow(item, index) {
+    const url = `/#/request?id=${this.state.requestIds[index]}`;
+    return (
+      <TableRow key={this.state.requestIds[index]} selectable={false}>
         <TableRowColumn>{item}</TableRowColumn>
         <TableRowColumn style={actionsColStyle}>
           <a href={url}>

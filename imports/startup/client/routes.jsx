@@ -18,7 +18,7 @@ const SubmitRequestContainer = require('../../ui/components/submitRequestContain
 const ViewRequestsContainer = require('../../ui/components/viewRequestsContainer.jsx');
 const SubmitReportContainer = require('../../ui/components/submitReportContainer.jsx');
 const RequestDetailContainer = require('../../ui/components/requestDetailContainer.jsx');
-const ManageRequests = require('../../ui/components/manageRequests.jsx');
+const ManageRequests = require('../../ui/pages/manageRequests.jsx');
 
 Meteor.startup(() => {
   injectTapEventPlugin();
