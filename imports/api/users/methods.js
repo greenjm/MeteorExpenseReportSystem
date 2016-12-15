@@ -93,6 +93,10 @@ Meteor.methods({
       throw new Meteor.Error('users.update.permissionDenied', 'You do not have required permissions to update user');
     }
 
+    if (currentUser.profile.isAdmin && userId === Meteor.userId() && !profile.isAdmin) {
+      throw new Meteor.Error('users.update.invalidUpdate', 'You cannot remove your own admin permissions');
+    }
+
     Meteor.users.update(userId, {
       $set: {
         profile: {

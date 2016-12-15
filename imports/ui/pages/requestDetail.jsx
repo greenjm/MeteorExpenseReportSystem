@@ -2,10 +2,9 @@ import { Table, TableRow, TableRowColumn, TableBody }
   from 'material-ui/Table';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
 import Paper from 'material-ui/Paper';
+import { hashHistory } from 'react-router';
 
-import { Meteor } from 'meteor/meteor';
-import { Tracker } from 'meteor/tracker';
-import Header from './header.jsx';
+import Header from '../components/header.jsx';
 import '../../api/requests/requests.js';
 
 /* global Requests:true*/
@@ -13,6 +12,7 @@ import '../../api/requests/requests.js';
 
 const React = require('react');
 
+// Styles
 const paperStyle = {
   height: '35px',
   lineHeight: '35px',
@@ -34,7 +34,7 @@ const RequestDetail = React.createClass({
       estCost: 0,
       partNo: '',
       quantity: 0,
-      unitcost: 0,
+      unitCost: 0,
       vendor: '',
       status: null,
       statMsg: '',
@@ -43,35 +43,38 @@ const RequestDetail = React.createClass({
   },
 
   componentWillMount() {
-    Tracker.autorun(() => {
-      Meteor.subscribe('requestOne', this.state.requestId, () => {
-        const request = Requests.findOne(this.state.requestId);
-        // const reqs = Requests.find().fetch();
-        // const id = this.props.location.query.id;
-        // let req = null;
-        // for (let x = 0; x < reqs.length; x += 1) {
-        //   if (reqs[x]._id === id) {
-        //     req = reqs[x];
-        //     break;
-        //   }
-        // }
-        if (request) {
-          this.setState({
-            description: request.description,
-            estCost: request.estCost,
-            partNo: request.partNo,
-            quantity: request.quantity,
-            unitCost: request.unitCost,
-            vendor: request.vendor,
-            status: request.status ? 'Approved' : 'Rejected',
-            statMsg: request.statMsg,
-            fileUrl: request.fileUrl,
-          });
-        }
-      });
+    this.setState({
+      description: this.props.description,
+      estCost: this.props.estCost,
+      partNo: this.props.partNo,
+      quantity: this.props.quantity,
+      unitCost: this.props.unitCost,
+      vendor: this.props.vendor,
     });
   },
 
+  componentWillReceiveProps(nextProps) {
+    if (!nextProps.user || (!nextProps.requestOwned && !nextProps.isAdmin)) {
+      hashHistory.push('/');
+    }
+
+    const descChange = this.state.description !== nextProps.description;
+    const estCostChange = this.state.estCost !== nextProps.estCost;
+    const partNoChange = this.state.partNo !== nextProps.partNo;
+    const quantityChange = this.state.quantity !== nextProps.quantity;
+    const unitCostChange = this.state.unitCost !== nextProps.unitCost;
+    const vendorChange = this.state.vendor !== nextProps.vendor;
+    this.setState({
+      description: descChange ? nextProps.description : this.state.description,
+      estCost: estCostChange ? nextProps.estCost : this.state.estCost,
+      partNo: partNoChange ? nextProps.partNo : this.state.partNo,
+      quantity: quantityChange ? nextProps.quantity : this.state.quantity,
+      unitCost: unitCostChange ? nextProps.unitCost : this.state.unitCost,
+      vendor: vendorChange ? nextProps.vendor : this.state.vendor,
+    });
+  },
+
+  // State Bindings
   changeDescription(e) {
     this.setState({ description: e.target.value });
   },
@@ -85,11 +88,21 @@ const RequestDetail = React.createClass({
   },
 
   changeQuantity(e) {
-    this.setState({ quantity: e.target.value });
+    const newState = {
+      quantity: e.target.value,
+      estCost: this.state.unitCost * e.target.value,
+    };
+
+    this.setState(newState);
   },
 
   changeUnitCost(e) {
-    this.setState({ unitCost: e.target.value });
+    const newState = {
+      unitCost: e.target.value,
+      estCost: this.state.quantity * e.target.value,
+    };
+
+    this.setState(newState);
   },
 
   changeVendor(e) {
@@ -140,10 +153,10 @@ const RequestDetail = React.createClass({
                   </TableRow>
                   <TableRow selectable={false}>
                     <TableRowColumn>
-                      <label htmlFor="name">Estimated Cost</label>
+                      <label htmlFor="name">Total Cost</label>
                     </TableRowColumn>
                     <TableRowColumn>
-                      <input name="name" type="text" value={this.state.estCost} onChange={this.changeEstCost} />
+                      <div>{this.state.estCost}</div>
                     </TableRowColumn>
                   </TableRow>
                   <TableRow selectable={false}>
@@ -204,8 +217,9 @@ const RequestDetail = React.createClass({
                   </TableRow>
                   <TableRow selectable={false}>
                     <TableRowColumn>
-                      <button onClick={this.editRequest}>Save Changes</button>
-                    </TableRowColumn>                  
+                      <button onClick={this.editRequest}>Save Changes</button>&nbsp;
+                      <button onClick={hashHistory.goBack}>Go Back</button>
+                    </TableRowColumn>
                   </TableRow>
                 </TableBody>
               </Table>

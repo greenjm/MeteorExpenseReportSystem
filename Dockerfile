@@ -2,7 +2,7 @@
 # https://github.com/chriswessels/meteor-tupperware
 
 # Inherit from chriswessels/meteor-tupperware image
-FROM quay.io/chriswessels/meteor-tupperware
+FROM abernix/meteord:node-4.6.1-onbuild
 
 # The maintainer of your app image
 MAINTAINER greenjm <jgreen1353@gmail.com>

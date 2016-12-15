@@ -1,13 +1,11 @@
 import { Table, TableRow, TableRowColumn, TableBody }
   from 'material-ui/Table';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
+import { hashHistory } from 'react-router';
 import Paper from 'material-ui/Paper';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 
-import { hashHistory } from 'react-router';
-import { Meteor } from 'meteor/meteor';
-import { Tracker } from 'meteor/tracker';
-import Header from './header.jsx';
+import Header from '../components/header.jsx';
 import '../../api/requests/requests.js';
 
 /* global Requests:true*/
@@ -15,6 +13,7 @@ import '../../api/requests/requests.js';
 
 const React = require('react');
 
+// Styles
 const paperStyle = {
   height: '35px',
   lineHeight: '35px',
@@ -22,11 +21,10 @@ const paperStyle = {
   paddingLeft: '24px',
 };
 
-const SubmitReport = React.createClass({
-  propTypes() {
-    return {
-      location: React.object,
-    };
+const ViewRequests = React.createClass({
+  propTypes: {
+    requests: React.PropTypes.array,
+    isAdmin: React.PropTypes.bool,
   },
 
   getInitialState() {
@@ -36,15 +34,21 @@ const SubmitReport = React.createClass({
   },
 
   componentWillMount() {
-    Tracker.autorun(() => {
-      Meteor.subscribe('requests', () => {
-        this.setState({ requests: Requests.find().fetch() });
-      });
-    });
+    this.setState({ requests: this.props.requests });
+  },
+
+  componentWillReceiveProps(nextProps) {
+    if (!nextProps.user) {
+      hashHistory.push('/');
+    }
+
+    if (this.state.requests !== nextProps.requests) {
+      this.setState({ requests: nextProps.requests });
+    }
   },
 
   showRequest(data, index) {
-    const url = `/#/viewRequests/request?id=${data._id}`;
+    const url = `/#/viewRequests/${data._id}`;
     return (
       <TableRow key={index}>
         <TableRowColumn>{index}</TableRowColumn>
@@ -56,29 +60,15 @@ const SubmitReport = React.createClass({
             </FloatingActionButton>
           </a>
         </TableRowColumn>
+        <TableRowColumn>{data.statMsg}</TableRowColumn>
       </TableRow>
     );
-  },
-
-  submitReport() {
-    let acceptedRequests = [];
-    for (let i = 0; i < requests.length; i += 1) {
-      if (requests[i].stat) {
-        acceptedRequests.push(requests[i]);
-      }
-    }
-    // TODO:
-    // Now send the accepted requests in an api call to the server
-  },
-
-  cancel() {
-    hashHistory.push('/dashboard');
   },
 
   render() {
     return (
       <div>
-        <Header />
+        <Header isAdmin={this.props.isAdmin} />
         <Paper style={paperStyle} zDepth={1}>Expense Requests</Paper>
         <br />
         <br />
@@ -88,12 +78,6 @@ const SubmitReport = React.createClass({
               <Table>
                 <TableBody displayRowCheckbox={false}>
                   {this.state.requests.map(this.showRequest)}
-                  <TableRow selectable={false}>
-                    <TableRowColumn>
-                      <button onClick={this.submitReport}>Submit Expense Report</button>
-                      <button onClick={this.cancel}>Cancel</button>
-                    </TableRowColumn>
-                  </TableRow>
                 </TableBody>
               </Table>
             </Col>
@@ -104,4 +88,4 @@ const SubmitReport = React.createClass({
   },
 });
 
-module.exports = SubmitReport;
+module.exports = ViewRequests;

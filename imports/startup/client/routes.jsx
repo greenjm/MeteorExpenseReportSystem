@@ -10,30 +10,30 @@ const React = require('react');
 const ReactDOM = require('react-dom');
 const Router = require('react-router').Router;
 const Route = require('react-router').Route;
-const Login = require('../../ui/components/login.jsx');
-const AdminDashboard = require('../../ui/components/adminDashboard.jsx');
-const ProjectDetail = require('../../ui/components/projectDetail.jsx');
-const UserDashboard = require('../../ui/components/userDashboard.jsx');
-const SubmitRequest = require('../../ui/components/submitRequest.jsx');
-const ManageRequests = require('../../ui/components/manageRequests.jsx');
-const ViewRequests = require('../../ui/components/viewRequests.jsx');
-const SubmitReport = require('../../ui/components/submitReport.jsx');
-const RequestDetail = require('../../ui/components/requestDetail.jsx');
+const LoginContainer = require('../../ui/components/loginContainer.jsx');
+const AdminDashboardContainer = require('../../ui/components/adminDashboardContainer.jsx');
+const ProjectDetailContainer = require('../../ui/components/projectDetailContainer.jsx');
+const UserDashboardContainer = require('../../ui/components/userDashboardContainer.jsx');
+const SubmitRequestContainer = require('../../ui/components/submitRequestContainer.jsx');
+const ViewRequestsContainer = require('../../ui/components/viewRequestsContainer.jsx');
+const SubmitReportContainer = require('../../ui/components/submitReportContainer.jsx');
+const RequestDetailContainer = require('../../ui/components/requestDetailContainer.jsx');
+const ManageRequests = require('../../ui/pages/manageRequests.jsx');
 
 Meteor.startup(() => {
   injectTapEventPlugin();
   ReactDOM.render((
     <MuiThemeProvider>
       <Router history={hashHistory}>
-        <Route path="/adminDashboard" component={AdminDashboard} />
-        <Route path="/dashboard" component={UserDashboard} />
-        <Route path="/project*" component={ProjectDetail} />
-        <Route path="/" component={Login} />
-        <Route path="/submitRequest" component={SubmitRequest} />
+        <Route path="/adminDashboard" component={AdminDashboardContainer} />
+        <Route path="/dashboard" component={UserDashboardContainer} />
+        <Route path="/project/:projectId" component={ProjectDetailContainer} />
+        <Route path="/" component={LoginContainer} />
+        <Route path="/submitRequest" component={SubmitRequestContainer} />
+        <Route path="/viewRequests" component={ViewRequestsContainer} />
+        <Route path="/submitReport" component={SubmitReportContainer} />
+        <Route path="/viewRequests/:requestId" component={RequestDetailContainer} />
         <Route path="/manageRequests" component={ManageRequests} />
-        <Route path="/viewRequests" component={ViewRequests} />
-        <Route path="/submitReport" component={SubmitReport} />
-        <Route path="/viewRequests/request*" component={RequestDetail} />
       </Router>
     </MuiThemeProvider>
   ), document.getElementById('app'));

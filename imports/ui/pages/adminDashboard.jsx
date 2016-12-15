@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-import { Tracker } from 'meteor/tracker';
+import { hashHistory } from 'react-router';
 import Paper from 'material-ui/Paper';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
   from 'material-ui/Table';
@@ -13,7 +13,7 @@ import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
 import '../../api/projects/projects.js';
-import Header from './header.jsx';
+import Header from '../components/header.jsx';
 
 /* global Projects:true*/
 /* eslint no-undef: "error"*/
@@ -45,17 +45,23 @@ const switchStyle = {
 };
 
 const AdminDashboard = React.createClass({
+  propTypes: {
+    isAdmin: React.PropTypes.bool,
+  },
+
   getInitialState() {
     return {
       projectNames: [],
       projectIds: [],
       users: [],
-      newUserDialogOpen: false,
+      editUserDialogOpen: false,
       newProjectDialogOpen: false,
-      newUserEmail: '',
-      newUserName: '',
-      emailError: '',
+      editUserId: '',
+      userName: '',
       userNameError: '',
+      autoInternet: false,
+      autoPhone: false,
+      emailError: '',
       isAdmin: false,
       dialogError: '',
       newProjectName: '',
@@ -65,27 +71,27 @@ const AdminDashboard = React.createClass({
     };
   },
 
-  componentWillMount() {
-    Tracker.autorun(() => {
-      if (sub.ready()) {
-        const projects = Projects.find().fetch();
-        const projectNames = [];
-        const projectIds = [];
-        for (let i = 0; i < projects.length; i += 1) {
-          projectNames.push(projects[i].name);
-          projectIds.push(projects[i]._id);
-        }
-        this.setState({ projectNames, projectIds });
+  componentWillReceiveProps(nextProps) {
+    if (!nextProps.user || !nextProps.isAdmin) {
+      hashHistory.push('/');
+    }
+
+    if (nextProps.projectReady) {
+      const projectNames = [];
+      const projectIds = [];
+      for (let i = 0; i < nextProps.projects.length; i += 1) {
+        projectNames.push(nextProps.projects[i].name);
+        projectIds.push(nextProps.projects[i]._id);
       }
-      if (userSub.ready()) {
-        const users = Meteor.users.find().fetch();
-        const userList = [];
-        for (let i = 0; i < users.length; i += 1) {
-          userList.push(users[i]);
-        }
-        this.setState({ users: userList });
+      this.setState({ projectNames, projectIds });
+    }
+    if (nextProps.userReady) {
+      const userList = [];
+      for (let i = 0; i < nextProps.users.length; i += 1) {
+        userList.push(nextProps.users[i]);
       }
-    });
+      this.setState({ users: userList });
+    }
   },
 
   createUserRow(item) {
@@ -94,7 +100,7 @@ const AdminDashboard = React.createClass({
         <TableRowColumn>{item.profile.name}</TableRowColumn>
         <TableRowColumn>{item.emails[0].address}</TableRowColumn>
         <TableRowColumn style={actionsColStyle}>
-          <FloatingActionButton mini zDepth={1}>
+          <FloatingActionButton mini zDepth={1} onTouchTap={() => this.editUser(item)}>
             <i className="material-icons">edit</i>
           </FloatingActionButton>
         </TableRowColumn>
@@ -102,7 +108,7 @@ const AdminDashboard = React.createClass({
   },
 
   createProjectRow(item, index) {
-    const url = `/#/project?id=${this.state.projectIds[index]}`;
+    const url = `/#/project/${this.state.projectIds[index]}`;
     return (
       <TableRow key={this.state.projectIds[index]} selectable={false}>
         <TableRowColumn>{item}</TableRowColumn>
@@ -135,26 +141,6 @@ const AdminDashboard = React.createClass({
     this.createItem(projectName, 4);
   },
 
-  showForm() {
-    document.getElementById('projectForm').style.display = 'block';
-  },
-
-  hideForm() {
-    document.getElementById('projectForm').style.display = 'none';
-    document.getElementById('name').value = '';
-    document.getElementById('project').value = '';
-  },
-
-  showUserForm() {
-    document.getElementById('userForm').style.display = 'block';
-  },
-
-  hideUserForm() {
-    document.getElementById('userForm').style.display = 'none';
-    document.getElementById('userName').value = '';
-    document.getElementById('userID').value = '';
-  },
-
   // User Dialog functions
   emptyUserFieldError() {
     if (this.state.newUserEmail === '') {
@@ -165,43 +151,91 @@ const AdminDashboard = React.createClass({
     }
   },
 
+  hideUserForm() {
+    document.getElementById('userForm').style.display = 'none';
+    document.getElementById('userName').value = '';
+    document.getElementById('userID').value = '';
+  },
+
   submitUser() {
-    if (this.state.newUserEmail === '' || this.state.newUserName === '') {
-      this.emptyUserFieldError();
+    if (this.state.userName === '') {
+      this.setState({ userNameError: 'This field is required.' });
       return;
     }
-    Meteor.call('users.new', this.state.newUserEmail,
-      this.state.newUserName,
-      this.state.isAdmin,
+    const profile = {
+      name: this.state.userName,
+      autoInternet: this.state.autoInternet,
+      autoPhone: this.state.autoPhone,
+      isAdmin: this.state.isAdmin,
+    };
+    Meteor.call('users.update', this.state.editUserId,
+      profile,
       (error, result) => {
         if (error != null) {
           this.setState({ dialogError: `Error: ${error.error}. Reason: ${error.reason}` });
           return;
         }
         if (result) {
-          this.setState({ dialogError: '', newUserName: '', newUserEmail: '', isAdmin: false });
+          this.setState({ dialogError: '' });
         }
         this.closeUserDialog();
       });
   },
 
   closeUserDialog() {
-    this.setState({ newUserDialogOpen: false,
-                    newUserName: '',
-                    newUserEmail: '',
-                    isAdmin: false });
+    this.setState({
+      editUserDialogOpen: false,
+      newUserName: '',
+      newUserEmail: '',
+      isAdmin: false,
+    });
   },
 
+  // State Bindings
   openUserDialog() {
-    this.setState({ newUserDialogOpen: true });
+    this.setState({ editUserDialogOpen: true });
   },
 
-  handleEmailChange(event) {
-    this.setState({ newUserEmail: event.target.value, emailError: '' });
+  closeProjectDialog() {
+    this.setState({ newProjectDialogOpen: false });
+  },
+
+  openProjectDialog() {
+    this.setState({ newProjectDialogOpen: true, dialogError: '' });
+  },
+
+  handleProjectNameChange(event) {
+    this.setState({ newProjectName: event.target.value, projectNameError: '' });
+  },
+
+  handleManagerChange(event, index, value) {
+    this.setState({ projectManager: value, managerError: '' });
+  },
+
+
+  editUser(user) {
+    this.setState({
+      editUserId: user._id,
+      userName: user.profile.name,
+      userNameError: '',
+      autoInternet: user.profile.autoInternet,
+      autoPhone: user.profile.autoPhone,
+      isAdmin: user.profile.isAdmin,
+      dialogError: '',
+    });
+    this.openUserDialog();
   },
 
   handleUserNameChange(event) {
-    this.setState({ newUserName: event.target.value, userNameError: '' });
+    this.setState({ userName: event.target.value, userNameError: '' });
+  },
+
+  handleAutoInternetChange() {
+    this.setState({ autoInternet: !this.state.autoInternet });
+  },
+
+  handleAutoPhoneChange() {
+    this.setState({ autoPhone: !this.state.autoPhone });
   },
 
   handleIsAdminChange() {
@@ -223,37 +257,20 @@ const AdminDashboard = React.createClass({
       this.emptyProjectFieldError();
       return;
     }
-    Meteor.call('projects.create', this.state.newProjectName, this.state.projectManager, (err, res) => {
+    Meteor.call('projects.create', this.state.newProjectName, this.state.projectManager, (err) => {
       if (err != null) {
         this.setState({ dialogError: `Error: ${err.error}. Reason: ${err.reason}` });
         return;
       }
-      if (res) {
-        this.setState({ dialogError: '', newProjectName: '', projectManager: '' });
-      }
+      this.setState({ dialogError: '', newProjectName: '', projectManager: '' });
+
       this.closeProjectDialog();
     });
   },
 
-  closeProjectDialog() {
-    this.setState({ newProjectDialogOpen: false });
-  },
-
-  openProjectDialog() {
-    this.setState({ newProjectDialogOpen: true });
-  },
-
-  handleProjectNameChange(event) {
-    this.setState({ newProjectName: event.target.value, projectNameError: '' });
-  },
-
-  handleManagerChange(event, index, value) {
-    this.setState({ projectManager: value, managerError: '' });
-  },
-
   createUserMenuItem(item) {
     return (
-      <MenuItem value={item._id} primaryText={item.profile.name} />
+      <MenuItem value={item._id} key={item._id} primaryText={item.profile.name} />
     );
   },
 
@@ -265,7 +282,7 @@ const AdminDashboard = React.createClass({
         onTouchTap={this.closeUserDialog}
       />,
       <FlatButton
-        label="Add"
+        label="Save"
         primary
         onTouchTap={this.submitUser}
       />,
@@ -286,7 +303,7 @@ const AdminDashboard = React.createClass({
 
     return (
       <div>
-        <Header />
+        <Header isAdmin={this.props.isAdmin} />
         <Paper style={paperStyle} zDepth={1}>Admin Dashboard</Paper>
         <br />
         <br />
@@ -294,16 +311,8 @@ const AdminDashboard = React.createClass({
           <Grid>
             <Row>
               <Col xs={12} sm={12} md={6} lg={6}>
-                <Table
-                  selectable={false}
-                >
+                <Table selectable={false}>
                   <TableHeader displaySelectAll={false}>
-                    <TableRow selectable={false}>
-                      <TableHeaderColumn colSpan="3" style={{ textAlign: 'center' }}>
-                        <RaisedButton label="New" primary style={tableHeaderButtonStyle} onTouchTap={this.openUserDialog} />
-                        Users
-                      </TableHeaderColumn>
-                    </TableRow>
                     <TableRow selectable={false}>
                       <TableHeaderColumn>Name</TableHeaderColumn>
                       <TableHeaderColumn>Email</TableHeaderColumn>
@@ -319,9 +328,7 @@ const AdminDashboard = React.createClass({
                 </Table>
               </Col>
               <Col xs={12} sm={12} md={6} lg={6}>
-                <Table
-                  selectable={false}
-                >
+                <Table selectable={false}>
                   <TableHeader displaySelectAll={false}>
                     <TableRow selectable={false}>
                       <TableHeaderColumn colSpan="2" style={{ textAlign: 'center' }}>
@@ -361,38 +368,42 @@ const AdminDashboard = React.createClass({
                   <TableBody
                     showRowHover
                     displayRowCheckbox={false}
-                  >
-                    
-                  </TableBody>
+                  />
                 </Table>
               </Col>
             </Row>
           </Grid>
         </div>
+
         <Dialog
-          title="Add New User"
+          title="Edit User"
           actions={userDialogActions}
           modal={false}
-          open={this.state.newUserDialogOpen}
+          open={this.state.editUserDialogOpen}
           onRequestClose={this.closeUserDialog}
         >
-          <TextField
-            hintText="email"
-            floatingLabelText="Email Address"
-            fullWidth
-            value={this.state.newUserEmail}
-            errorText={this.state.emailError}
-            name="newUserEmail"
-            onChange={this.handleEmailChange}
-          />
           <TextField
             hintText="name"
             floatingLabelText="Full Name"
             fullWidth
-            value={this.state.newUserName}
+            value={this.state.userName}
             errorText={this.state.userNameError}
-            name="newUserEmail"
+            name="userName"
             onChange={this.handleUserNameChange}
+          />
+          <br />
+          <Toggle
+            label="Auto Internet?"
+            style={switchStyle}
+            toggled={this.state.autoInternet}
+            onToggle={this.handleAutoInternetChange}
+          />
+          <br />
+          <Toggle
+            label="Auto Phone?"
+            style={switchStyle}
+            toggled={this.state.autoPhone}
+            onToggle={this.handleAutoPhoneChange}
           />
           <br />
           <Toggle
@@ -417,7 +428,7 @@ const AdminDashboard = React.createClass({
             fullWidth
             value={this.state.newProjectName}
             errorText={this.state.projectNameError}
-            name="newUserEmail"
+            name="newProjectName"
             onChange={this.handleProjectNameChange}
           />
           <SelectField
@@ -430,7 +441,7 @@ const AdminDashboard = React.createClass({
           <div style={{ color: 'red' }}>{this.state.dialogError}</div>
         </Dialog>
       </div>
-      );
+    );
   },
 });
 

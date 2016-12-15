@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-// import { check } from 'meteor/check';
+import { check } from 'meteor/check';
 import '../requests.js';
 
 /* global Requests:true*/
@@ -12,18 +12,20 @@ Meteor.publish('requests', function requestsPublish() {
     return null;
   }
 
-  // if (currentUser.profile.isAdmin) {
-  //   const reports = Reports.find();
-  //   return reports;
-  // }
+  if (currentUser.profile.isAdmin) {
+    const requests = Requests.find();
+    return requests;
+  }
 
   const requests = Requests.find({ userId: this.userId });
   return requests;
 });
 
 Meteor.publish('requestOne', function retrieveRequest(requestId) {
+  check(requestId, String);
+
   const currentUser = Meteor.users.findOne(this.userId);
-    if (currentUser == null || currentUser.profile == null) {
+  if (currentUser == null || currentUser.profile == null) {
     return null;
   }
 
