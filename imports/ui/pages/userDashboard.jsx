@@ -1,4 +1,3 @@
-
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
   from 'material-ui/Table';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
@@ -125,8 +124,8 @@ function ManagerView(props) {
 }
 
 ManagerView.propTypes = {
-  projects: React.propTypes.array,
-  requests: React.propTypes.array,
+  projects: React.PropTypes.array,
+  requests: React.PropTypes.array,
 };
 
 function EmployeeView(props) {
@@ -371,75 +370,5 @@ const UserDashboard = React.createClass({
     );
   },
 });
-
-/*
-        <br />
-        <div>
-          <Grid>
-            <Row>
-              <Col xs={12} sm={12} md={12} lg={12}>
-                <Paper
-                  style={paperStyle}
-                  zDepth={2}
-                >
-                  Welcome, {this.state.name}
-                </Paper>
-              </Col>
-            </Row>
-            <br />
-            <br />
-            <Row>
-              <Col xs={12} sm={12} md={6} lg={6} style={leftColStyle}>
-                <Paper style={paperStyle} zDepth={1}>For Employees</Paper>
-                <RaisedButton
-                  label="Submit A New Request"
-                  labelPosition="before"
-                  style={buttonStyle}
-                  icon={<ActionReceipt />}
-                  primary
-                  onTouchTap={this.submitRequest}
-                />
-                <br />
-                <RaisedButton
-                  label="View My Requests"
-                  labelPosition="before"
-                  style={buttonStyle}
-                  icon={<Description />}
-                  primary
-                  onTouchTap={this.viewRequests}
-                />
-                <br />
-                <RaisedButton
-                  label="Generate Monthly Report"
-                  labelPosition="before"
-                  style={buttonStyle}
-                  icon={<Assignment />}
-                  secondary
-                  onTouchTap={this.submitReport}
-                />
-              </Col>
-              <Col xs={12} sm={12} md={6} lg={6} >
-                <Paper style={paperStyle} zDepth={1}>For Managers</Paper>
-                <RaisedButton
-                  label="Manage Projects"
-                  labelPosition="before"
-                  style={buttonStyle}
-                  icon={<DeveloperBoard />}
-                  primary
-                />
-                <br />
-                <RaisedButton
-                  label="Manage Requests"
-                  labelPosition="before"
-                  style={buttonStyle}
-                  icon={<ViewList />}
-                  secondary
-                  onTouchTap={this.manageRequests}
-                />
-              </Col>
-            </Row>
-          </Grid>
-        </div>
-        */
 
 module.exports = UserDashboard;
