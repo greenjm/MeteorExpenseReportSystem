@@ -39,3 +39,27 @@ Meteor.publish('usersInProject', function projectUsersPublish(projectId) {
   }
   return null;
 });
+
+Meteor.publish('usersNames', function usersNamesPublish(userIdList) {
+  // Given a list of userIds, return the name of those users
+  check(userIdList, Array);
+
+  const currentUser = Meteor.users.findOne(this.userId);
+
+  if (currentUser == null || currentUser.profile == null) {
+    return null;
+  }
+
+  const ids = [];
+  for (let i = 0; i < userIdList.length; i += 1) {
+    if (!userIdList[i].userId) {
+      break;
+    }
+    ids.push(userIdList[i].userId);
+  }
+
+  const find = { $or: [{ _id: { $in: ids } }, { _id: { $in: userIdList } }] };
+  const projection = { 'profile.name': 1 };
+  const names = Meteor.users.find(find, projection);
+  return names;
+});

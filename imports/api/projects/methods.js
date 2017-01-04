@@ -1,5 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
+// import { ValidatedMethod } from 'meteor/mdg:validated-method';
+// import { SimpleSchema } from 'meteor/aldeed:simple-schema';
 import './projects.js';
 
 /* global Projects:true*/
@@ -34,6 +36,52 @@ function isManager(projectId) {
   return project != null || currentUser.profile.isAdmin;
 }
 
+/**
+The commented out methods using ValidatedMethod are designed to be used
+for testing purposes. Should they succeed, they and others will be created
+to replace the current methods.
+*/
+
+// export const createProject = new ValidatedMethod({
+//   name: 'projects.create',
+//   validate: new SimpleSchema({
+//     name: { type: String },
+//     mgr: { type: String },
+//   }).validator(),
+//   run({ name, mgr }) {
+//     if (isAdmin()) {
+//       return Projects.insert({
+//         name,
+//         managers: [mgr],
+//         employees: [],
+//         bornOn: new Date(),
+//         isActive: true,
+//         inactiveDate: null,
+//       });
+//     }
+//     throw new Meteor.Error('projects.create.unauthorized',
+//       'You do not have permission to create projects.');
+//   },
+// });
+
+// export const addManager = new ValidatedMethod({
+//   name: 'projects.addManager',
+//   validate: new SimpleSchema({
+//     proj: { type: String },
+//     user: { type: String },
+//   }).validator(),
+//   run({ proj, user }) {
+//     if (isAdmin()) {
+//       const result = Projects.update({ _id: proj },
+//                       { $addToSet: { managers: user } });
+
+//       return result.nModified === 1;
+//     }
+//     throw new Meteor.Error('projects.addManager.unauthorized',
+//       'You do not have permission to add managers.');
+//   },
+// });
+
 Meteor.methods({
   /**
   Creates new project using the name of the project and one manager provided
@@ -45,12 +93,15 @@ Meteor.methods({
     check(name, String);
     check(mgr, String);
 
-    return Projects.insert({ name,
-      managers: [mgr],
-      employees: [],
-      bornOn: new Date(),
-      isActive: true,
-      inactiveDate: null });
+    if (isAdmin()) {
+      return Projects.insert({ name,
+        managers: [mgr],
+        employees: [],
+        bornOn: new Date(),
+        isActive: true,
+        inactiveDate: null });
+    }
+    throw new Meteor.Error('projects.create.unauthorized', 'You do not have permission to create projects.');
   },
 
   'projects.addManager': function addManager(proj, user) {
@@ -149,6 +200,11 @@ Meteor.methods({
 
       return result.nModified === 1;
     }
-    throw new Meteor.Error('projects.editName.unauthorized', 'You do not have permission to deactivate projects.');
+    throw new Meteor.Error('projects.editName.unauthorized', 'You do not have permission to change name of projects.');
   },
+
+  // signIn: function signIn(givenId) {
+  //   check(givenId, String);
+  //   this.setUserId(givenId);
+  // },
 });

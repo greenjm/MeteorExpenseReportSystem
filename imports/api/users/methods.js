@@ -47,7 +47,7 @@ Meteor.methods({
     }
     if (/^[A-Z0-9'.1234z_%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email)) {
       const username = email.substr(0, email.indexOf('@'));
-      Accounts.createUser({
+      const userId = Accounts.createUser({
         username,
         email,
         profile: {
@@ -56,13 +56,9 @@ Meteor.methods({
           autoInternet: true,
           autoPhone: true,
         },
-      }, (error, userId) => {
-        if (error != null) {
-          Accounts.sendEnrollmentEmail(userId);
-          return true;
-        }
-        throw new Meteor.Error('users.new.failed', 'Accounts.createUser call failed');
       });
+      Accounts.sendEnrollmentEmail(userId);
+      return true;
     }
     throw new Meteor.Error('users.new.invalidEmail', 'Email address is not valid');
   },
@@ -95,6 +91,10 @@ Meteor.methods({
     const currentUserId = Meteor.userId();
     if (!currentUser.profile.isAdmin && currentUserId !== userId) {
       throw new Meteor.Error('users.update.permissionDenied', 'You do not have required permissions to update user');
+    }
+
+    if (currentUser.profile.isAdmin && userId === Meteor.userId() && !profile.isAdmin) {
+      throw new Meteor.Error('users.update.invalidUpdate', 'You cannot remove your own admin permissions');
     }
 
     Meteor.users.update(userId, {
