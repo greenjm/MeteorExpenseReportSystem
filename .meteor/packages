@@ -36,3 +36,6 @@ aldeed:simple-schema
 digilord:faker
 mdg:validated-method
 react-meteor-data
+cfs:standard-packages
+cfs:gridfs
+cfs:ejson-file
