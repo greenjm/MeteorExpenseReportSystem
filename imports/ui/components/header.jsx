@@ -35,7 +35,7 @@ const Header = React.createClass({
       const notificationSub = Meteor.subscribe('notifications');
       if (notificationSub.ready()) {
         const notificationCount = Notifications.find().count();
-        const notifications = Notifications.find().fetch();
+        const notifications = Notifications.find().sort({ bornOn: -1 }).fetch();
         this.setState({ notificationCount, notifications });
       }
     });
