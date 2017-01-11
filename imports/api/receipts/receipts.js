@@ -1,4 +1,4 @@
-import { FS } from 'fs';
+import { FS } from 'meteor/cfs:base-package';
 
 /* global Receipts:true*/
 /* eslint no-undef: "error"*/

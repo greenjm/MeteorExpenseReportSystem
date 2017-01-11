@@ -16,6 +16,7 @@ import '../imports/api/receipts/receipts.js';
 import '../imports/api/projects/server/publications.js';
 import '../imports/api/users/server/publications.js';
 import '../imports/api/requests/server/publications.js';
+import '../imports/api/receipts/server/publications.js';
 
 Meteor.startup(() => {
   // code to run on server at startup

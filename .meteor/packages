@@ -39,3 +39,4 @@ react-meteor-data
 cfs:standard-packages
 cfs:gridfs
 cfs:ejson-file
+cfs:base-package
