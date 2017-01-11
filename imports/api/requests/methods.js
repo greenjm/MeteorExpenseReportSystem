@@ -26,7 +26,6 @@ Meteor.methods({
       partNo: prt,
       quantity: qty,
       unitCost: unt,
-      fileUrl: '',
     };
 
     Requests.schema.validate(newReq);

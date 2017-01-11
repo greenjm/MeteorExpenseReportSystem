@@ -10,7 +10,7 @@ dependencies:
 test:
   override:
 #     - gagarin -v
-    - meteor npm run lint-ci
+    - meteor npm run lint-dev
     - npm run test
 
 #deployment:
