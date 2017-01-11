@@ -2,6 +2,7 @@
 // at the top of their render()
 import { hashHistory } from 'react-router';
 import { Meteor } from 'meteor/meteor';
+import { Tracker } from 'meteor/tracker';
 import AppBar from 'material-ui/AppBar';
 import IconButton from 'material-ui/IconButton';
 import IconMenu from 'material-ui/IconMenu';
@@ -9,6 +10,9 @@ import MenuItem from 'material-ui/MenuItem';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import Badge from 'material-ui/Badge';
 import NotificationsIcon from 'material-ui/svg-icons/social/notifications';
+
+/* global Notifications:true*/
+/* eslint no-undef: "error"*/
 
 const React = require('react');
 
@@ -21,13 +25,40 @@ const Header = React.createClass({
     return {
       userDashLink: <MenuItem primaryText="User Dashboard" onTouchTap={this.userDash} />,
       adminDashLink: null,
+      notificationCount: 0,
+      notifications: [],
     };
+  },
+
+  componentWillMount() {
+    Tracker.autorun(() => {
+      const notificationSub = Meteor.subscribe('notifications');
+      if (notificationSub.ready()) {
+        const notificationCount = Notifications.find().count();
+        const notifications = Notifications.find().fetch();
+        this.setState({ notificationCount, notifications });
+      }
+    });
   },
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.isAdmin) {
       this.setState({ adminDashLink: <MenuItem primaryText="Admin Dashboard" onTouchTap={this.adminDash} /> });
     }
+  },
+
+  markReadAndGo(id, url) {
+    // Meteor.call('markRead', id);
+    hashHistory.push(url);
+  },
+
+  createNotification(item) {
+    return (
+      <MenuItem
+        primaryText={item.text}
+        onTouchTap={() => { this.markReadAndGo(item._id, item.url); }}
+      />
+    );
   },
 
   userDash() {
@@ -54,7 +85,7 @@ const Header = React.createClass({
               <IconMenu
                 iconButtonElement={
                   <Badge
-                    badgeContent={10}
+                    badgeContent={this.state.notificationCount}
                     secondary
                     badgeStyle={{ top: 22, right: 24, height: 18, width: 18 }}
                     style={{ padding: 0 }}
@@ -67,8 +98,10 @@ const Header = React.createClass({
                 targetOrigin={{ horizontal: 'right', vertical: 'top' }}
                 anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
               >
-                <MenuItem primaryText="View Notifications" />
-                <MenuItem primaryText="Dismiss all" />
+                { this.state.notificationCount === 0 ? (
+                  <MenuItem primaryText="0 Unread Notifications" />
+                ) : this.state.notifications.map(this.createNotification)
+                }
               </IconMenu>
               <IconMenu
                 iconButtonElement={
