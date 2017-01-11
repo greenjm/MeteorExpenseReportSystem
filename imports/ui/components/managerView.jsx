@@ -192,7 +192,7 @@ const ManagerView = React.createClass({
                     this.state.requests.map(this.createRequestRow) :
                     (
                     <TableRow selectable={false}>
-                      <TableRowColumn>You have not submitted any requests yet.</TableRowColumn>
+                      <TableRowColumn>No requests require your attention.</TableRowColumn>
                       <TableRowColumn />
                     </TableRow>
                     )
