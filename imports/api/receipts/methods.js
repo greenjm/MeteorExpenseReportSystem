@@ -6,12 +6,10 @@ import './receipts.js';
 /* eslint no-undef: "error"*/
 
 // Security
-Receipts.allow({
-  insert() { return !!this.userId; },
-  download() { return !!this.userId; },
-});
-
 Receipts.deny({
+  insert(userId, fileObj) {
+    return !fileObj.owner || userId !== fileObj.owner;
+  },
   update() { return true; },
   remove() { return true; },
 });
