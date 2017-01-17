@@ -13,7 +13,7 @@ const RequestDetailContainer = createContainer(({ params }) => {
   const requestSub = Meteor.subscribe('requests');
   const requestReady = requestSub.ready();
   const request = requestReady && Requests.findOne(requestId);
-  const requestOwned = user && request && user._id === request.userId;
+  const requestOwned = !!user && !!request && user._id === request.userId;
   return {
     user: !!user || false,
     isAdmin,

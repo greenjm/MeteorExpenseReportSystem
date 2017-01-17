@@ -3,8 +3,9 @@ import { Table, TableRow, TableRowColumn, TableBody }
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
 import Paper from 'material-ui/Paper';
 import { hashHistory } from 'react-router';
-
+import TextField from 'material-ui/TextField';
 import Header from '../components/header.jsx';
+import RaisedButton from 'material-ui/RaisedButton';
 import '../../api/requests/requests.js';
 
 /* global Requests:true*/
@@ -54,7 +55,8 @@ const RequestDetail = React.createClass({
   },
 
   componentWillReceiveProps(nextProps) {
-    if (!nextProps.user || (!nextProps.requestOwned && !nextProps.isAdmin)) {
+    if (!nextProps.user || 
+        (nextProps.requestReady && !nextProps.requestOwned && !nextProps.isAdmin)) {
       hashHistory.push('/');
     }
 
@@ -148,7 +150,13 @@ const RequestDetail = React.createClass({
                       <label htmlFor="name">Description</label>
                     </TableRowColumn>
                     <TableRowColumn>
-                      <input name="name" type="text" value={this.state.description} onChange={this.changeDescription} />
+                      <TextField
+                        hintText="Description"
+                        multiLine
+                        value={this.state.description}
+                        fullWidth
+                        onChange={this.changeDescription}
+                      />
                     </TableRowColumn>
                   </TableRow>
                   <TableRow selectable={false}>
@@ -156,7 +164,12 @@ const RequestDetail = React.createClass({
                       <label htmlFor="name">Total Cost</label>
                     </TableRowColumn>
                     <TableRowColumn>
-                      <div>{this.state.estCost}</div>
+                      <TextField
+                        hintText="Description"
+                        value={this.state.estCost}
+                        fullWidth
+                        readOnly
+                      />
                     </TableRowColumn>
                   </TableRow>
                   <TableRow selectable={false}>
@@ -164,7 +177,12 @@ const RequestDetail = React.createClass({
                       <label htmlFor="name">Part Number</label>
                     </TableRowColumn>
                     <TableRowColumn>
-                      <input name="name" type="text" value={this.state.partNo} onChange={this.changePartNo} />
+                      <TextField
+                        hintText="Part Number"
+                        value={this.state.partNo}
+                        fullWidth
+                        onChange={this.changePartNo}
+                      />
                     </TableRowColumn>
                   </TableRow>
                   <TableRow selectable={false}>
@@ -172,7 +190,12 @@ const RequestDetail = React.createClass({
                       <label htmlFor="name">Quantity</label>
                     </TableRowColumn>
                     <TableRowColumn>
-                      <input name="name" type="text" value={this.state.quantity} onChange={this.changeQuantity} />
+                      <TextField
+                        hintText="Quantity"
+                        value={this.state.quantity}
+                        fullWidth
+                        onChange={this.changeQuantity}
+                      />
                     </TableRowColumn>
                   </TableRow>
                   <TableRow selectable={false}>
@@ -180,7 +203,12 @@ const RequestDetail = React.createClass({
                       <label htmlFor="name">Unit Cost</label>
                     </TableRowColumn>
                     <TableRowColumn>
-                      <input name="name" type="text" value={this.state.unitCost} onChange={this.changeUnitCost} />
+                      <TextField
+                        hintText="Unit Cost"
+                        value={this.state.unitCost}
+                        fullWidth
+                        onChange={this.changeUnitCost}
+                      />
                     </TableRowColumn>
                   </TableRow>
                   <TableRow selectable={false}>
@@ -188,15 +216,12 @@ const RequestDetail = React.createClass({
                       <label htmlFor="name">Vendor</label>
                     </TableRowColumn>
                     <TableRowColumn>
-                      <input name="name" type="text" value={this.state.vendor} onChange={this.changeVendor} />
-                    </TableRowColumn>
-                  </TableRow>
-                  <TableRow selectable={false}>
-                    <TableRowColumn>
-                      <label htmlFor="name">File URL</label>
-                    </TableRowColumn>
-                    <TableRowColumn>
-                      <input name="name" type="text" value={this.state.fileUrl} onChange={this.changeFileUrl} />
+                      <TextField
+                        hintText="Vendor"
+                        value={this.state.vendor}
+                        fullWidth
+                        onChange={this.changeVendor}
+                      />
                     </TableRowColumn>
                   </TableRow>
                   <TableRow selectable={false}>
@@ -204,7 +229,12 @@ const RequestDetail = React.createClass({
                       <label htmlFor="name">Status</label>
                     </TableRowColumn>
                     <TableRowColumn>
-                      <input name="name" type="text" value={this.state.status} disabled />
+                      <TextField
+                        hintText="Status"
+                        value={this.state.status}
+                        fullWidth
+                        readOnly
+                      />
                     </TableRowColumn>
                   </TableRow>
                   <TableRow selectable={false}>
@@ -212,12 +242,23 @@ const RequestDetail = React.createClass({
                       <label htmlFor="name">Status Message</label>
                     </TableRowColumn>
                     <TableRowColumn>
-                      <input name="name" type="text" value={this.state.statMsg} disabled />
+                      <TextField
+                        hintText="Status Message"
+                        value={this.state.statMsg}
+                        fullWidth
+                        readOnly
+                      />
                     </TableRowColumn>
                   </TableRow>
                   <TableRow selectable={false}>
+                    <TableRowColumn />
                     <TableRowColumn>
-                      <button onClick={this.editRequest}>Save Changes</button>
+                      <RaisedButton
+                        label="Save Changes"
+                        primary
+                        onClick={this.editRequest}
+                        style={{ float: 'right' }}
+                      />
                     </TableRowColumn>
                   </TableRow>
                 </TableBody>
