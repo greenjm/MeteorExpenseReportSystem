@@ -11,9 +11,12 @@ const RequestDetailContainer = createContainer(({ params }) => {
   const profile = user && user.profile;
   const isAdmin = profile && profile.isAdmin;
   const requestSub = Meteor.subscribe('requests');
+  const receiptSub = Meteor.subscribe('receipts');
   const requestReady = requestSub.ready();
+  const receiptReady = receiptSub.ready();
   const request = requestReady && Requests.findOne(requestId);
   const requestOwned = !!user && !!request && user._id === request.userId;
+  const receipt = request && request.receipt && receiptReady && request.receipt.getFileRecord();
   return {
     user: !!user || false,
     isAdmin,
@@ -25,6 +28,9 @@ const RequestDetailContainer = createContainer(({ params }) => {
     quantity: request ? request.quantity : 0,
     unitCost: request ? request.unitCost : 0,
     vendor: request ? request.vendor : '',
+    status: request ? request.status : null,
+    statMsg: request ? request.statMsg : '',
+    receipt,
     requestOwned,
   };
 }, RequestDetailPage);

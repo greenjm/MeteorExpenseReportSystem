@@ -2,14 +2,16 @@ import { Meteor } from 'meteor/meteor';
 import { Table, TableRow, TableRowColumn, TableBody }
   from 'material-ui/Table';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
+import { FS } from 'meteor/cfs:base-package';
 import Paper from 'material-ui/Paper';
+import CircularProgress from 'material-ui/CircularProgress';
 import { hashHistory } from 'react-router';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import Header from '../components/header.jsx';
 import '../../api/requests/requests.js';
 
-/* global Requests:true*/
+/* global Requests Receipts:true*/
 /* eslint no-undef: "error"*/
 
 const React = require('react');
@@ -20,6 +22,17 @@ const paperStyle = {
   lineHeight: '35px',
   fontFamily: 'Roboto,sans-serif',
   paddingLeft: '24px',
+};
+
+const fileInputStyle = {
+  cursor: 'pointer',
+  position: 'absolute',
+  top: 0,
+  bottom: 0,
+  right: 0,
+  left: 0,
+  width: '100%',
+  opacity: 0,
 };
 
 const RequestDetail = React.createClass({
@@ -47,6 +60,8 @@ const RequestDetail = React.createClass({
       statMsg: '',
       readStyle: {},
       editStyle: { display: 'none' },
+      isUploading: false,
+      receipt: null,
     };
   },
 
@@ -64,6 +79,9 @@ const RequestDetail = React.createClass({
       unitCost: this.props.unitCost,
       readVendor: this.props.vendor,
       vendor: this.props.vendor,
+      status: this.props.status,
+      statMsg: this.props.statMsg,
+      receipt: this.props.receipt,
     });
   },
 
@@ -80,6 +98,9 @@ const RequestDetail = React.createClass({
     const quantityChange = this.state.quantity !== nextProps.quantity;
     const unitCostChange = this.state.unitCost !== nextProps.unitCost;
     const vendorChange = this.state.vendor !== nextProps.vendor;
+    const statusChange = this.state.status !== nextProps.status;
+    const statMsgChange = this.state.statMsg !== nextProps.statMsg;
+    const receiptChange = this.state.receipt !== nextProps.receipt;
     this.setState({
       requestId: requestIdChange ? nextProps.requestId : this.state.requestId,
       readDescription: descChange ? nextProps.description : this.state.description,
@@ -93,6 +114,9 @@ const RequestDetail = React.createClass({
       unitCost: unitCostChange ? nextProps.unitCost : this.state.unitCost,
       readVendor: vendorChange ? nextProps.vendor : this.state.vendor,
       vendor: vendorChange ? nextProps.vendor : this.state.vendor,
+      status: statusChange ? nextProps.status : this.state.status,
+      statMsg: statMsgChange ? nextProps.statMsg : this.state.statMsg,
+      receipt: receiptChange ? nextProps.receipt : this.state.receipt,
     });
   },
 
@@ -163,7 +187,52 @@ const RequestDetail = React.createClass({
     );
   },
 
+  uploadReceipt(e) {
+    const reqId = this.state.requestId;
+    const fileObj = new FS.File(e.target.files[0]);
+    fileObj.owner = Meteor.userId();
+    fileObj.requestId = reqId;
+    fileObj.bornOn = new Date();
+    const upload = Receipts.insert(fileObj);
+    this.setState({ isUploading: true });
+    Meteor.call('receipts.attachToRequest', reqId, upload, (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        this.setState({ isUploading: false });
+      }
+    });
+  },
+
   render() {
+    let receiptRightColumn = null;
+    if (this.state.isUploading) {
+      receiptRightColumn = (
+        <CircularProgress />
+      );
+    } else if (!this.state.receipt) {
+      receiptRightColumn = (
+        <RaisedButton
+          label="Upload Receipt"
+          labelPosition="before"
+          containerElement="label"
+        >
+          <input type="file" onChange={this.uploadReceipt} style={fileInputStyle} />
+        </RaisedButton>
+      );
+    } else {
+      receiptRightColumn = (
+        <a href={this.state.receipt.url()} rel="noopener noreferrer" target="_blank">{this.state.receipt.name()}</a>
+      );
+    }
+
+    let statusValue = '';
+    if (this.state.status) {
+      statusValue = 'Approved';
+    } else if (this.state.status === false) {
+      statusValue = 'Rejected';
+    }
+
     return (
       <div>
         <Header />
@@ -285,7 +354,7 @@ const RequestDetail = React.createClass({
                     <TableRowColumn>
                       <TextField
                         hintText="Pending"
-                        value={this.state.status}
+                        value={statusValue}
                         fullWidth
                         readOnly
                       />
@@ -308,6 +377,9 @@ const RequestDetail = React.createClass({
                     <TableRow selectable={false}>
                       <TableRowColumn>
                         <label htmlFor="receipt">Receipt</label>
+                      </TableRowColumn>
+                      <TableRowColumn>
+                        {receiptRightColumn}
                       </TableRowColumn>
                     </TableRow>
                   }
