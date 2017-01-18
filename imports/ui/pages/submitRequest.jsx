@@ -230,7 +230,7 @@ const SubmitRequest = React.createClass({
     return (
       <div>
         <Header isAdmin={this.props.isAdmin} />
-        <Paper style={paperStyle} zDepth={1}>Submit a new Request</Paper>
+        <Paper style={paperStyle} zDepth={1}>Submit a Material Purchase Approval</Paper>
         <br />
         <br />
         <div>
@@ -245,25 +245,24 @@ const SubmitRequest = React.createClass({
                       fullWidth
                     />
                     <TextField
-                      hintText="Description"
-                      value={this.state.description}
-                      onChange={this.handleDescriptionChange}
-                      errorText={this.state.descriptionError}
-                      fullWidth
-                    />
-                    <TextField
-                      hintText="Total Cost"
-                      value={this.state.estimatedCost}
-                      onChange={this.handleEstimateChange}
-                      errorText={this.state.estimatedCostError}
-                      fullWidth
-                      readOnly
-                    />
-                    <TextField
                       hintText="Vendor Name"
                       value={this.state.vendor}
                       onChange={this.handleVendorChange}
                       errorText={this.state.vendorError}
+                      fullWidth
+                    />
+                    <TextField
+                      hintText="Part Number"
+                      value={this.state.partNum}
+                      onChange={this.handlePartNumChange}
+                      errorText={this.state.partNumError}
+                      fullWidth
+                    />
+                    <TextField
+                      hintText="Description"
+                      value={this.state.description}
+                      onChange={this.handleDescriptionChange}
+                      errorText={this.state.descriptionError}
                       fullWidth
                     />
                     <TextField
@@ -281,11 +280,12 @@ const SubmitRequest = React.createClass({
                       fullWidth
                     />
                     <TextField
-                      hintText="Part No."
-                      value={this.state.partNum}
-                      onChange={this.handlePartNumChange}
-                      errorText={this.state.partNumError}
+                      hintText="Total Cost"
+                      value={this.state.estimatedCost}
+                      onChange={this.handleEstimateChange}
+                      errorText={this.state.estimatedCostError}
                       fullWidth
+                      readOnly
                     />
                     <div style={{ color: 'red' }}>{this.state.dialogError}</div>
                     <div style={{ float: 'right', margin: '10px' }}>
@@ -299,7 +299,7 @@ const SubmitRequest = React.createClass({
           </Grid>
           <Snackbar
             open={this.state.snackbarOpen}
-            message="Submitted your request"
+            message="Successfully submitted your request"
             autoHideDuration={5000}
             action="view"
             onActionTouchTap={this.handleSnackbarAction}

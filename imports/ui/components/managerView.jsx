@@ -176,7 +176,7 @@ const ManagerView = React.createClass({
                 </TableBody>
               </Table>
             </Tab>
-            <Tab index={1} label="Requests" onActive={this.props.updateTab} >
+            <Tab index={1} label="Material Purchase Approvals" onActive={this.props.updateTab} >
               <Table selectable={false}>
                 <TableHeader displaySelectAll={false}>
                   <TableRow selectable={false}>
