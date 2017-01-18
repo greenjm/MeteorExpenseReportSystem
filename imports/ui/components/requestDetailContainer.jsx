@@ -18,6 +18,7 @@ const RequestDetailContainer = createContainer(({ params }) => {
     user: !!user || false,
     isAdmin,
     requestReady,
+    requestId: request._id,
     description: request ? request.description : '',
     estCost: request ? request.estCost : 0,
     partNo: request ? request.partNo : '',

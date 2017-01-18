@@ -1,11 +1,12 @@
+import { Meteor } from 'meteor/meteor';
 import { Table, TableRow, TableRowColumn, TableBody }
   from 'material-ui/Table';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
 import Paper from 'material-ui/Paper';
 import { hashHistory } from 'react-router';
 import TextField from 'material-ui/TextField';
-import Header from '../components/header.jsx';
 import RaisedButton from 'material-ui/RaisedButton';
+import Header from '../components/header.jsx';
 import '../../api/requests/requests.js';
 
 /* global Requests:true*/
@@ -30,36 +31,49 @@ const RequestDetail = React.createClass({
 
   getInitialState() {
     return {
-      requestId: this.props.location.query.id,
+      requestId: '',
+      readDescription: '',
       description: '',
       estCost: 0,
+      readPartNo: '',
       partNo: '',
+      readQuantity: 0,
       quantity: 0,
+      readUnitCost: 0,
       unitCost: 0,
+      readVendor: '',
       vendor: '',
       status: null,
       statMsg: '',
-      fileUrl: '',
+      readStyle: {},
+      editStyle: { display: 'none' },
     };
   },
 
   componentWillMount() {
     this.setState({
+      requestId: this.props.requestId,
+      readDescription: this.props.description,
       description: this.props.description,
       estCost: this.props.estCost,
+      readPartNo: this.props.partNo,
       partNo: this.props.partNo,
+      readQuantity: this.props.quantity,
       quantity: this.props.quantity,
+      readUnitCost: this.props.unitCost,
       unitCost: this.props.unitCost,
+      readVendor: this.props.vendor,
       vendor: this.props.vendor,
     });
   },
 
   componentWillReceiveProps(nextProps) {
-    if (!nextProps.user || 
+    if (!nextProps.user ||
         (nextProps.requestReady && !nextProps.requestOwned && !nextProps.isAdmin)) {
       hashHistory.push('/');
     }
 
+    const requestIdChange = this.state.requestId !== nextProps.requestId;
     const descChange = this.state.description !== nextProps.description;
     const estCostChange = this.state.estCost !== nextProps.estCost;
     const partNoChange = this.state.partNo !== nextProps.partNo;
@@ -67,11 +81,17 @@ const RequestDetail = React.createClass({
     const unitCostChange = this.state.unitCost !== nextProps.unitCost;
     const vendorChange = this.state.vendor !== nextProps.vendor;
     this.setState({
+      requestId: requestIdChange ? nextProps.requestId : this.state.requestId,
+      readDescription: descChange ? nextProps.description : this.state.description,
       description: descChange ? nextProps.description : this.state.description,
       estCost: estCostChange ? nextProps.estCost : this.state.estCost,
+      readPartNo: partNoChange ? nextProps.partNo : this.state.partNo,
       partNo: partNoChange ? nextProps.partNo : this.state.partNo,
+      readQuantity: quantityChange ? nextProps.quantity : this.state.quantity,
       quantity: quantityChange ? nextProps.quantity : this.state.quantity,
+      readUnitCost: unitCostChange ? nextProps.unitCost : this.state.unitCost,
       unitCost: unitCostChange ? nextProps.unitCost : this.state.unitCost,
+      readVendor: vendorChange ? nextProps.vendor : this.state.vendor,
       vendor: vendorChange ? nextProps.vendor : this.state.vendor,
     });
   },
@@ -79,10 +99,6 @@ const RequestDetail = React.createClass({
   // State Bindings
   changeDescription(e) {
     this.setState({ description: e.target.value });
-  },
-
-  changeEstCost(e) {
-    this.setState({ estCost: e.target.value });
   },
 
   changePartNo(e) {
@@ -111,26 +127,40 @@ const RequestDetail = React.createClass({
     this.setState({ vendor: e.target.value });
   },
 
-  changeFileUrl(e) {
-    this.setState({ fileUrl: e.target.value });
+  editRequest() {
+    this.setState({ readStyle: { display: 'none' }, editStyle: {} });
   },
 
-  editRequest() {
-    // not sure what the api endpoint is for editing a request
-    const req = {
-      description: this.state.description,
-      estCost: this.state.estCost,
-      partNo: this.state.partNo,
-      quantity: this.state.quantity,
-      unitCost: this.state.unitCost,
-      vendor: this.state.vendor,
-      status: this.state.status,
-      statMsg: this.state.statMsg,
-      fileUrl: this.state.fileUrl,
-    };
+  cancelEdit() {
+    this.setState({
+      readStyle: {},
+      editStyle: { display: 'none' },
+      description: this.state.readDescription,
+      estCost: this.state.readUnitCost * this.state.readQuantity,
+      partNo: this.state.readPartNo,
+      quantity: this.state.readQuantity,
+      unitCost: this.state.readUnitCost,
+      vendor: this.state.readVendor,
+    });
+  },
 
-    console.log(req);
-    // send the req object
+  saveRequest() {
+    Meteor.call('requests.edit',
+      this.state.requestId,
+      this.state.description,
+      this.state.estCost,
+      this.state.vendor,
+      this.state.partNo,
+      +this.state.quantity,
+      +this.state.unitCost,
+      (err) => {
+        if (err) {
+          console.log(err);
+        } else {
+          this.cancelEdit();
+        }
+      }
+    );
   },
 
   render() {
@@ -141,6 +171,19 @@ const RequestDetail = React.createClass({
         <br />
         <br />
         <Grid>
+          {!this.state.status &&
+            <Row>
+              <Col xs={12} sm={12} md={12} lg={12}>
+                <RaisedButton
+                  label="Edit"
+                  primary
+                  onClick={this.editRequest}
+                  style={{ float: 'right' }}
+                />
+              </Col>
+            </Row>
+          }
+          <br />
           <Row>
             <Col xs={12} sm={12} md={12} lg={12}>
               <Table>
@@ -150,12 +193,19 @@ const RequestDetail = React.createClass({
                       <label htmlFor="name">Description</label>
                     </TableRowColumn>
                     <TableRowColumn>
+                      <p
+                        id="readDescription"
+                        style={{ ...this.state.readStyle, ...{ 'white-space': 'normal' } }}
+                      >
+                        {this.state.readDescription}
+                      </p>
                       <TextField
                         hintText="Description"
                         multiLine
                         value={this.state.description}
                         fullWidth
                         onChange={this.changeDescription}
+                        style={this.state.editStyle}
                       />
                     </TableRowColumn>
                   </TableRow>
@@ -164,12 +214,7 @@ const RequestDetail = React.createClass({
                       <label htmlFor="name">Total Cost</label>
                     </TableRowColumn>
                     <TableRowColumn>
-                      <TextField
-                        hintText="Description"
-                        value={this.state.estCost}
-                        fullWidth
-                        readOnly
-                      />
+                      <p>{this.state.estCost}</p>
                     </TableRowColumn>
                   </TableRow>
                   <TableRow selectable={false}>
@@ -177,11 +222,13 @@ const RequestDetail = React.createClass({
                       <label htmlFor="name">Part Number</label>
                     </TableRowColumn>
                     <TableRowColumn>
+                      <p style={this.state.readStyle} >{this.state.readPartNo}</p>
                       <TextField
                         hintText="Part Number"
                         value={this.state.partNo}
                         fullWidth
                         onChange={this.changePartNo}
+                        style={this.state.editStyle}
                       />
                     </TableRowColumn>
                   </TableRow>
@@ -190,11 +237,14 @@ const RequestDetail = React.createClass({
                       <label htmlFor="name">Quantity</label>
                     </TableRowColumn>
                     <TableRowColumn>
+                      <p style={this.state.readStyle} >{this.state.readQuantity}</p>
                       <TextField
                         hintText="Quantity"
                         value={this.state.quantity}
                         fullWidth
+                        type="number"
                         onChange={this.changeQuantity}
+                        style={this.state.editStyle}
                       />
                     </TableRowColumn>
                   </TableRow>
@@ -203,11 +253,13 @@ const RequestDetail = React.createClass({
                       <label htmlFor="name">Unit Cost</label>
                     </TableRowColumn>
                     <TableRowColumn>
+                      <p style={this.state.readStyle} >{this.state.readUnitCost}</p>
                       <TextField
                         hintText="Unit Cost"
                         value={this.state.unitCost}
                         fullWidth
                         onChange={this.changeUnitCost}
+                        style={this.state.editStyle}
                       />
                     </TableRowColumn>
                   </TableRow>
@@ -216,11 +268,13 @@ const RequestDetail = React.createClass({
                       <label htmlFor="name">Vendor</label>
                     </TableRowColumn>
                     <TableRowColumn>
+                      <p style={this.state.readStyle} >{this.state.readVendor}</p>
                       <TextField
                         hintText="Vendor"
                         value={this.state.vendor}
                         fullWidth
                         onChange={this.changeVendor}
+                        style={this.state.editStyle}
                       />
                     </TableRowColumn>
                   </TableRow>
@@ -230,7 +284,7 @@ const RequestDetail = React.createClass({
                     </TableRowColumn>
                     <TableRowColumn>
                       <TextField
-                        hintText="Status"
+                        hintText="Pending"
                         value={this.state.status}
                         fullWidth
                         readOnly
@@ -243,21 +297,34 @@ const RequestDetail = React.createClass({
                     </TableRowColumn>
                     <TableRowColumn>
                       <TextField
-                        hintText="Status Message"
+                        hintText="Pending"
                         value={this.state.statMsg}
                         fullWidth
                         readOnly
                       />
                     </TableRowColumn>
                   </TableRow>
+                  {this.state.status &&
+                    <TableRow selectable={false}>
+                      <TableRowColumn>
+                        <label htmlFor="receipt">Receipt</label>
+                      </TableRowColumn>
+                    </TableRow>
+                  }
                   <TableRow selectable={false}>
                     <TableRowColumn />
                     <TableRowColumn>
                       <RaisedButton
                         label="Save Changes"
                         primary
-                        onClick={this.editRequest}
-                        style={{ float: 'right' }}
+                        onClick={this.saveRequest}
+                        style={{ ...{ float: 'right', margin: 5 }, ...this.state.editStyle }}
+                      />
+                      <RaisedButton
+                        label="Cancel"
+                        primary
+                        onClick={this.cancelEdit}
+                        style={{ ...{ float: 'right', margin: 5 }, ...this.state.editStyle }}
                       />
                     </TableRowColumn>
                   </TableRow>
