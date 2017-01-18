@@ -307,7 +307,7 @@ const SubmitRequest = React.createClass({
           />
         </div>
       </div>
-      );
+    );
   },
 });
 

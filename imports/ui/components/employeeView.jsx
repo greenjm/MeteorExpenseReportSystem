@@ -99,30 +99,33 @@ const EmployeeView = React.createClass({
     }
 
     let status = '';
-    let style = 'background-color: ';
+    const style = {};
     if (item.status === undefined) {
       status = 'Pending';
-      style += '#fff;';
+      style.backgroundColor = '#fff;';
     } else if (item.status) {
       status = 'Approved';
-      style += '#a8ffa0;';
+      style.backgroundColor = '#a8ffa0;';
     } else {
-      return;
+      status = 'Denied';
     }
 
-    return (
-      <TableRow selectable={false} style={style}>
-        <TableRowColumn>{projectName}</TableRowColumn>
-        <TableRowColumn>{status}</TableRowColumn>
-        <TableRowColumn>{item.statMsg}</TableRowColumn>
-        <TableRowColumn>{item.estCost}</TableRowColumn>
-        <TableRowColumn>
-          <FloatingActionButton mini style={{ margin: '3px' }} onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}>
-            <Search />
-          </FloatingActionButton>
-        </TableRowColumn>
-      </TableRow>
-    );
+    if (status !== 'Denied') {
+      return (
+        <TableRow selectable={false} style={style}>
+          <TableRowColumn>{projectName}</TableRowColumn>
+          <TableRowColumn>{status}</TableRowColumn>
+          <TableRowColumn>{item.statMsg}</TableRowColumn>
+          <TableRowColumn>{item.estCost}</TableRowColumn>
+          <TableRowColumn>
+            <FloatingActionButton mini style={{ margin: '3px' }} onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}>
+              <Search />
+            </FloatingActionButton>
+          </TableRowColumn>
+        </TableRow>
+      );
+    }
+    return '';
   },
 
   submitReport() {
@@ -133,16 +136,15 @@ const EmployeeView = React.createClass({
       }
     }
 
-    //there is no user passed in on this one. Meteor.getUser() I guess
-
+    // there is no user passed in on this one. Meteor.getUser() I guess
     const reportItem = {
-      author: this.props.user.username,
       requests: approvedRequests,
       month: new Date().getMonth(),
       year: new Date().getYear(),
-    }
+    };
 
-    //send reportItem. Modify if necessary.
+    // send reportItem. Modify if necessary.
+    console.log(reportItem);
   },
 
   render() {
@@ -161,10 +163,10 @@ const EmployeeView = React.createClass({
                 {this.state.projects.length > 0 ?
                   this.state.projects.map(this.createProjectRow) :
                   (
-                  <TableRow selectable={false}>
-                    <TableRowColumn>You do not belong to any projects.</TableRowColumn>
-                    <TableRowColumn />
-                  </TableRow>
+                    <TableRow selectable={false}>
+                      <TableRowColumn>You do not belong to any projects.</TableRowColumn>
+                      <TableRowColumn />
+                    </TableRow>
                   )
                 }
               </TableBody>
@@ -185,10 +187,10 @@ const EmployeeView = React.createClass({
                 {this.state.requests.length > 0 ?
                   this.state.requests.map(this.createRequestRow) :
                   (
-                  <TableRow selectable={false}>
-                    <TableRowColumn>You have not submitted any requests yet.</TableRowColumn>
-                    <TableRowColumn />
-                  </TableRow>
+                    <TableRow selectable={false}>
+                      <TableRowColumn>You have not submitted any requests yet.</TableRowColumn>
+                      <TableRowColumn />
+                    </TableRow>
                   )
                 }
               </TableBody>
@@ -204,17 +206,18 @@ const EmployeeView = React.createClass({
                 {this.state.requests.length > 0 ?
                   this.state.requests.map(this.createReportRow) :
                   (
-                  <TableRow selectable={false}>
-                    <TableRowColumn>You have not submitted any requests yet.</TableRowColumn>
-                    <TableRowColumn />
-                  </TableRow>
+                    <TableRow selectable={false}>
+                      <TableRowColumn>You have not submitted any requests yet.</TableRowColumn>
+                      <TableRowColumn />
+                    </TableRow>
                   )
                 }
                 <FlatButton
                   label="Submit Monthly Report"
                   primary
                   onTouchTap={this.submitReport}
-                  disabled={this.state.requests > 0} />
+                  disabled={this.state.requests > 0}
+                />
               </TableBody>
             </Table>
           </Tab>

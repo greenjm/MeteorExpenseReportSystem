@@ -101,22 +101,25 @@ const ManageRequests = React.createClass({
 
   handleConfirmPress() {
     this.removeItem(this.state.requestId);
-    this.setState({ requestDialogOpen: false,
-                    status: true,
+    this.setState({
+      requestDialogOpen: false,
+      status: true,
     });
   },
 
   handleDenyPress() {
     this.removeItem(this.state.requestId);
 
-    this.setState({ requestDialogOpen: false,
-                    status: false,
+    this.setState({
+      requestDialogOpen: false,
+      status: false,
     });
   },
 
   handleCancelPress() {
-    this.setState({ requestDialogOpen: false,
-                    statMsg: '',
+    this.setState({
+      requestDialogOpen: false,
+      statMsg: '',
     });
   },
 

@@ -167,10 +167,10 @@ const ManagerView = React.createClass({
                   {this.state.projects.length > 0 ?
                     this.state.projects.map(this.createProjectRow) :
                     (
-                    <TableRow selectable={false}>
-                      <TableRowColumn>You do not belong to any projects.</TableRowColumn>
-                      <TableRowColumn />
-                    </TableRow>
+                      <TableRow selectable={false}>
+                        <TableRowColumn>You do not belong to any projects.</TableRowColumn>
+                        <TableRowColumn />
+                      </TableRow>
                     )
                   }
                 </TableBody>
@@ -191,10 +191,10 @@ const ManagerView = React.createClass({
                   {this.state.requests.length > 0 ?
                     this.state.requests.map(this.createRequestRow) :
                     (
-                    <TableRow selectable={false}>
-                      <TableRowColumn>No requests require your attention.</TableRowColumn>
-                      <TableRowColumn />
-                    </TableRow>
+                      <TableRow selectable={false}>
+                        <TableRowColumn>No requests require your attention.</TableRowColumn>
+                        <TableRowColumn />
+                      </TableRow>
                     )
                   }
                 </TableBody>
