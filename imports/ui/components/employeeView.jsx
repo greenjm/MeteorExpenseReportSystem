@@ -3,7 +3,6 @@ import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowCol
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import FlatButton from 'material-ui/FlatButton';
-import ContentAdd from 'material-ui/svg-icons/content/add';
 import Search from 'material-ui/svg-icons/action/search';
 import RaisedButton from 'material-ui/RaisedButton';
 import { hashHistory } from 'react-router';
@@ -44,13 +43,16 @@ const EmployeeView = React.createClass({
       <TableRow selectable={false}>
         <TableRowColumn>{item.name}</TableRowColumn>
         <TableRowColumn>
-          <FloatingActionButton mini style={{ margin: '3px' }} onTouchTap={() => { this.goTo(`/project/view/${item._id}`); }}>
-            <Search />
-          </FloatingActionButton>
+          <RaisedButton
+            onTouchTap={() => { this.goTo(`/project/view/${item._id}`); }}
+            label="Submit New MPA"
+            style={{ margin: '3px' }}
+            primary
+          />
           <RaisedButton
             onTouchTap={() => { this.goTo(`/submitRequest/${item._id}`); }}
             label="Submit New MPA"
-            style={{ top: '0px' }}
+            style={{ margin: '3px' }}
             primary
           />
         </TableRowColumn>
