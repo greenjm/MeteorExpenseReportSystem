@@ -416,6 +416,7 @@ const AdminDashboard = React.createClass({
             value={this.state.projectManager}
             onChange={this.handleManagerChange}
             errorText={this.state.managerError}
+            hintText="Select a Manager"
           >
             {this.state.users.map(this.createUserMenuItem)}
           </SelectField>

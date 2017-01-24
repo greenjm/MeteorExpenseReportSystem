@@ -25,8 +25,8 @@ Meteor.publish('requests', function requestsPublish() {
   }
 
   const requests = Requests.find({ $or:
-    [{ userId: this.userId },
-      { projectId: { $in: projectIds },
+  [{ userId: this.userId },
+    { projectId: { $in: projectIds },
     }],
   });
   return requests;
