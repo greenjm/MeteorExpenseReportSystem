@@ -89,14 +89,23 @@ Meteor.methods({
   @param mgr, String; UserId of manager
   @return boolean; returns true if project was successfully created and added to collection
   **/
-  'projects.create': function createProject(name, mgr) {
+  'projects.create': function createProject(name, employees, managers) {
     check(name, String);
-    check(mgr, String);
+    check(employees, Array);
+    check(managers, Array);
 
     if (isAdmin()) {
+      const empIds = [];
+      const manIds = [];
+      for (let i = 0; i < employees.length; i += 1) {
+        empIds.push(employees[i]._id);
+      }
+      for (let i = 0; i < managers.length; i += 1) {
+        manIds.push(managers[i]._id);
+      }
       return Projects.insert({ name,
-        managers: [mgr],
-        employees: [],
+        managers: manIds,
+        employees: empIds,
         bornOn: new Date(),
         isActive: true,
         inactiveDate: null });
