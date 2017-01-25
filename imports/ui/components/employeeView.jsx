@@ -45,7 +45,7 @@ const EmployeeView = React.createClass({
         <TableRowColumn>
           <RaisedButton
             onTouchTap={() => { this.goTo(`/project/view/${item._id}`); }}
-            label="Submit New MPA"
+            label="View Project Details"
             style={{ margin: '3px' }}
             primary
           />
