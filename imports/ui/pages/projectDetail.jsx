@@ -185,7 +185,7 @@ const ProjectDetail = React.createClass({
     );
     return (
       <ListItem
-        rightIconButton={rightIcon}
+        rightIconButton={this.state.mode === 'edit' ? rightIcon : null}
         primaryText={item.profile.name}
       />
     );
