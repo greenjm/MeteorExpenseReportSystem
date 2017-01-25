@@ -113,6 +113,45 @@ Meteor.methods({
     throw new Meteor.Error('projects.create.unauthorized', 'You do not have permission to create projects.');
   },
 
+  'projects.edit': function editProject(id, name, active, employees, managers) {
+    check(id, String);
+    check(name, String);
+    check(active, Boolean);
+    check(employees, Array);
+    check(managers, Array);
+
+    if (isAdmin()) {
+      const project = Projects.findOne(id);
+      if (project === null || project === undefined) {
+        throw new Meteor.Error('projects.edit.badId', 'The ID does not match a project in the database.');
+      }
+      let inactiveDate = null;
+      if (!active) {
+        inactiveDate = new Date();
+      }
+      const empIds = [];
+      const manIds = [];
+      for (let i = 0; i < employees.length; i += 1) {
+        empIds.push(employees[i]._id);
+      }
+      for (let i = 0; i < managers.length; i += 1) {
+        manIds.push(managers[i]._id);
+      }
+      return Projects.update({ _id: id },
+        {
+          $set: {
+            name,
+            isActive: active,
+            inactiveDate,
+            employees: empIds,
+            managers: manIds,
+          },
+        }
+      );
+    }
+    throw new Meteor.Error('projects.edit.unauthorized', 'You do not have permission to edit projects.');
+  },
+
   'projects.addManager': function addManager(proj, user) {
     // set manager(s) to the project
     check(proj, String);

@@ -1,8 +1,10 @@
 import { Meteor } from 'meteor/meteor';
 import { hashHistory } from 'react-router';
-import { Tracker } from 'meteor/tracker';
 import { TableRow, TableRowColumn }
   from 'material-ui/Table';
+import IconButton from 'material-ui/IconButton';
+import ContentClear from 'material-ui/svg-icons/content/clear';
+import { List, ListItem } from 'material-ui/List';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
 import Paper from 'material-ui/Paper';
 import FlatButton from 'material-ui/FlatButton';
@@ -36,19 +38,22 @@ const ProjectDetail = React.createClass({
 
   getInitialState() {
     return {
-      projectId: this.props.location.query.id,
+      projectId: '',
       Name: '',
+      inactiveDate: null,
       Managers: [],
       ManagerNames: [],
       Employees: [],
       EmployeeNames: [],
       BornOn: '',
-      Active: '',
-      allEmployees: [],
+      Active: false,
+      users: [],
       nameError: '',
       employeeSelected: '',
       employeeSelectedError: '',
       mode: 'view',
+      dialogError: '',
+      dialogSuccess: '',
     };
   },
 
@@ -57,45 +62,26 @@ const ProjectDetail = React.createClass({
       hashHistory.push('/');
     }
 
+    const projectIdChange = this.state.projectId !== nextProps.projectId;
     const nameChange = this.state.Name !== nextProps.name;
     const managersChange = this.state.Managers !== nextProps.managers;
     const employeesChange = this.state.Employees !== nextProps.employees;
     const bornOnChange = this.state.BornOn !== nextProps.bornOn;
-    const activeChange = this.state.Active !== nextProps.isActive;
+    const activeChange = this.state.Active !== nextProps.active;
     const allEmployeeChange = this.state.allEmployees !== nextProps.users;
-
-    if (managersChange) {
-      this.getNames(nextProps.managers, 'ManagerNames');
-    }
-    if (employeesChange) {
-      this.getNames(nextProps.employees, 'EmployeeNames');
-    }
+    const inactiveDateChange = this.state.inactiveDate !== nextProps.inactiveDate;
 
     this.setState({
+      projectId: projectIdChange ? nextProps.projectId : this.state.projectId,
       Name: nameChange ? nextProps.name : this.state.Name,
       Managers: managersChange ? nextProps.managers : this.state.Managers,
       Employees: employeesChange ? nextProps.employees : this.state.Employees,
       BornOn: bornOnChange ? nextProps.bornOn.toString() : this.state.BornOn,
-      Active: activeChange ? nextProps.isActive : this.state.Active,
-      allEmployees: allEmployeeChange ? nextProps.users : this.state.allEmployees,
+      Active: activeChange ? nextProps.active : this.state.Active,
+      users: allEmployeeChange ? nextProps.users : this.state.users,
+      inactiveDate: inactiveDateChange ? nextProps.inactiveDate : this.state.inactiveDate,
       mode: nextProps.mode,
     });
-  },
-
-  getNames(people, stateField) {
-    const ans = [];
-    const thisClass = this;
-
-    if (people) {
-      for (let x = 0; x < people.length; x += 1) {
-        Meteor.call('users.getOne', people[x], (err, res) => {
-          ans.push(res.profile.name);
-          const obj = {};
-          obj[stateField] = ans;
-          thisClass.setState(obj);
-        });
-      }
-    }
   },
 
   createUserRow(item) {
@@ -114,28 +100,43 @@ const ProjectDetail = React.createClass({
     this.setState({ Name: event.target.value });
   },
 
-  handleEmployeeSelect(event, index, value) {
-    this.setState({ employeeSelected: value, employeeSelectedError: '' });
+  handleEmployeeSelect(event, index) {
+    const users = this.state.users;
+    const selected = users.splice(index, 1);
+    const employees = this.state.Employees;
+    employees.push(selected[0]);
+    this.setState({ users, Employees: employees });
   },
 
-  editProject() {
-    if (this.state.Active) {
-      Tracker.autorun(() => {
-        Meteor.call('projects.activate', this.state.projectId);
-      });
-    } else {
-      Tracker.autorun(() => {
-        Meteor.call('projects.deactivate', this.state.projectId);
-      });
-    }
+  handleManagerSelect(event, index) {
+    const users = this.state.users;
+    const selected = users.splice(index, 1);
+    const managers = this.state.Managers;
+    managers.push(selected[0]);
+    this.setState({ users, Managers: managers });
+  },
 
-    if (this.state.employeeSelected) {
-      this.addEmployee();
+  editProject(e) {
+    e.preventDefault();
+    if (this.state.Name === '') {
+      this.setState({ nameError: 'This field is required.' });
+      return;
     }
+    Meteor.call('projects.edit', this.state.projectId,
+      this.state.Name,
+      !!this.state.Active,
+      this.state.Employees,
+      this.state.Managers,
+      (err) => {
+        if (err != null) {
+          this.setState({ dialogError: `Error: ${err.error}. Reason: ${err.reason}` });
+          return;
+        }
+        this.setState({ dialogSuccess: 'Project successfully updated.', dialogError: '' });
 
-    Tracker.autorun(() => {
-      Meteor.call('projects.editName', this.state.projectId, this.state.Name);
-    });
+        this.closeProjectDialog();
+      }
+    );
   },
 
   createEmployeeMenuItem(item) {
@@ -144,37 +145,66 @@ const ProjectDetail = React.createClass({
     );
   },
 
-  addEmployee() {
-    const selected = this.state.employeeSelected;
-    let index = -1;
-
-    for (let x = 0; x < this.state.allEmployees.length; x += 1) {
-      if (selected === this.state.allEmployees[x]._id) {
-        index = x;
-        break;
-      }
-    }
-
-    const arrIds = this.state.Employees.slice();
-    const arrNames = this.state.EmployeeNames.slice();
-
-    arrIds.push(this.state.allEmployees[index].profile._id);
-    arrNames.push(this.state.allEmployees[index].profile.name);
-
-    Tracker.autorun(() => {
-      Meteor.call('projects.addEmployee', this.state.projectId, this.state.allEmployees[index]._id, (err) => {
-        if (!err) {
-          this.setState({ Employees: arrIds, EmployeeNames: arrNames });
-        }
-      });
-    });
-  },
-
   cancelEdit() {
     hashHistory.push('/adminDashboard');
   },
 
+  createEmployeeListItem(item, index) {
+    const rightIcon = (
+      <IconButton
+        tooltip="remove"
+        onTouchTap={() => { this.removeProjectEmployee(index); }}
+      >
+        <ContentClear />
+      </IconButton>
+    );
+    return (
+      <ListItem
+        rightIconButton={this.state.mode === 'edit' ? rightIcon : null}
+        primaryText={item.profile.name}
+      />
+    );
+  },
+
+  removeProjectEmployee(index) {
+    const users = this.state.users;
+    const employees = this.state.Employees;
+    const removed = employees.splice(index, 1);
+    users.push(removed[0]);
+    this.setState({ users, selectedEmployees: employees });
+  },
+
+  createManagerListItem(item, index) {
+    const rightIcon = (
+      <IconButton
+        tooltip="remove"
+        onTouchTap={() => { this.removeProjectManager(index); }}
+      >
+        <ContentClear />
+      </IconButton>
+    );
+    return (
+      <ListItem
+        rightIconButton={rightIcon}
+        primaryText={item.profile.name}
+      />
+    );
+  },
+
+  removeProjectManager(index) {
+    const users = this.state.users;
+    const managers = this.state.Managers;
+    const removed = managers.splice(index, 1);
+    users.push(removed[0]);
+    this.setState({ users, Managers: managers });
+  },
+
   render() {
+    const date = new Date(this.state.BornOn);
+    let inactiveDate = this.state.inactiveDate;
+    if (inactiveDate !== null) {
+      inactiveDate = new Date(inactiveDate);
+    }
     return (
       <div>
         <Header isAdmin={this.props.isAdmin} />
@@ -187,6 +217,7 @@ const ProjectDetail = React.createClass({
               <Paper style={{ textAlign: 'center', padding: '10px' }} zDepth={1}>
                 <form onSubmit={this.editProject}>
                   <TextField
+                    floatingLabelText="Project Name"
                     hintText="Name"
                     value={this.state.Name}
                     onChange={this.changeName}
@@ -194,45 +225,57 @@ const ProjectDetail = React.createClass({
                     fullWidth
                     readOnly={this.state.mode === 'view'}
                   />
-                  <TextField
-                    hintText="Managers"
-                    value={this.state.ManagerNames.join(', ')}
-                    fullWidth
-                    readOnly
-                  />
-                  <TextField
-                    hintText="Employees"
-                    value={this.state.EmployeeNames.join(', ')}
-                    fullWidth
-                    readOnly
-                  />
-                  <TextField
-                    hintText="Start Date"
-                    value={this.state.BornOn}
-                    fullWidth
-                    readOnly
-                  />
+                  <div style={{ textAlign: 'left' }} >
+                    <p><strong>Date Created: </strong><span>{date.toDateString()}</span></p>
+                  </div>
+                  { inactiveDate !== null &&
+                    <div style={{ textAlign: 'left' }} >
+                      <p><strong>Date Inactivated: </strong>
+                        <span>{inactiveDate.toDateString()}</span>
+                      </p>
+                    </div>
+                  }
                   <Checkbox
-                    label="Active"
+                    label="Is Active?"
                     checked={!!this.state.Active}
                     onClick={this.toggleActive}
                     disabled={this.state.mode === 'view'}
+                    style={{ textAlign: 'left' }}
                   />
-                  <SelectField
-                    floatingLabelText="Add Employee"
-                    value={this.state.employeeSelected}
-                    onChange={this.handleEmployeeSelect}
-                    errorText={this.state.employeeSelectedError}
-                    fullWidth
-                    disabled={this.state.mode === 'view'}
-                  >
-                    {this.state.allEmployees.map(this.createEmployeeMenuItem)}
-                  </SelectField>
+                  <div style={{ display: 'inline' }} >
+                    <SelectField
+                      floatingLabelText="Add Employee"
+                      style={{ float: 'right' }}
+                      onChange={this.handleEmployeeSelect}
+                      disabled={this.state.mode === 'view'}
+                    >
+                      {this.state.users.map(this.createEmployeeMenuItem)}
+                    </SelectField>
+                    <List style={{ width: '30%' }} >
+                      <ListItem primaryText="Employees" style={{ fontWeight: 'bold' }} />
+                      {this.state.Employees.map(this.createEmployeeListItem)}
+                    </List>
+                  </div>
+                  <div style={{ display: 'inline' }} >
+                    <SelectField
+                      floatingLabelText="Add Manager"
+                      onChange={this.handleManagerSelect}
+                      style={{ float: 'right' }}
+                      disabled={this.state.mode === 'view'}
+                    >
+                      {this.state.users.map(this.createEmployeeMenuItem)}
+                    </SelectField>
+                    <List style={{ width: '30%' }} >
+                      <ListItem primaryText="Managers" style={{ fontWeight: 'bold' }} />
+                      {this.state.Managers.map(this.createManagerListItem)}
+                    </List>
+                  </div>
                   <div style={{ color: 'red' }}>{this.state.dialogError}</div>
+                  <div style={{ color: 'green' }}>{this.state.dialogSuccess}</div>
                   { this.state.mode === 'edit' &&
                     <div style={{ float: 'right', margin: '10px' }}>
                       <FlatButton label="Cancel" onTouchTap={this.cancelEdit} />
-                      <FlatButton type="submit" label="Submit" primary />
+                      <FlatButton type="submit" label="Save" primary />
                     </div>
                   }
                 </form>
