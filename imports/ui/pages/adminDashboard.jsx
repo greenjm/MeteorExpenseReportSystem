@@ -193,7 +193,6 @@ const AdminDashboard = React.createClass({
     this.setState({ projectManager: value, managerError: '' });
   },
 
-
   editUser(user) {
     this.setState({
       editUserId: user._id,

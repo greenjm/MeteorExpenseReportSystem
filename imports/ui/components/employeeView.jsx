@@ -3,8 +3,8 @@ import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowCol
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import FlatButton from 'material-ui/FlatButton';
-import ContentAdd from 'material-ui/svg-icons/content/add';
 import Search from 'material-ui/svg-icons/action/search';
+import RaisedButton from 'material-ui/RaisedButton';
 import { hashHistory } from 'react-router';
 
 const React = require('react');
@@ -43,12 +43,18 @@ const EmployeeView = React.createClass({
       <TableRow selectable={false}>
         <TableRowColumn>{item.name}</TableRowColumn>
         <TableRowColumn>
-          <FloatingActionButton mini style={{ margin: '3px' }} onTouchTap={() => { this.goTo(`/project/view/${item._id}`); }}>
-            <Search />
-          </FloatingActionButton>
-          <FloatingActionButton mini style={{ margin: '3px' }} onTouchTap={() => { this.goTo(`/submitRequest/${item._id}`); }}>
-            <ContentAdd />
-          </FloatingActionButton>
+          <RaisedButton
+            onTouchTap={() => { this.goTo(`/project/view/${item._id}`); }}
+            label="View Project Details"
+            style={{ margin: '3px' }}
+            primary
+          />
+          <RaisedButton
+            onTouchTap={() => { this.goTo(`/submitRequest/${item._id}`); }}
+            label="Submit New MPA"
+            style={{ margin: '3px' }}
+            primary
+          />
         </TableRowColumn>
       </TableRow>
     );
@@ -173,28 +179,36 @@ const EmployeeView = React.createClass({
             </Table>
           </Tab>
           <Tab index={1} label="Material Purchase Approvals" onActive={this.props.updateTab} >
-            <Table selectable={false}>
-              <TableHeader displaySelectAll={false}>
-                <TableRow selectable={false}>
-                  <TableHeaderColumn>Project Name</TableHeaderColumn>
-                  <TableHeaderColumn>Status</TableHeaderColumn>
-                  <TableHeaderColumn>Status Message</TableHeaderColumn>
-                  <TableHeaderColumn>Cost</TableHeaderColumn>
-                  <TableHeaderColumn>Actions</TableHeaderColumn>
-                </TableRow>
-              </TableHeader>
-              <TableBody displayRowCheckbox={false}>
-                {this.state.requests.length > 0 ?
-                  this.state.requests.map(this.createRequestRow) :
-                  (
-                    <TableRow selectable={false}>
-                      <TableRowColumn>You have not submitted any requests yet.</TableRowColumn>
-                      <TableRowColumn />
-                    </TableRow>
-                  )
-                }
-              </TableBody>
-            </Table>
+            <div>
+              <Table selectable={false}>
+                <TableHeader displaySelectAll={false}>
+                  <TableRow selectable={false}>
+                    <TableHeaderColumn>Project Name</TableHeaderColumn>
+                    <TableHeaderColumn>Status</TableHeaderColumn>
+                    <TableHeaderColumn>Status Message</TableHeaderColumn>
+                    <TableHeaderColumn>Cost</TableHeaderColumn>
+                    <TableHeaderColumn>Actions</TableHeaderColumn>
+                  </TableRow>
+                </TableHeader>
+                <TableBody displayRowCheckbox={false}>
+                  {this.state.requests.length > 0 ?
+                    this.state.requests.map(this.createRequestRow) :
+                    (
+                      <TableRow selectable={false}>
+                        <TableRowColumn>You have not submitted any requests yet.</TableRowColumn>
+                        <TableRowColumn />
+                      </TableRow>
+                    )
+                  }
+                </TableBody>
+              </Table>
+              <RaisedButton
+                primary
+                label="Submit New MPA"
+                style={{ float: 'right', margin: '10px' }}
+                onTouchTap={() => { this.goTo('/submitRequest'); }}
+              />
+            </div>
           </Tab>
           <Tab
             index={2}
