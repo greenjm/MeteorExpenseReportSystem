@@ -32,4 +32,30 @@ Meteor.methods({
     return result.nModified === 1;
   },
 
+  'notifications.createHelper': function helpCreate(proj, managers, reqId) {
+    let i = 0;
+    const currentUserId = Meteor.userId();
+    check(proj, String);
+    check(managers, Array);
+    check(reqId, String);
+    const targetURL = `/requestDetail/${reqId}`;
+    const noteText = `${currentUserId}+ has created a request for the project:+ ${proj}`;
+    for (i = 0; i < managers.length; i += 1) {
+      Meteor.call('notifications.create', managers[i], noteText, targetURL);
+    }
+  },
+
+  'notifications.respondHelper': function respondCreate(state, reqId, reqUser) {
+    let reply = 'denied';
+    const currentUserId = Meteor.userId();
+    check(state, Boolean);
+    check(reqId, String);
+    check(reqUser, String);
+    if (state) {
+      reply = 'approved';
+    }
+    const targetURL = `/requestDetail/${reqId}`;
+    const noteText = `${currentUserId}+ has ${reply} your request`;
+    Meteor.call('notifications.create', reqUser, noteText, targetURL);
+  },
 });

@@ -40,6 +40,7 @@ const SubmitRequest = React.createClass({
       partNumError: '',
       dialogError: '',
       snackbarOpen: false,
+      createdRequest: '',
     };
   },
 
@@ -138,8 +139,20 @@ const SubmitRequest = React.createClass({
             qty: '',
             unitCost: '',
             snackbarOpen: true,
+            createdRequest: result,
           });
         }
+      });
+
+    Meteor.call('notifications.createHelper', this.state.project.name,
+      this.state.project.managers,
+      this.state.createdRequest,
+      (error) => {
+        if (error != null) {
+          this.setState({ dialogError: `Error: ${error.error}. ${error.reason}` });
+          return;
+        }
+        return;
       });
   },
 
