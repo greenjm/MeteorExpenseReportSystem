@@ -1,9 +1,12 @@
 import { Meteor } from 'meteor/meteor';
 import { hashHistory } from 'react-router';
 import Paper from 'material-ui/Paper';
+import { List, ListItem } from 'material-ui/List';
+import IconButton from 'material-ui/IconButton';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
   from 'material-ui/Table';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
+import ContentClear from 'material-ui/svg-icons/content/clear';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -50,6 +53,9 @@ const AdminDashboard = React.createClass({
       projectNames: [],
       projectIds: [],
       users: [],
+      listUsers: [],
+      selectedEmployees: [],
+      selectedManagers: [],
       editUserDialogOpen: false,
       newProjectDialogOpen: false,
       editUserId: '',
@@ -62,8 +68,8 @@ const AdminDashboard = React.createClass({
       dialogError: '',
       newProjectName: '',
       projectNameError: '',
-      projectManager: '',
       managerError: '',
+      employeeError: '',
     };
   },
 
@@ -86,7 +92,7 @@ const AdminDashboard = React.createClass({
       for (let i = 0; i < nextProps.users.length; i += 1) {
         userList.push(nextProps.users[i]);
       }
-      this.setState({ users: userList });
+      this.setState({ users: userList, listUsers: userList.slice() });
     }
   },
 
@@ -178,7 +184,12 @@ const AdminDashboard = React.createClass({
   },
 
   closeProjectDialog() {
-    this.setState({ newProjectDialogOpen: false });
+    this.setState({
+      newProjectDialogOpen: false,
+      selectedEmployees: [],
+      selectedManagers: [],
+      users: this.state.listUsers.slice(),
+    });
   },
 
   openProjectDialog() {
@@ -189,10 +200,22 @@ const AdminDashboard = React.createClass({
     this.setState({ newProjectName: event.target.value, projectNameError: '' });
   },
 
-  handleManagerChange(event, index, value) {
-    this.setState({ projectManager: value, managerError: '' });
+  handleManagerChange(event, index) {
+    const users = this.state.users;
+    const selected = users.splice(index, 1);
+    const managers = this.state.selectedManagers;
+    managers.push(selected[0]);
+    this.setState({ users, selectedManagers: managers, managerError: '' });
   },
 
+  handleEmployeeChange(event, index) {
+    const users = this.state.users;
+    const selected = users.splice(index, 1);
+    const employees = this.state.selectedEmployees;
+    employees.push(selected[0]);
+    this.setState({ users, selectedEmployees: employees, employeeError: '' });
+  },
+  
   editUser(user) {
     this.setState({
       editUserId: user._id,
@@ -227,31 +250,82 @@ const AdminDashboard = React.createClass({
     if (this.state.newProjectName === '') {
       this.setState({ projectNameError: 'This field is required.' });
     }
-    if (this.state.projectManager === '') {
-      this.setState({ managerError: 'This field is required.' });
-    }
   },
 
   submitProject() {
-    if (this.state.newProjectName === '' || this.state.projectManager === '') {
+    if (this.state.newProjectName === '') {
       this.emptyProjectFieldError();
       return;
     }
-    Meteor.call('projects.create', this.state.newProjectName, this.state.projectManager, (err) => {
-      if (err != null) {
-        this.setState({ dialogError: `Error: ${err.error}. Reason: ${err.reason}` });
-        return;
-      }
-      this.setState({ dialogError: '', newProjectName: '', projectManager: '' });
+    Meteor.call('projects.create', this.state.newProjectName,
+      this.state.selectedEmployees,
+      this.state.selectedManagers,
+      (err) => {
+        if (err != null) {
+          this.setState({ dialogError: `Error: ${err.error}. Reason: ${err.reason}` });
+          return;
+        }
+        this.setState({ dialogError: '', newProjectName: '' });
 
-      this.closeProjectDialog();
-    });
+        this.closeProjectDialog();
+      }
+    );
   },
 
   createUserMenuItem(item) {
     return (
       <MenuItem value={item._id} key={item._id} primaryText={item.profile.name} />
     );
+  },
+
+  createEmployeeListItem(item, index) {
+    const rightIcon = (
+      <IconButton
+        tooltip="remove"
+        onTouchTap={() => { this.removeProjectEmployee(index); }}
+      >
+        <ContentClear />
+      </IconButton>
+    );
+    return (
+      <ListItem
+        rightIconButton={rightIcon}
+        primaryText={item.profile.name}
+      />
+    );
+  },
+
+  removeProjectEmployee(index) {
+    const users = this.state.users;
+    const employees = this.state.selectedEmployees;
+    const removed = employees.splice(index, 1);
+    users.push(removed[0]);
+    this.setState({ users, selectedEmployees: employees });
+  },
+
+  createManagerListItem(item, index) {
+    const rightIcon = (
+      <IconButton
+        tooltip="remove"
+        onTouchTap={() => { this.removeProjectManager(index); }}
+      >
+        <ContentClear />
+      </IconButton>
+    );
+    return (
+      <ListItem
+        rightIconButton={rightIcon}
+        primaryText={item.profile.name}
+      />
+    );
+  },
+
+  removeProjectManager(index) {
+    const users = this.state.users;
+    const managers = this.state.selectedManagers;
+    const removed = managers.splice(index, 1);
+    users.push(removed[0]);
+    this.setState({ users, selectedManagers: managers });
   },
 
   render() {
@@ -303,7 +377,7 @@ const AdminDashboard = React.createClass({
                     showRowHover
                     displayRowCheckbox={false}
                   >
-                    {this.state.users.map(this.createUserRow)}
+                    {this.state.listUsers.map(this.createUserRow)}
                   </TableBody>
                 </Table>
               </Col>
@@ -411,14 +485,33 @@ const AdminDashboard = React.createClass({
             name="newProjectName"
             onChange={this.handleProjectNameChange}
           />
-          <SelectField
-            value={this.state.projectManager}
-            onChange={this.handleManagerChange}
-            errorText={this.state.managerError}
-            hintText="Select a Manager"
-          >
-            {this.state.users.map(this.createUserMenuItem)}
-          </SelectField>
+          <div>
+            <SelectField
+              value=""
+              onChange={this.handleEmployeeChange}
+              errorText={this.state.employeeError}
+              floatingLabelText="Select Employees"
+            >
+              {this.state.users.map(this.createUserMenuItem)}
+            </SelectField>
+            <SelectField
+              value=""
+              onChange={this.handleManagerChange}
+              errorText={this.state.managerError}
+              floatingLabelText="Select Managers"
+              style={{ float: 'right' }}
+            >
+              {this.state.users.map(this.createUserMenuItem)}
+            </SelectField>
+          </div>
+          <div>
+            <List style={{ float: 'left' }} >
+              {this.state.selectedEmployees.map(this.createEmployeeListItem)}
+            </List>
+            <List style={{ float: 'right' }} >
+              {this.state.selectedManagers.map(this.createManagerListItem)}
+            </List>
+          </div>
           <div style={{ color: 'red' }}>{this.state.dialogError}</div>
         </Dialog>
       </div>
