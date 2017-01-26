@@ -1,3 +1,4 @@
+import { Meteor } from 'meteor/meteor';
 import { Table, TableRow, TableRowColumn, TableBody }
   from 'material-ui/Table';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
@@ -73,8 +74,21 @@ const SubmitReport = React.createClass({
         acceptedRequests.push(this.state.requests[i]);
       }
     }
-    // TODO:
-    // Now send the accepted requests in an api call to the server
+
+    const month = new Date().toLocaleString('en-us', { month: 'long' });
+    Meteor.call('requests.create', this.state.project._id,
+      acceptedRequests,
+      month,
+      new Date().getFullYear(),
+      (error, result) => {
+        if (error != null) {
+          console.error(error);
+          return;
+        }
+        if (result) {
+          console.log('Successful submission!');
+        }
+      });
   },
 
   cancel() {
