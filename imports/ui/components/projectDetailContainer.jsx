@@ -15,22 +15,40 @@ const ProjectDetailContainer = createContainer(({ params }) => {
   // Subscriptions
   const projectSub = Meteor.subscribe('projectGet', projectId);
   const userSub = Meteor.subscribe('users');
+  const usersInProjectSub = Meteor.subscribe('usersInProject', projectId);
 
   // Ready
   const projectReady = projectSub.ready();
   const userReady = userSub && userSub.ready();
+  const usersInProjectReady = usersInProjectSub && usersInProjectSub.ready();
 
   // Data
   const project = projectReady && Projects.findOne(projectId);
-  const users = userReady && Meteor.users.find().fetch();
+  const users = userReady && usersInProjectReady && project &&
+    Meteor.users.find({
+      $and: [
+        {
+          _id: { $not: { $in: project.employees } },
+        },
+        {
+          _id: { $not: { $in: project.managers } },
+        },
+      ],
+    }).fetch();
+  const employees = userReady && projectReady && usersInProjectReady &&
+    Meteor.users.find({ _id: { $in: project.employees } }).fetch();
+  const managers = userReady && projectReady && usersInProjectReady &&
+    Meteor.users.find({ _id: { $in: project.managers } }).fetch();
   return {
     user: !!user || false,
+    projectId,
+    inactiveDate: project ? project.inactiveDate : null,
     isAdmin,
     projectReady,
     mode,
     name: project ? project.name : '',
-    managers: project ? project.managers : [],
-    employees: project ? project.employees : [],
+    managers: managers || [],
+    employees: employees || [],
     bornOn: project ? project.bornOn.toString() : '',
     active: project ? !!project.isActive : false,
     users: userReady ? users : [],

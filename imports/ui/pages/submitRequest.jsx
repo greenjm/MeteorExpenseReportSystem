@@ -2,9 +2,11 @@ import { Meteor } from 'meteor/meteor';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
 import { hashHistory } from 'react-router';
 import TextField from 'material-ui/TextField';
+import CircularProgress from 'material-ui/CircularProgress';
 import FlatButton from 'material-ui/FlatButton';
-import Snackbar from 'material-ui/Snackbar';
 import Paper from 'material-ui/Paper';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 import Header from '../components/header.jsx';
 
 const React = require('react');
@@ -21,11 +23,13 @@ const SubmitRequest = React.createClass({
   propTypes: {
     project: React.PropTypes.object,
     isAdmin: React.PropTypes.bool,
+    projects: React.PropTypes.array,
   },
 
   getInitialState() {
     return {
       project: {},
+      projects: [],
       description: '',
       descriptionError: '',
       estimatedCost: '',
@@ -41,12 +45,14 @@ const SubmitRequest = React.createClass({
       dialogError: '',
       snackbarOpen: false,
       createdRequest: '',
+      successfulSubmission: false,
     };
   },
 
   componentWillMount() {
     this.setState({
       project: this.props.project,
+      projects: this.props.projects,
     });
   },
 
@@ -55,9 +61,11 @@ const SubmitRequest = React.createClass({
       hashHistory.push('/');
     }
 
-    const projectsChange = this.state.project !== nextProps.project;
+    const projectChange = this.state.project !== nextProps.project;
+    const projectsChange = this.state.projects !== nextProps.projects;
     this.setState({
-      project: projectsChange ? nextProps.project : this.state.project,
+      project: projectChange ? nextProps.project : this.state.project,
+      projects: projectsChange ? nextProps.projects : this.state.projects,
     });
   },
 
@@ -140,7 +148,9 @@ const SubmitRequest = React.createClass({
             unitCost: '',
             snackbarOpen: true,
             createdRequest: result,
+            successfulSubmission: true,
           });
+          setTimeout(this.goToDashboard, 2000);
         }
       });
 
@@ -229,21 +239,23 @@ const SubmitRequest = React.createClass({
     this.setState({ partNumError: err });
   },
 
-  // Snackbar methods
-  handleSnackbarAction() {
-    // TODO: change to request view when ready
+  goToDashboard() {
     hashHistory.push('/dashboard');
   },
 
-  closeSnackbar() {
-    this.setState({ snackbarOpen: false });
+  createProjectItem(item) {
+    return (<MenuItem value={item._id} key={item._id} primaryText={item.name} />);
+  },
+
+  handleProjectChange(event, index) {
+    this.setState({ project: this.state.projects[index] });
   },
 
   render() {
     return (
       <div>
         <Header isAdmin={this.props.isAdmin} />
-        <Paper style={paperStyle} zDepth={1}>Submit a new Request</Paper>
+        <Paper style={paperStyle} zDepth={1}>Submit a Material Purchase Approval</Paper>
         <br />
         <br />
         <div>
@@ -251,76 +263,90 @@ const SubmitRequest = React.createClass({
             <Row>
               <Col xs={12} sm={12} md={12} lg={12}>
                 <Paper style={{ textAlign: 'center', padding: '10px' }} zDepth={1}>
-                  <form onSubmit={this.submitRequest}>
-                    <TextField
-                      readOnly
-                      value={this.state.project.name}
-                      fullWidth
-                    />
-                    <TextField
-                      hintText="Description"
-                      value={this.state.description}
-                      onChange={this.handleDescriptionChange}
-                      errorText={this.state.descriptionError}
-                      fullWidth
-                    />
-                    <TextField
-                      hintText="Total Cost"
-                      value={this.state.estimatedCost}
-                      onChange={this.handleEstimateChange}
-                      errorText={this.state.estimatedCostError}
-                      fullWidth
-                      readOnly
-                    />
-                    <TextField
-                      hintText="Vendor Name"
-                      value={this.state.vendor}
-                      onChange={this.handleVendorChange}
-                      errorText={this.state.vendorError}
-                      fullWidth
-                    />
-                    <TextField
-                      hintText="Quantity"
-                      value={this.state.qty}
-                      onChange={this.handleQtyChange}
-                      errorText={this.state.qtyError}
-                      fullWidth
-                    />
-                    <TextField
-                      hintText="Unit Cost"
-                      value={this.state.unitCost}
-                      onChange={this.handleUnitCostChange}
-                      errorText={this.state.unitCostError}
-                      fullWidth
-                    />
-                    <TextField
-                      hintText="Part No."
-                      value={this.state.partNum}
-                      onChange={this.handlePartNumChange}
-                      errorText={this.state.partNumError}
-                      fullWidth
-                    />
-                    <div style={{ color: 'red' }}>{this.state.dialogError}</div>
-                    <div style={{ float: 'right', margin: '10px' }}>
-                      <FlatButton label="Cancel" onTouchTap={this.cancelRequest} />
-                      <FlatButton type="submit" label="Submit" primary />
+                  {!this.state.successfulSubmission && (
+                    <form onSubmit={this.submitRequest}>
+                      {!!this.state.project.name && (
+                        <TextField
+                          readOnly
+                          value={this.state.project.name}
+                          floatingLabelText="Project Name"
+                          fullWidth
+                        />
+                      )}
+                      {!this.state.project.name && (
+                        <SelectField
+                          floatingLabelText="Project Name"
+                          value={this.state.project}
+                          onChange={this.handleProjectChange}
+                          style={{ float: 'left' }}
+                          floatingLabelStyle={{ fontSize: '20px', marginLeft: '-129px' }}
+                        >
+                          {this.state.projects.map(this.createProjectItem)}
+                        </SelectField>
+                      )}
+                      <TextField
+                        floatingLabelText="Vendor Name"
+                        value={this.state.vendor}
+                        onChange={this.handleVendorChange}
+                        errorText={this.state.vendorError}
+                        fullWidth
+                      />
+                      <TextField
+                        floatingLabelText="Part Number"
+                        value={this.state.partNum}
+                        onChange={this.handlePartNumChange}
+                        errorText={this.state.partNumError}
+                        fullWidth
+                      />
+                      <TextField
+                        floatingLabelText="Description"
+                        value={this.state.description}
+                        onChange={this.handleDescriptionChange}
+                        errorText={this.state.descriptionError}
+                        fullWidth
+                      />
+                      <TextField
+                        floatingLabelText="Quantity"
+                        value={this.state.qty}
+                        onChange={this.handleQtyChange}
+                        errorText={this.state.qtyError}
+                        fullWidth
+                      />
+                      <TextField
+                        floatingLabelText="Unit Cost"
+                        value={this.state.unitCost}
+                        onChange={this.handleUnitCostChange}
+                        errorText={this.state.unitCostError}
+                        fullWidth
+                      />
+                      <TextField
+                        floatingLabelText="Total Cost"
+                        value={this.state.estimatedCost}
+                        onChange={this.handleEstimateChange}
+                        fullWidth
+                        readOnly
+                      />
+                      <div style={{ color: 'red' }}>{this.state.dialogError}</div>
+                      <div style={{ float: 'right', margin: '10px' }}>
+                        <FlatButton label="Cancel" onTouchTap={this.cancelRequest} />
+                        <FlatButton type="submit" label="Submit" primary />
+                      </div>
+                    </form>
+                  )}
+                  {this.state.successfulSubmission && (
+                    <div>
+                      <div>Your request has been successfully submitted.</div>
+                      <br />
+                      <CircularProgress size={50} />
                     </div>
-                  </form>
+                  )}
                 </Paper>
               </Col>
             </Row>
           </Grid>
-          <Snackbar
-            open={this.state.snackbarOpen}
-            message="Submitted your request"
-            autoHideDuration={5000}
-            action="view"
-            onActionTouchTap={this.handleSnackbarAction}
-            onRequestClose={this.closeSnackbar}
-          />
         </div>
       </div>
-      );
+    );
   },
 });
 

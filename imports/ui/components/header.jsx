@@ -48,7 +48,7 @@ const Header = React.createClass({
   },
 
   markReadAndGo(id, url) {
-    // Meteor.call('markRead', id);
+    Meteor.call('notfications.updateRead', id);
     hashHistory.push(url);
   },
 
