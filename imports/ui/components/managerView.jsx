@@ -1,7 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
   from 'material-ui/Table';
-import FloatingActionButton from 'material-ui/FloatingActionButton';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import Search from 'material-ui/svg-icons/action/search';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -83,9 +82,9 @@ const ManagerView = React.createClass({
       <TableRow selectable={false}>
         <TableRowColumn>{item.name}</TableRowColumn>
         <TableRowColumn>
-          <FloatingActionButton mini style={{ margin: '3px' }} href={`/#/project/view/${item._id}`}>
-            <Search />
-          </FloatingActionButton>
+          <RaisedButton style={{ margin: '3px' }} href={`/#/project/view/${item._id}`}>
+            View Details
+          </RaisedButton>
         </TableRowColumn>
       </TableRow>
     );
@@ -129,9 +128,9 @@ const ManagerView = React.createClass({
             onTouchTap={() => { this.handleDenyPress(item); }}
           />
           <a href={url}>
-            <FloatingActionButton mini style={{ margin: '3px' }}>
-              <Search />
-            </FloatingActionButton>
+            <RaisedButton style={{ margin: '3px' }}>
+              View Details
+            </RaisedButton>
           </a>
         </TableRowColumn>
       </TableRow>

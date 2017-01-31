@@ -1,8 +1,8 @@
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
   from 'material-ui/Table';
-import FloatingActionButton from 'material-ui/FloatingActionButton';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import Search from 'material-ui/svg-icons/action/search';
 import { hashHistory } from 'react-router';
@@ -43,12 +43,12 @@ const EmployeeView = React.createClass({
       <TableRow selectable={false}>
         <TableRowColumn>{item.name}</TableRowColumn>
         <TableRowColumn>
-          <FloatingActionButton mini style={{ margin: '3px' }} onTouchTap={() => { this.goTo(`/project/view/${item._id}`); }}>
+          <RaisedButton style={{ margin: '3px' }} onTouchTap={() => { this.goTo(`/project/view/${item._id}`); }}>
             <Search />
-          </FloatingActionButton>
-          <FloatingActionButton mini style={{ margin: '3px' }} onTouchTap={() => { this.goTo(`/submitRequest/${item._id}`); }}>
+          </RaisedButton>
+          <RaisedButton style={{ margin: '3px' }} onTouchTap={() => { this.goTo(`/submitRequest/${item._id}`); }}>
             <ContentAdd />
-          </FloatingActionButton>
+          </RaisedButton>
         </TableRowColumn>
       </TableRow>
     );
@@ -80,9 +80,9 @@ const EmployeeView = React.createClass({
         <TableRowColumn>{item.statMsg}</TableRowColumn>
         <TableRowColumn>{item.estCost}</TableRowColumn>
         <TableRowColumn>
-          <FloatingActionButton mini style={{ margin: '3px' }} onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}>
+          <RaisedButton style={{ margin: '3px' }} onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}>
             <Search />
-          </FloatingActionButton>
+          </RaisedButton>
         </TableRowColumn>
       </TableRow>
     );
@@ -118,9 +118,9 @@ const EmployeeView = React.createClass({
           <TableRowColumn>{item.statMsg}</TableRowColumn>
           <TableRowColumn>{item.estCost}</TableRowColumn>
           <TableRowColumn>
-            <FloatingActionButton mini style={{ margin: '3px' }} onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}>
+            <RaisedButton style={{ margin: '3px' }} onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}>
               <Search />
-            </FloatingActionButton>
+            </RaisedButton>
           </TableRowColumn>
         </TableRow>
       );

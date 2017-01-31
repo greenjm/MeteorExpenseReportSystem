@@ -23,6 +23,7 @@ const Header = React.createClass({
 
   getInitialState() {
     return {
+      user: "",
       userDashLink: <MenuItem primaryText="User Dashboard" onTouchTap={this.userDash} />,
       adminDashLink: null,
       notificationCount: 0,
@@ -113,7 +114,7 @@ const Header = React.createClass({
                 {this.state.userDashLink}
                 {this.state.adminDashLink}
                 <MenuItem primaryText="Profile" />
-                <MenuItem primaryText="Sign out" onTouchTap={this.logout} />
+                <MenuItem primaryText="Sign out of" onTouchTap={this.logout} />
               </IconMenu>
             </div>
           }

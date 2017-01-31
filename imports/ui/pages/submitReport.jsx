@@ -2,8 +2,6 @@ import { Table, TableRow, TableRowColumn, TableBody }
   from 'material-ui/Table';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
 import Paper from 'material-ui/Paper';
-import FloatingActionButton from 'material-ui/FloatingActionButton';
-
 import { hashHistory } from 'react-router';
 import Header from '../components/header.jsx';
 import '../../api/requests/requests.js';
@@ -57,9 +55,9 @@ const SubmitReport = React.createClass({
         <TableRowColumn>{data.description}</TableRowColumn>
         <TableRowColumn>
           <a href={url}>
-            <FloatingActionButton mini zDepth={1}>
-              <i className="material-icons">search</i>
-            </FloatingActionButton>
+            <RaisedButton zDepth={1}>
+              Search
+            </RaisedButton>
           </a>
         </TableRowColumn>
       </TableRow>

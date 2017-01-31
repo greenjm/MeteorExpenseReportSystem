@@ -3,7 +3,6 @@ import { hashHistory } from 'react-router';
 import Paper from 'material-ui/Paper';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
   from 'material-ui/Table';
-import FloatingActionButton from 'material-ui/FloatingActionButton';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -14,6 +13,7 @@ import MenuItem from 'material-ui/MenuItem';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
 import '../../api/projects/projects.js';
 import Header from '../components/header.jsx';
+import muiThemeable from 'material-ui/styles/muiThemeable';
 
 /* global Projects:true*/
 /* eslint no-undef: "error"*/
@@ -96,9 +96,9 @@ const AdminDashboard = React.createClass({
         <TableRowColumn>{item.profile.name}</TableRowColumn>
         <TableRowColumn>{item.emails[0].address}</TableRowColumn>
         <TableRowColumn style={actionsColStyle}>
-          <FloatingActionButton mini zDepth={1} onTouchTap={() => this.editUser(item)}>
-            <i className="material-icons">edit</i>
-          </FloatingActionButton>
+          <RaisedButton zDepth={1} onTouchTap={() => this.editUser(item)}>
+            Edit
+          </RaisedButton>
         </TableRowColumn>
       </TableRow>);
   },
@@ -110,9 +110,9 @@ const AdminDashboard = React.createClass({
         <TableRowColumn>{item}</TableRowColumn>
         <TableRowColumn style={actionsColStyle}>
           <a href={url}>
-            <FloatingActionButton mini zDepth={1}>
-              <i className="material-icons">search</i>
-            </FloatingActionButton>
+            <RaisedButton zDepth={1}>
+              View
+            </RaisedButton>
           </a>
         </TableRowColumn>
       </TableRow>);
