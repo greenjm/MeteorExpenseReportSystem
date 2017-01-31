@@ -8,7 +8,8 @@ import './receipts.js';
 // Security
 Receipts.deny({
   insert(userId, fileObj) {
-    return !fileObj.owner || userId !== fileObj.owner;
+    return !fileObj.owner || userId !== fileObj.owner
+      || !fileObj.requestId || !fileObj.bornOn;
   },
   update() { return true; },
   remove() { return true; },
