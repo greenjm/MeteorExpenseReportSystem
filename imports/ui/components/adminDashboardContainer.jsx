@@ -21,6 +21,23 @@ const AdminDashboardContainer = createContainer(() => {
   const reportSub = Meteor.subscribe('reports');
   const reportReady = reportSub.ready();
   const reports = reportReady && Reports.find().fetch();
+
+  const userFilter = function filterUsers(regex) {
+    const filteredUsers = userReady && Meteor.users.find(
+      {
+        'profile.name': { $regex: regex },
+      }).fetch();
+    return filteredUsers;
+  };
+
+  const projectFilter = function filterProjects(regex) {
+    const filteredProjects = projectReady && Projects.find(
+      {
+        name: { $regex: regex },
+      }).fetch();
+    return filteredProjects;
+  };
+
   return {
     user: !!user || false,
     isAdmin,
@@ -30,6 +47,8 @@ const AdminDashboardContainer = createContainer(() => {
     projects: projects || [],
     users: users || [],
     reports: reports || [],
+    userFilter,
+    projectFilter,
   };
 }, AdminDashboardPage);
 

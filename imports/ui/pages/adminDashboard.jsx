@@ -53,6 +53,7 @@ const AdminDashboard = React.createClass({
       users: [],
       reports: [],
       listUsers: [],
+      allUsers: [],
       selectedEmployees: [],
       selectedManagers: [],
       editUserDialogOpen: false,
@@ -67,6 +68,8 @@ const AdminDashboard = React.createClass({
       projectNameError: '',
       managerError: '',
       employeeError: '',
+      userFilter: null,
+      projectFilter: null,
     };
   },
 
@@ -83,11 +86,12 @@ const AdminDashboard = React.createClass({
       for (let i = 0; i < nextProps.users.length; i += 1) {
         userList.push(nextProps.users[i]);
       }
-      this.setState({ users: userList, listUsers: userList.slice() });
+      this.setState({ users: userList, listUsers: userList.slice(), allUsers: userList.slice() });
     }
     if (nextProps.reportReady) {
       this.setState({ reports: nextProps.reports });
     }
+    this.setState({ userFilter: nextProps.userFilter, projectFilter: nextProps.projectFilter });
   },
 
   createUserRow(item) {
@@ -324,6 +328,17 @@ const AdminDashboard = React.createClass({
       </TableRow>);
   },
 
+  // Filters
+  handleUserFilterChange(e) {
+    const regex = new RegExp(e.target.value, 'i');
+    this.setState({ listUsers: this.state.userFilter(regex) });
+  },
+
+  handleProjectFilterChange(e) {
+    const regex = new RegExp(e.target.value, 'i');
+    this.setState({ projects: this.state.projectFilter(regex) });
+  },
+
   render() {
     const userDialogActions = [
       <FlatButton
@@ -362,6 +377,15 @@ const AdminDashboard = React.createClass({
             <Table selectable={false}>
               <TableHeader displaySelectAll={false}>
                 <TableRow selectable={false}>
+                  <TableHeaderColumn colSpan="3">
+                    <TextField
+                      hintText="Name"
+                      floatingLabelText="Search Users"
+                      onChange={this.handleUserFilterChange}
+                    />
+                  </TableHeaderColumn>
+                </TableRow>
+                <TableRow selectable={false}>
                   <TableHeaderColumn>Name</TableHeaderColumn>
                   <TableHeaderColumn>Email</TableHeaderColumn>
                   <TableHeaderColumn>Actions</TableHeaderColumn>
@@ -372,7 +396,7 @@ const AdminDashboard = React.createClass({
                   this.state.listUsers.map(this.createUserRow) :
                   (
                   <TableRow selectable={false}>
-                    <TableRowColumn>There are no users in the system.</TableRowColumn>
+                    <TableRowColumn>No users found.</TableRowColumn>
                     <TableRowColumn />
                     <TableRowColumn />
                   </TableRow>
@@ -386,7 +410,14 @@ const AdminDashboard = React.createClass({
               <Table selectable={false}>
                 <TableHeader displaySelectAll={false}>
                   <TableRow selectable={false}>
-                    <TableHeaderColumn colSpan="4" style={{ textAlign: 'center' }}>
+                    <TableHeaderColumn>
+                      <TextField
+                        hintText="Name"
+                        floatingLabelText="Search Projects"
+                        onChange={this.handleProjectFilterChange}
+                      />
+                    </TableHeaderColumn>
+                    <TableHeaderColumn colSpan="3" style={{ textAlign: 'center' }}>
                       <RaisedButton label="New" primary style={tableHeaderButtonStyle} onTouchTap={this.openProjectDialog} />
                     </TableHeaderColumn>
                   </TableRow>
@@ -402,7 +433,7 @@ const AdminDashboard = React.createClass({
                     this.state.projects.map(this.createProjectRow) :
                     (
                     <TableRow selectable={false}>
-                      <TableRowColumn>No projects created.</TableRowColumn>
+                      <TableRowColumn>No projects found.</TableRowColumn>
                       <TableRowColumn />
                       <TableRowColumn />
                       <TableRowColumn />
