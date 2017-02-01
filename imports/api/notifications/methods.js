@@ -15,12 +15,13 @@ Meteor.methods({
       userId: user,
       text: intext,
       URL: url,
+      isRead: false,
       bornOn: new Date(),
     };
 
     Notifications.schema.validate(newNoti);
-
-    return Notifications.insert(newNoti);
+    const result = Notifications.insert(newNoti);
+    return result;
   },
 
   'notifications.updateRead': function setRead(notiId) {
@@ -34,12 +35,12 @@ Meteor.methods({
 
   'notifications.createHelper': function helpCreate(proj, managers, reqId) {
     let i = 0;
-    const currentUserId = Meteor.userId();
+    const currentUser = Meteor.user();
     check(proj, String);
     check(managers, Array);
     check(reqId, String);
     const targetURL = `/requestDetail/${reqId}`;
-    const noteText = `${currentUserId}+ has created a request for the project:+ ${proj}`;
+    const noteText = `${currentUser.profile.name} has created a request for the project: ${proj}`;
     for (i = 0; i < managers.length; i += 1) {
       Meteor.call('notifications.create', managers[i], noteText, targetURL);
     }
@@ -47,7 +48,7 @@ Meteor.methods({
 
   'notifications.respondHelper': function respondCreate(state, reqId, reqUser) {
     let reply = 'denied';
-    const currentUserId = Meteor.userId();
+    const currentUser = Meteor.user();
     check(state, Boolean);
     check(reqId, String);
     check(reqUser, String);
@@ -55,7 +56,7 @@ Meteor.methods({
       reply = 'approved';
     }
     const targetURL = `/requestDetail/${reqId}`;
-    const noteText = `${currentUserId}+ has ${reply} your request`;
+    const noteText = `${currentUser.profile.name} has ${reply} your request`;
     Meteor.call('notifications.create', reqUser, noteText, targetURL);
   },
 });

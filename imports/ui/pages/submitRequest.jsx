@@ -147,22 +147,21 @@ const SubmitRequest = React.createClass({
             qty: '',
             unitCost: '',
             snackbarOpen: true,
-            createdRequest: result,
             successfulSubmission: true,
           });
+          Meteor.call('notifications.createHelper', this.state.project.name,
+            this.state.project.managers,
+            result,
+          //   (error) => {
+          //     if (error != null) {
+          //       this.setState({ dialogError: `Error: ${error.error}. ${error.reason}` });
+          //       return;
+          //     }
+          //       return;
+          // }
+          );
           setTimeout(this.goToDashboard, 2000);
         }
-      });
-
-    Meteor.call('notifications.createHelper', this.state.project.name,
-      this.state.project.managers,
-      this.state.createdRequest,
-      (error) => {
-        if (error != null) {
-          this.setState({ dialogError: `Error: ${error.error}. ${error.reason}` });
-          return;
-        }
-        return;
       });
   },
 
