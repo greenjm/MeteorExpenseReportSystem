@@ -215,7 +215,7 @@ const AdminDashboard = React.createClass({
     employees.push(selected[0]);
     this.setState({ users, selectedEmployees: employees, employeeError: '' });
   },
-  
+
   editUser(user) {
     this.setState({
       editUserId: user._id,

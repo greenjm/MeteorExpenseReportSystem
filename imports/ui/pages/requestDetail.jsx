@@ -249,6 +249,10 @@ const RequestDetail = React.createClass({
                   onClick={this.editRequest}
                   style={{ float: 'right' }}
                 />
+                <RaisedButton
+                  label="Cancel"
+                  style={{ float: 'right' }}
+                />
               </Col>
             </Row>
           }

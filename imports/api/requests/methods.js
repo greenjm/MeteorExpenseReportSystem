@@ -6,7 +6,7 @@ import './requests.js';
 /* eslint no-undef: "error"*/
 
 Meteor.methods({
-  'requests.create': function createRequest(proj, desc, est, vend, prt, qty, unt) {
+  'requests.create': function createRequest(proj, desc, est, vend, prt, qty, unt, projType, date, indUsage) {
     const currentUserId = Meteor.userId();
     check(proj, String);
     check(desc, String);
@@ -15,17 +15,22 @@ Meteor.methods({
     check(prt, String);
     check(qty, Number);
     check(unt, Number);
+    check(projType, String);
+    check(date, String);
+    check(indUsage, String);
 
     const newReq = {
       userId: currentUserId,
       projectId: proj,
-      bornOn: new Date(),
-      description: desc,
-      estCost: est,
       vendor: vend,
+      description: desc,
       partNo: prt,
       quantity: qty,
       unitCost: unt,
+      estCost: est,
+      project: projType,
+      dateRequired: date,
+      intendedUsage: indUsage,
     };
 
     Requests.schema.validate(newReq);
@@ -62,7 +67,7 @@ Meteor.methods({
         quantity: qty,
         unitCost: unt,
       },
-    });
+      });
 
     return result.nModified === 1;
   },

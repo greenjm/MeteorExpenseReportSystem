@@ -43,6 +43,12 @@ const SubmitRequest = React.createClass({
       partNum: '',
       partNumError: '',
       dialogError: '',
+      projectType: '',
+      projectTypeError: '',
+      dateRequired: '',
+      dateRequiredError: '',
+      intendedUsage: '',
+      intendedUsageError: '',
       successfulSubmission: false,
     };
   },
@@ -97,6 +103,21 @@ const SubmitRequest = React.createClass({
       hasError = true;
     }
 
+    if (this.state.projectType === '') {
+      this.projectTypeError(requiredError);
+      hasError = true;
+    }
+
+    if (this.state.dateRequired === '') {
+      this.dateRequiredError(requiredError);
+      hasError = true;
+    }
+
+    if (this.state.intendedUsage === '') {
+      this.intendedUsageError(requiredError);
+      hasError = true;
+    }
+
     const qtyNum = +this.state.qty;
     if (this.state.qty === '') {
       this.qtyError(requiredError);
@@ -131,12 +152,13 @@ const SubmitRequest = React.createClass({
       this.state.partNum,
       qtyNum,
       +unitCostNum.toFixed(2),
+      this.state.projectType,
+      this.state.dateRequired,
+      this.state.intendedUsage,
       (error, result) => {
         if (error != null) {
           this.setState({ dialogError: `Error: ${error.error}. Reason: ${error.reason}` });
-          return;
-        }
-        if (result) {
+        } else {
           this.setState({
             description: '',
             estimatedCost: '',
@@ -224,6 +246,33 @@ const SubmitRequest = React.createClass({
     this.setState({ partNumError: err });
   },
 
+  // Project Type methods
+  handleProjectTypeChange(event) {
+    this.setState({ projectType: event.target.value, projectTypeError: '' });
+  },
+
+  projectTypeError(err) {
+    this.setState({ projectTypeError: err });
+  },
+
+  // Date Required methods
+  handleDateRequiredChange(event) {
+    this.setState({ dateRequired: event.target.value, dateRequiredError: '' });
+  },
+
+  dateRequiredError(err) {
+    this.setState({ dateRequiredError: err });
+  },
+
+  // Intended Usage methods
+  handleIntendedUsageChange(event) {
+    this.setState({ intendedUsage: event.target.value, intendedUsageError: '' });
+  },
+
+  intendedUsageError(err) {
+    this.setState({ intendedUsageError: err });
+  },
+
   goToDashboard() {
     hashHistory.push('/dashboard');
   },
@@ -270,17 +319,10 @@ const SubmitRequest = React.createClass({
                         </SelectField>
                       )}
                       <TextField
-                        floatingLabelText="Vendor Name"
+                        floatingLabelText="Vendor Name, Address, Phone Number & Website (if applicable)"
                         value={this.state.vendor}
                         onChange={this.handleVendorChange}
                         errorText={this.state.vendorError}
-                        fullWidth
-                      />
-                      <TextField
-                        floatingLabelText="Part Number"
-                        value={this.state.partNum}
-                        onChange={this.handlePartNumChange}
-                        errorText={this.state.partNumError}
                         fullWidth
                       />
                       <TextField
@@ -288,6 +330,13 @@ const SubmitRequest = React.createClass({
                         value={this.state.description}
                         onChange={this.handleDescriptionChange}
                         errorText={this.state.descriptionError}
+                        fullWidth
+                      />
+                      <TextField
+                        floatingLabelText="Part Number"
+                        value={this.state.partNum}
+                        onChange={this.handlePartNumChange}
+                        errorText={this.state.partNumError}
                         fullWidth
                       />
                       <TextField
@@ -310,6 +359,27 @@ const SubmitRequest = React.createClass({
                         onChange={this.handleEstimateChange}
                         fullWidth
                         readOnly
+                      />
+                      <TextField
+                        floatingLabelText="Project"
+                        value={this.state.projectType}
+                        onChange={this.handleProjectTypeChange}
+                        errorText={this.state.projectTypeError}
+                        fullWidth
+                      />
+                      <TextField
+                        floatingLabelText="Date Required"
+                        value={this.state.dateRequired}
+                        onChange={this.handleDateRequiredChange}
+                        errorText={this.state.dateRequiredError}
+                        fullWidth
+                      />
+                      <TextField
+                        floatingLabelText="Intended Program Usage"
+                        value={this.state.intendedUsage}
+                        onChange={this.handleIntendedUsageChange}
+                        errorText={this.state.intendedUsageError}
+                        fullWidth
                       />
                       <div style={{ color: 'red' }}>{this.state.dialogError}</div>
                       <div style={{ float: 'right', margin: '10px' }}>
