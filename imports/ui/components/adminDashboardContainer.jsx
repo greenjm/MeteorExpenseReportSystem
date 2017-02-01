@@ -11,15 +11,15 @@ const AdminDashboardContainer = createContainer(() => {
   const isAdmin = profile && profile.isAdmin;
 
   const projectSub = Meteor.subscribe('projects');
-  const projectReady = projectSub.ready();
-  const projects = projectReady && Projects.find().fetch();
-
   const userSub = Meteor.subscribe('users');
-  const userReady = userSub.ready();
-  const users = userReady && Meteor.users.find().fetch();
-
   const reportSub = Meteor.subscribe('reports');
+
+  const projectReady = projectSub.ready();
+  const userReady = userSub.ready();
   const reportReady = reportSub.ready();
+
+  const projects = projectReady && Projects.find().fetch();
+  const users = userReady && Meteor.users.find().fetch();
   const reports = reportReady && Reports.find().fetch();
 
   const userFilter = function filterUsers(regex) {
