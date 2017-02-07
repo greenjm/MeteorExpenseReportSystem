@@ -5,6 +5,7 @@ import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import Search from 'material-ui/svg-icons/action/search';
+import RaisedButton from 'material-ui/RaisedButton';
 import { hashHistory } from 'react-router';
 
 const React = require('react');
@@ -43,12 +44,18 @@ const EmployeeView = React.createClass({
       <TableRow selectable={false}>
         <TableRowColumn>{item.name}</TableRowColumn>
         <TableRowColumn>
-          <RaisedButton style={{ margin: '3px' }} onTouchTap={() => { this.goTo(`/project/view/${item._id}`); }}>
-            <Search />
-          </RaisedButton>
-          <RaisedButton style={{ margin: '3px' }} onTouchTap={() => { this.goTo(`/submitRequest/${item._id}`); }}>
-            <ContentAdd />
-          </RaisedButton>
+          <RaisedButton
+            onTouchTap={() => { this.goTo(`/project/view/${item._id}`); }}
+            label="View Project Details"
+            style={{ margin: '3px' }}
+            primary
+          />
+          <RaisedButton
+            onTouchTap={() => { this.goTo(`/submitRequest/${item._id}`); }}
+            label="Submit New MPA"
+            style={{ margin: '3px' }}
+            primary
+          />
         </TableRowColumn>
       </TableRow>
     );
@@ -163,38 +170,46 @@ const EmployeeView = React.createClass({
                 {this.state.projects.length > 0 ?
                   this.state.projects.map(this.createProjectRow) :
                   (
-                    <TableRow selectable={false}>
-                      <TableRowColumn>You do not belong to any projects.</TableRowColumn>
-                      <TableRowColumn />
-                    </TableRow>
+                  <TableRow selectable={false}>
+                    <TableRowColumn>You do not belong to any projects.</TableRowColumn>
+                    <TableRowColumn />
+                  </TableRow>
                   )
                 }
               </TableBody>
             </Table>
           </Tab>
           <Tab index={1} label="Material Purchase Approvals" onActive={this.props.updateTab} >
-            <Table selectable={false}>
-              <TableHeader displaySelectAll={false}>
-                <TableRow selectable={false}>
-                  <TableHeaderColumn>Project Name</TableHeaderColumn>
-                  <TableHeaderColumn>Status</TableHeaderColumn>
-                  <TableHeaderColumn>Status Message</TableHeaderColumn>
-                  <TableHeaderColumn>Cost</TableHeaderColumn>
-                  <TableHeaderColumn>Actions</TableHeaderColumn>
-                </TableRow>
-              </TableHeader>
-              <TableBody displayRowCheckbox={false}>
-                {this.state.requests.length > 0 ?
-                  this.state.requests.map(this.createRequestRow) :
-                  (
+            <div>
+              <Table selectable={false}>
+                <TableHeader displaySelectAll={false}>
+                  <TableRow selectable={false}>
+                    <TableHeaderColumn>Project Name</TableHeaderColumn>
+                    <TableHeaderColumn>Status</TableHeaderColumn>
+                    <TableHeaderColumn>Status Message</TableHeaderColumn>
+                    <TableHeaderColumn>Cost</TableHeaderColumn>
+                    <TableHeaderColumn>Actions</TableHeaderColumn>
+                  </TableRow>
+                </TableHeader>
+                <TableBody displayRowCheckbox={false}>
+                  {this.state.requests.length > 0 ?
+                    this.state.requests.map(this.createRequestRow) :
+                    (
                     <TableRow selectable={false}>
                       <TableRowColumn>You have not submitted any requests yet.</TableRowColumn>
                       <TableRowColumn />
                     </TableRow>
-                  )
-                }
-              </TableBody>
-            </Table>
+                    )
+                  }
+                </TableBody>
+              </Table>
+              <RaisedButton
+                primary
+                label="Submit New MPA"
+                style={{ float: 'right', margin: '10px' }}
+                onTouchTap={() => { this.goTo('/submitRequest'); }}
+              />
+            </div>
           </Tab>
           <Tab
             index={2}
@@ -206,10 +221,10 @@ const EmployeeView = React.createClass({
                 {this.state.requests.length > 0 ?
                   this.state.requests.map(this.createReportRow) :
                   (
-                    <TableRow selectable={false}>
-                      <TableRowColumn>You have not submitted any requests yet.</TableRowColumn>
-                      <TableRowColumn />
-                    </TableRow>
+                  <TableRow selectable={false}>
+                    <TableRowColumn>You have not submitted any requests yet.</TableRowColumn>
+                    <TableRowColumn />
+                  </TableRow>
                   )
                 }
                 <FlatButton

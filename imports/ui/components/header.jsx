@@ -36,7 +36,7 @@ const Header = React.createClass({
       const notificationSub = Meteor.subscribe('notifications');
       if (notificationSub.ready()) {
         const notificationCount = Notifications.find().count();
-        const notifications = Notifications.find().sort({ bornOn: -1 }).fetch();
+        const notifications = Notifications.find({}, { sort: { bornOn: -1 } }).fetch();
         this.setState({ notificationCount, notifications });
       }
     });
@@ -49,7 +49,7 @@ const Header = React.createClass({
   },
 
   markReadAndGo(id, url) {
-    Meteor.call('notfications.updateRead', id);
+    Meteor.call('notifications.updateRead', id);
     hashHistory.push(url);
   },
 
@@ -57,7 +57,7 @@ const Header = React.createClass({
     return (
       <MenuItem
         primaryText={item.text}
-        onTouchTap={() => { this.markReadAndGo(item._id, item.url); }}
+        onTouchTap={() => { this.markReadAndGo(item._id, item.URL); }}
       />
     );
   },

@@ -8,6 +8,7 @@
     "test": "meteor test --once --driver-package dispatch:mocha-phantomjs"
   },
   "dependencies": {
+    "bcrypt": "^1.0.2",
     "check": "^1.0.0",
     "classnames": "^2.2.5",
     "coffee-script": "^1.0.17",
