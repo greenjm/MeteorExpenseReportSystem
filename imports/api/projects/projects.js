@@ -4,7 +4,6 @@ import { Factory } from 'meteor/dburles:factory';
 // import { faker } from 'meteor/digilord:faker';
 
 /* global Projects:true*/
-/* eslint no-undef: "error"*/
 
 Projects = new Mongo.Collection('projects');
 

@@ -16,7 +16,6 @@ import Header from '../components/header.jsx';
 import muiThemeable from 'material-ui/styles/muiThemeable';
 
 /* global Projects:true*/
-/* eslint no-undef: "error"*/
 
 const React = require('react');
 

@@ -3,7 +3,6 @@ import { createContainer } from 'meteor/react-meteor-data';
 import AdminDashboardPage from '../pages/adminDashboard.jsx';
 
 /* global Projects:true*/
-/* eslint no-undef: "error"*/
 
 const AdminDashboardContainer = createContainer(() => {
   const user = Meteor.user();

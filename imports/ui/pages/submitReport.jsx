@@ -7,7 +7,6 @@ import Header from '../components/header.jsx';
 import '../../api/requests/requests.js';
 
 /* global Requests:true*/
-/* eslint no-undef: "error"*/
 
 const React = require('react');
 

@@ -15,7 +15,6 @@ import Header from '../components/header.jsx';
 
 
 /* global Projects:true*/
-/* eslint no-undef: "error"*/
 
 const React = require('react');
 
