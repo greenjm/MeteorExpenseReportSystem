@@ -74,8 +74,6 @@ Meteor.methods({
     check(profile, {
       name: String,
       isAdmin: Boolean,
-      autoInternet: Boolean,
-      autoPhone: Boolean,
     });
 
     const currentUser = Meteor.user();
@@ -102,8 +100,6 @@ Meteor.methods({
         profile: {
           name: profile.name,
           isAdmin: profile.isAdmin,
-          autoInternet: profile.autoInternet,
-          autoPhone: profile.autoPhone,
         },
       },
     });
@@ -111,8 +107,6 @@ Meteor.methods({
     return {
       name: true,
       isAdmin: true,
-      autoInternet: true,
-      autoPhone: true,
     };
   },
 

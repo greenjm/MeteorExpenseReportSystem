@@ -5,7 +5,7 @@ import { List, ListItem } from 'material-ui/List';
 import IconButton from 'material-ui/IconButton';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
   from 'material-ui/Table';
-import FloatingActionButton from 'material-ui/FloatingActionButton';
+import { Tabs, Tab } from 'material-ui/Tabs';
 import ContentClear from 'material-ui/svg-icons/content/clear';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
@@ -14,7 +14,6 @@ import TextField from 'material-ui/TextField';
 import Toggle from 'material-ui/Toggle';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
-import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
 import '../../api/projects/projects.js';
 import Header from '../components/header.jsx';
 
@@ -50,10 +49,11 @@ const AdminDashboard = React.createClass({
 
   getInitialState() {
     return {
-      projectNames: [],
-      projectIds: [],
+      projects: [],
       users: [],
+      reports: [],
       listUsers: [],
+      allUsers: [],
       selectedEmployees: [],
       selectedManagers: [],
       editUserDialogOpen: false,
@@ -61,8 +61,6 @@ const AdminDashboard = React.createClass({
       editUserId: '',
       userName: '',
       userNameError: '',
-      autoInternet: false,
-      autoPhone: false,
       emailError: '',
       isAdmin: false,
       dialogError: '',
@@ -70,6 +68,8 @@ const AdminDashboard = React.createClass({
       projectNameError: '',
       managerError: '',
       employeeError: '',
+      userFilter: null,
+      projectFilter: null,
     };
   },
 
@@ -79,21 +79,19 @@ const AdminDashboard = React.createClass({
     }
 
     if (nextProps.projectReady) {
-      const projectNames = [];
-      const projectIds = [];
-      for (let i = 0; i < nextProps.projects.length; i += 1) {
-        projectNames.push(nextProps.projects[i].name);
-        projectIds.push(nextProps.projects[i]._id);
-      }
-      this.setState({ projectNames, projectIds });
+      this.setState({ projects: nextProps.projects });
     }
     if (nextProps.userReady) {
       const userList = [];
       for (let i = 0; i < nextProps.users.length; i += 1) {
         userList.push(nextProps.users[i]);
       }
-      this.setState({ users: userList, listUsers: userList.slice() });
+      this.setState({ users: userList, listUsers: userList.slice(), allUsers: userList.slice() });
     }
+    if (nextProps.reportReady) {
+      this.setState({ reports: nextProps.reports });
+    }
+    this.setState({ userFilter: nextProps.userFilter, projectFilter: nextProps.projectFilter });
   },
 
   createUserRow(item) {
@@ -102,23 +100,22 @@ const AdminDashboard = React.createClass({
         <TableRowColumn>{item.profile.name}</TableRowColumn>
         <TableRowColumn>{item.emails[0].address}</TableRowColumn>
         <TableRowColumn style={actionsColStyle}>
-          <FloatingActionButton mini zDepth={1} onTouchTap={() => this.editUser(item)}>
-            <i className="material-icons">edit</i>
-          </FloatingActionButton>
+          <RaisedButton label="Edit User" primary onTouchTap={() => this.editUser(item)} />
         </TableRowColumn>
       </TableRow>);
   },
 
-  createProjectRow(item, index) {
-    const url = `/#/project/edit/${this.state.projectIds[index]}`;
+  createProjectRow(item) {
+    const date = new Date(item.bornOn);
+    const url = `/#/project/edit/${item._id}`;
     return (
-      <TableRow key={this.state.projectIds[index]} selectable={false}>
-        <TableRowColumn>{item}</TableRowColumn>
+      <TableRow key={item._id} selectable={false}>
+        <TableRowColumn>{item.name}</TableRowColumn>
+        <TableRowColumn>{date.toDateString()}</TableRowColumn>
+        <TableRowColumn>{item.isActive ? 'Active' : 'Inactive'}</TableRowColumn>
         <TableRowColumn style={actionsColStyle}>
           <a href={url}>
-            <FloatingActionButton mini zDepth={1}>
-              <i className="material-icons">search</i>
-            </FloatingActionButton>
+            <RaisedButton label="Edit Project" primary />
           </a>
         </TableRowColumn>
       </TableRow>);
@@ -151,8 +148,6 @@ const AdminDashboard = React.createClass({
     }
     const profile = {
       name: this.state.userName,
-      autoInternet: this.state.autoInternet,
-      autoPhone: this.state.autoPhone,
       isAdmin: this.state.isAdmin,
     };
     Meteor.call('users.update', this.state.editUserId,
@@ -215,14 +210,12 @@ const AdminDashboard = React.createClass({
     employees.push(selected[0]);
     this.setState({ users, selectedEmployees: employees, employeeError: '' });
   },
-  
+
   editUser(user) {
     this.setState({
       editUserId: user._id,
       userName: user.profile.name,
       userNameError: '',
-      autoInternet: user.profile.autoInternet,
-      autoPhone: user.profile.autoPhone,
       isAdmin: user.profile.isAdmin,
       dialogError: '',
     });
@@ -231,14 +224,6 @@ const AdminDashboard = React.createClass({
 
   handleUserNameChange(event) {
     this.setState({ userName: event.target.value, userNameError: '' });
-  },
-
-  handleAutoInternetChange() {
-    this.setState({ autoInternet: !this.state.autoInternet });
-  },
-
-  handleAutoPhoneChange() {
-    this.setState({ autoPhone: !this.state.autoPhone });
   },
 
   handleIsAdminChange() {
@@ -328,6 +313,32 @@ const AdminDashboard = React.createClass({
     this.setState({ users, selectedManagers: managers });
   },
 
+  createReportRow(item) {
+    const url = `/#/report/${item._id}`;
+    return (
+      <TableRow key={item._id} selectable={false}>
+        <TableRowColumn>{item.month}</TableRowColumn>
+        <TableRowColumn>{item.year}</TableRowColumn>
+        <TableRowColumn>{item.approvedRequests.length}</TableRowColumn>
+        <TableRowColumn style={actionsColStyle}>
+          <a href={url}>
+            <RaisedButton label="View Report (TODO)" primary />
+          </a>
+        </TableRowColumn>
+      </TableRow>);
+  },
+
+  // Filters
+  handleUserFilterChange(e) {
+    const regex = new RegExp(e.target.value, 'i');
+    this.setState({ listUsers: this.state.userFilter(regex) });
+  },
+
+  handleProjectFilterChange(e) {
+    const regex = new RegExp(e.target.value, 'i');
+    this.setState({ projects: this.state.projectFilter(regex) });
+  },
+
   render() {
     const userDialogActions = [
       <FlatButton
@@ -361,73 +372,107 @@ const AdminDashboard = React.createClass({
         <Paper style={paperStyle} zDepth={1}>Admin Dashboard</Paper>
         <br />
         <br />
-        <div>
-          <Grid>
-            <Row>
-              <Col xs={12} sm={12} md={6} lg={6}>
-                <Table selectable={false}>
-                  <TableHeader displaySelectAll={false}>
+        <Tabs>
+          <Tab index={0} label="Users" >
+            <Table selectable={false}>
+              <TableHeader displaySelectAll={false}>
+                <TableRow selectable={false}>
+                  <TableHeaderColumn colSpan="3">
+                    <TextField
+                      hintText="Name"
+                      floatingLabelText="Search Users"
+                      onChange={this.handleUserFilterChange}
+                    />
+                  </TableHeaderColumn>
+                </TableRow>
+                <TableRow selectable={false}>
+                  <TableHeaderColumn>Name</TableHeaderColumn>
+                  <TableHeaderColumn>Email</TableHeaderColumn>
+                  <TableHeaderColumn>Actions</TableHeaderColumn>
+                </TableRow>
+              </TableHeader>
+              <TableBody displayRowCheckbox={false}>
+                {this.state.listUsers.length > 0 ?
+                  this.state.listUsers.map(this.createUserRow) :
+                  (
+                  <TableRow selectable={false}>
+                    <TableRowColumn>No users found.</TableRowColumn>
+                    <TableRowColumn />
+                    <TableRowColumn />
+                  </TableRow>
+                  )
+                }
+              </TableBody>
+            </Table>
+          </Tab>
+          <Tab index={1} label="Projects" >
+            <div>
+              <Table selectable={false}>
+                <TableHeader displaySelectAll={false}>
+                  <TableRow selectable={false}>
+                    <TableHeaderColumn>
+                      <TextField
+                        hintText="Name"
+                        floatingLabelText="Search Projects"
+                        onChange={this.handleProjectFilterChange}
+                      />
+                    </TableHeaderColumn>
+                    <TableHeaderColumn colSpan="3" style={{ textAlign: 'center' }}>
+                      <RaisedButton label="New" primary style={tableHeaderButtonStyle} onTouchTap={this.openProjectDialog} />
+                    </TableHeaderColumn>
+                  </TableRow>
+                  <TableRow selectable={false}>
+                    <TableHeaderColumn>Project Name</TableHeaderColumn>
+                    <TableHeaderColumn>Date Created</TableHeaderColumn>
+                    <TableHeaderColumn>Is Active</TableHeaderColumn>
+                    <TableHeaderColumn>Actions</TableHeaderColumn>
+                  </TableRow>
+                </TableHeader>
+                <TableBody displayRowCheckbox={false}>
+                  {this.state.projects.length > 0 ?
+                    this.state.projects.map(this.createProjectRow) :
+                    (
                     <TableRow selectable={false}>
-                      <TableHeaderColumn>Name</TableHeaderColumn>
-                      <TableHeaderColumn>Email</TableHeaderColumn>
-                      <TableHeaderColumn>Actions</TableHeaderColumn>
+                      <TableRowColumn>No projects found.</TableRowColumn>
+                      <TableRowColumn />
+                      <TableRowColumn />
+                      <TableRowColumn />
                     </TableRow>
-                  </TableHeader>
-                  <TableBody
-                    showRowHover
-                    displayRowCheckbox={false}
-                  >
-                    {this.state.listUsers.map(this.createUserRow)}
-                  </TableBody>
-                </Table>
-              </Col>
-              <Col xs={12} sm={12} md={6} lg={6}>
-                <Table selectable={false}>
-                  <TableHeader displaySelectAll={false}>
-                    <TableRow selectable={false}>
-                      <TableHeaderColumn colSpan="2" style={{ textAlign: 'center' }}>
-                        <RaisedButton label="New" primary style={tableHeaderButtonStyle} onTouchTap={this.openProjectDialog} />
-                        Projects
-                      </TableHeaderColumn>
-                    </TableRow>
-                    <TableRow selectable={false}>
-                      <TableHeaderColumn>Name</TableHeaderColumn>
-                      <TableHeaderColumn>Actions</TableHeaderColumn>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody
-                    showRowHover
-                    displayRowCheckbox={false}
-                  >
-                    {this.state.projectNames.map(this.createProjectRow)}
-                  </TableBody>
-                </Table>
-              </Col>
-              <Col xs={12} sm={12} md={6} lg={6}>
-                <Table
-                  selectable={false}
-                >
-                  <TableHeader displaySelectAll={false}>
-                    <TableRow selectable={false}>
-                      <TableHeaderColumn colSpan="2" style={{ textAlign: 'center' }}>
-                        <RaisedButton label="New" primary style={tableHeaderButtonStyle} onTouchTap={this.openRequestDialog} />
-                        Requests
-                      </TableHeaderColumn>
-                    </TableRow>
-                    <TableRow selectable={false}>
-                      <TableHeaderColumn>Name</TableHeaderColumn>
-                      <TableHeaderColumn>Actions</TableHeaderColumn>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody
-                    showRowHover
-                    displayRowCheckbox={false}
-                  />
-                </Table>
-              </Col>
-            </Row>
-          </Grid>
-        </div>
+                    )
+                  }
+                </TableBody>
+              </Table>
+            </div>
+          </Tab>
+          <Tab
+            index={2}
+            label="Monthly Expense Reports"
+          >
+            <Table selectable={false}>
+              <TableHeader displaySelectAll={false}>
+                <TableRow selectable={false}>
+                  <TableHeaderColumn>Month</TableHeaderColumn>
+                  <TableHeaderColumn>Year</TableHeaderColumn>
+                  <TableHeaderColumn># of Requests</TableHeaderColumn>
+                  <TableHeaderColumn>Actions</TableHeaderColumn>
+                </TableRow>
+              </TableHeader>
+              <TableBody displayRowCheckbox={false}>
+                {this.state.reports.length > 0 ?
+                  this.state.reports.map(this.createReportRow) :
+                  (
+                  <TableRow selectable={false}>
+                    <TableRowColumn>No MERs submitted.</TableRowColumn>
+                    <TableRowColumn />
+                    <TableRowColumn />
+                    <TableRowColumn />
+                  </TableRow>
+                  )
+                }
+              </TableBody>
+            </Table>
+          </Tab>
+        </Tabs>
 
         <Dialog
           title="Edit User"
@@ -444,20 +489,6 @@ const AdminDashboard = React.createClass({
             errorText={this.state.userNameError}
             name="userName"
             onChange={this.handleUserNameChange}
-          />
-          <br />
-          <Toggle
-            label="Auto Internet?"
-            style={switchStyle}
-            toggled={this.state.autoInternet}
-            onToggle={this.handleAutoInternetChange}
-          />
-          <br />
-          <Toggle
-            label="Auto Phone?"
-            style={switchStyle}
-            toggled={this.state.autoPhone}
-            onToggle={this.handleAutoPhoneChange}
           />
           <br />
           <Toggle
