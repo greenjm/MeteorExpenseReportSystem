@@ -105,6 +105,17 @@ const ManageRequests = React.createClass({
       requestDialogOpen: false,
       status: true,
     });
+    Meteor.call('notifications.respondHelper', this.state.status,
+      this.state.requestId,
+      this.state.userId,
+      // (error) => {
+      //   if (error != null) {
+      //     this.setState({ dialogError: `Error: ${error.error}. ${error.reason}` });
+      //     return;
+      //   }
+      //   return;
+      // }
+    );
   },
 
   handleDenyPress() {
@@ -114,6 +125,17 @@ const ManageRequests = React.createClass({
       requestDialogOpen: false,
       status: false,
     });
+    Meteor.call('notifications.respondHelper', this.state.status,
+      this.state.requestId,
+      this.state.userId,
+      // (error) => {
+      //   if (error != null) {
+      //     this.setState({ dialogError: `Error: ${error.error}. ${error.reason}` });
+      //     return;
+      //   }
+      //   return;
+      // }
+    );
   },
 
   handleCancelPress() {
