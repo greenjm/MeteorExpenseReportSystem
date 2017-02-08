@@ -78,6 +78,12 @@ Meteor.methods({
     return result.nModified === 1;
   },
 
+  'requests.delete': function deleteReq(reqId) {
+    check(reqId, String);
+    const result = Requests.remove({ _id: reqId });
+    return result;
+  },
+
   // 'requests.addReceipt': function addReqReceipt(reqId, recpt) {
   //   check(reqId, String);
   //   check(recpt, Object);

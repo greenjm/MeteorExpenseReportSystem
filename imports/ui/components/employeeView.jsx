@@ -1,3 +1,4 @@
+import { Meteor } from 'meteor/meteor';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
   from 'material-ui/Table';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
@@ -36,6 +37,19 @@ const EmployeeView = React.createClass({
 
   goTo(url) {
     hashHistory.push(url);
+  },
+
+  removeItem(index) {
+    const filteredRequests = [];
+    for (let i = this.state.requests.length - 1; i >= 0; i -= 1) {
+      if (i !== index) {
+        filteredRequests.push(this.state.requests[i]);
+      }
+    }
+
+    this.setState({
+      requests: filteredRequests,
+    });
   },
 
   createProjectRow(item) {
@@ -89,6 +103,15 @@ const EmployeeView = React.createClass({
           <FloatingActionButton mini style={{ margin: '3px' }} onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}>
             <Search />
           </FloatingActionButton>
+          <RaisedButton
+            onTouchTap={() => {
+              Meteor.call('requests.delete', item._id);
+              this.removeItem(item._id);
+            }}
+            label="Delete"
+            style={{ margin: '3px' }}
+            primary
+          />
         </TableRowColumn>
       </TableRow>
     );
