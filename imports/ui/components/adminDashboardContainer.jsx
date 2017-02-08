@@ -6,6 +6,14 @@ import AdminDashboardPage from '../pages/adminDashboard.jsx';
 /* eslint no-undef: "error"*/
 
 const AdminDashboardContainer = createContainer(() => {
+  // Breadcrumbs
+  const breadcrumbs = [
+    {
+      page: 'Admin Dashboard',
+      url: '/#/adminDashboard',
+    },
+  ];
+
   const user = Meteor.user();
   const profile = user && user.profile;
   const isAdmin = profile && profile.isAdmin;
@@ -39,6 +47,7 @@ const AdminDashboardContainer = createContainer(() => {
   };
 
   return {
+    breadcrumbs,
     user: !!user || false,
     isAdmin,
     projectReady,

@@ -38,6 +38,7 @@ const ProjectDetail = React.createClass({
 
   getInitialState() {
     return {
+      breadcrumbs: [],
       projectId: '',
       Name: '',
       inactiveDate: null,
@@ -81,7 +82,14 @@ const ProjectDetail = React.createClass({
       users: allEmployeeChange ? nextProps.users : this.state.users,
       inactiveDate: inactiveDateChange ? nextProps.inactiveDate : this.state.inactiveDate,
       mode: nextProps.mode,
+      breadcrumbs: nextProps.breadcrumbs,
     });
+  },
+
+  createBreadcrumb(item) {
+    return (
+      <li><a href={item.url}>{item.page}</a></li>
+    );
   },
 
   createUserRow(item) {
@@ -208,7 +216,11 @@ const ProjectDetail = React.createClass({
     return (
       <div>
         <Header isAdmin={this.props.isAdmin} />
-        <Paper style={paperStyle} zDepth={1}>Project Detail: {this.state.Name}</Paper>
+        <Paper style={paperStyle} zDepth={1}>
+          <ul className="breadcrumb">
+            {this.state.breadcrumbs.map(this.createBreadcrumb)}
+          </ul>
+        </Paper>
         <br />
         <br />
         <Grid>

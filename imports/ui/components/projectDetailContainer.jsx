@@ -39,7 +39,35 @@ const ProjectDetailContainer = createContainer(({ params }) => {
     Meteor.users.find({ _id: { $in: project.employees } }).fetch();
   const managers = userReady && projectReady && usersInProjectReady &&
     Meteor.users.find({ _id: { $in: project.managers } }).fetch();
+
+  // Breadcrumbs
+  let breadcrumbs = [];
+  if (mode === 'edit') {
+    breadcrumbs = [
+      {
+        page: 'Admin Dashboard',
+        url: '/#/adminDashboard',
+      },
+      {
+        page: `Project Detail: ${project.name}`,
+        url: `/#/project/edit/${projectId}`,
+      },
+    ];
+  } else {
+    breadcrumbs = [
+      {
+        page: 'User Dashboard',
+        url: '/#/dashboard',
+      },
+      {
+        page: `Project Detail: ${project.name}`,
+        url: `/#/project/view/${projectId}`,
+      },
+    ];
+  }
+
   return {
+    breadcrumbs,
     user: !!user || false,
     projectId,
     inactiveDate: project ? project.inactiveDate : null,
