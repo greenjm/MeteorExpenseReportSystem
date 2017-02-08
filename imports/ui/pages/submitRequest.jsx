@@ -155,10 +155,11 @@ const SubmitRequest = React.createClass({
       this.state.projectType,
       this.state.dateRequired,
       this.state.intendedUsage,
-      (error, result) => {
+      (error) => {
         if (error != null) {
           this.setState({ dialogError: `Error: ${error.error}. Reason: ${error.reason}` });
         } else {
+          setTimeout(this.goToDashboard, 2000);
           this.setState({
             description: '',
             estimatedCost: '',
@@ -168,7 +169,6 @@ const SubmitRequest = React.createClass({
             unitCost: '',
             successfulSubmission: true,
           });
-          setTimeout(this.goToDashboard, 2000);
         }
       });
   },
