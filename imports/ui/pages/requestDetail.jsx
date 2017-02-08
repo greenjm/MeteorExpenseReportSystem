@@ -336,7 +336,7 @@ const RequestDetail = React.createClass({
                       <label htmlFor="name">Total Cost</label>
                     </TableRowColumn>
                     <TableRowColumn>
-                      <p>{this.state.estCost}</p>
+                      <p>$ {this.state.estCost.toFixed(2)}</p>
                     </TableRowColumn>
                   </TableRow>
                   <TableRow selectable={false}>
@@ -375,7 +375,7 @@ const RequestDetail = React.createClass({
                       <label htmlFor="name">Unit Cost</label>
                     </TableRowColumn>
                     <TableRowColumn>
-                      <p style={this.state.readStyle} >{this.state.readUnitCost}</p>
+                      <p style={this.state.readStyle} >$ {this.state.readUnitCost.toFixed(2)}</p>
                       <TextField
                         hintText="Unit Cost"
                         value={this.state.unitCost}

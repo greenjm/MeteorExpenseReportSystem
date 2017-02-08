@@ -100,13 +100,7 @@ const AdminDashboard = React.createClass({
         <TableRowColumn>{item.profile.name}</TableRowColumn>
         <TableRowColumn>{item.emails[0].address}</TableRowColumn>
         <TableRowColumn style={actionsColStyle}>
-<<<<<<< HEAD
-          <RaisedButton zDepth={1} onTouchTap={() => this.editUser(item)}>
-            Edit
-          </RaisedButton>
-=======
           <RaisedButton label="Edit User" primary onTouchTap={() => this.editUser(item)} />
->>>>>>> develop
         </TableRowColumn>
       </TableRow>);
   },
@@ -121,13 +115,7 @@ const AdminDashboard = React.createClass({
         <TableRowColumn>{item.isActive ? 'Active' : 'Inactive'}</TableRowColumn>
         <TableRowColumn style={actionsColStyle}>
           <a href={url}>
-<<<<<<< HEAD
-            <RaisedButton zDepth={1}>
-              View
-            </RaisedButton>
-=======
             <RaisedButton label="Edit Project" primary />
->>>>>>> develop
           </a>
         </TableRowColumn>
       </TableRow>);

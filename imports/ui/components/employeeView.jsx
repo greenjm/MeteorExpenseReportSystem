@@ -5,7 +5,6 @@ import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import Search from 'material-ui/svg-icons/action/search';
-import RaisedButton from 'material-ui/RaisedButton';
 import { hashHistory } from 'react-router';
 
 const React = require('react');
@@ -88,7 +87,7 @@ const EmployeeView = React.createClass({
         <TableRowColumn>{item.estCost}</TableRowColumn>
         <TableRowColumn>
           <RaisedButton style={{ margin: '3px' }} onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}>
-            <Search />
+            View
           </RaisedButton>
         </TableRowColumn>
       </TableRow>
@@ -126,7 +125,7 @@ const EmployeeView = React.createClass({
           <TableRowColumn>{item.estCost}</TableRowColumn>
           <TableRowColumn>
             <RaisedButton style={{ margin: '3px' }} onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}>
-              <Search />
+              View
             </RaisedButton>
           </TableRowColumn>
         </TableRow>
