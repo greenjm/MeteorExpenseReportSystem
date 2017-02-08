@@ -73,7 +73,7 @@ const ManageRequests = React.createClass({
         <TableRowColumn>{item.emails[0].address}</TableRowColumn>
         <TableRowColumn style={actionsColStyle}>
           <FloatingActionButton mini zDepth={1}>
-            <i className="material-icons">edit</i>
+           Edit
           </FloatingActionButton>
         </TableRowColumn>
       </TableRow>);

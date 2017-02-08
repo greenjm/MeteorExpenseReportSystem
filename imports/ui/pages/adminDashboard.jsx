@@ -16,9 +16,9 @@ import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import '../../api/projects/projects.js';
 import Header from '../components/header.jsx';
+import muiThemeable from 'material-ui/styles/muiThemeable';
 
 /* global Projects:true*/
-/* eslint no-undef: "error"*/
 
 const React = require('react');
 

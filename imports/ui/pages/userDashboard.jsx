@@ -4,6 +4,7 @@ import Paper from 'material-ui/Paper';
 import Header from '../components/header.jsx';
 import ManagerView from '../components/managerView.jsx';
 import EmployeeView from '../components/employeeView.jsx';
+import TextField from 'material-ui/TextField'
 
 const React = require('react');
 
@@ -122,12 +123,14 @@ const UserDashboard = React.createClass({
     return (
       <div>
         <Header isAdmin={this.props.isAdmin} />
-        <Paper style={paperStyle} zDepth={1}>User Dashboard</Paper>
+        <Paper style={paperStyle} zDepth={1}>{this.state.viewToggle ? 'Employee Dashboard' : 'Manager Dashboard'}</Paper>
         <br />
+        <div>
+        </div>
         {this.state.isManager &&
           <div style={{ float: 'right', marginRight: '10px' }}>
             <Toggle
-              label={this.state.viewToggle ? 'Manager View' : 'Employee View'}
+              label={!this.state.viewToggle ? 'Employee View' : 'Manager View'}
               toggled={this.state.viewToggle}
               onToggle={this.toggleView}
             />
