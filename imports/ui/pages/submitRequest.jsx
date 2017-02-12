@@ -155,21 +155,11 @@ const SubmitRequest = React.createClass({
       this.state.projectType,
       this.state.dateRequired,
       this.state.intendedUsage,
-      (error) => {
+      (error, result) => {
         if (error != null) {
           this.setState({ dialogError: `Error: ${error.error}. Reason: ${error.reason}` });
         } else {
           setTimeout(this.goToDashboard, 2000);
-          this.setState({
-            description: '',
-            estimatedCost: '',
-            vendor: '',
-            partNum: '',
-            qty: '',
-            unitCost: '',
-            snackbarOpen: true,
-            successfulSubmission: true,
-          });
           Meteor.call('notifications.createHelper', this.state.project.name,
             this.state.project.managers,
             result,
@@ -181,6 +171,16 @@ const SubmitRequest = React.createClass({
           //       return;
           // }
           );
+          this.setState({
+            description: '',
+            estimatedCost: '',
+            vendor: '',
+            partNum: '',
+            qty: '',
+            unitCost: '',
+            snackbarOpen: true,
+            successfulSubmission: true,
+          });
           // setTimeout(this.goToDashboard, 2000);
         }
       });
