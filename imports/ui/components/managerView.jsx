@@ -102,15 +102,6 @@ const ManagerView = React.createClass({
       }
     }
 
-    let status = '';
-    if (item.status === undefined) {
-      status = 'Pending';
-    } else if (item.status) {
-      status = 'Approved';
-    } else {
-      status = 'Denied';
-    }
-
     return (
       <TableRow key={index} selectable={false}>
         <TableRowColumn style={{ width: '5%', textAlign: 'left' }}>{index}</TableRowColumn>
