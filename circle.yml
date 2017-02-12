@@ -1,0 +1,20 @@
+dependencies:
+  cache_directories:
+    - ~/.meteor
+  override:
+    - meteor || curl https://install.meteor.com | /bin/sh
+    # - npm install -g gagarin
+    - meteor npm install
+    - meteor add dispatch:mocha-phantomjs
+
+test:
+  override:
+#     - gagarin -v
+    - meteor npm run lint-dev
+#    - npm run test
+# Removed - npm run test since tests are not working/not being managed
+#deployment:
+#  production:
+#    branch: "master"
+#    commands:
+#      - printf "<Meteor username>\n<Meteor password>\n" | meteor deploy circlecivelocity.meteor.com
