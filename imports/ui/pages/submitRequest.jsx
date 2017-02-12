@@ -167,8 +167,21 @@ const SubmitRequest = React.createClass({
             partNum: '',
             qty: '',
             unitCost: '',
+            snackbarOpen: true,
             successfulSubmission: true,
           });
+          Meteor.call('notifications.createHelper', this.state.project.name,
+            this.state.project.managers,
+            result,
+          //   (error) => {
+          //     if (error != null) {
+          //       this.setState({ dialogError: `Error: ${error.error}. ${error.reason}` });
+          //       return;
+          //     }
+          //       return;
+          // }
+          );
+          // setTimeout(this.goToDashboard, 2000);
         }
       });
   },

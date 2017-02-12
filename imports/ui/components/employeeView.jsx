@@ -214,10 +214,10 @@ const EmployeeView = React.createClass({
                   {this.state.requests.length > 0 ?
                     this.state.requests.map(this.createRequestRow) :
                     (
-                      <TableRow selectable={false}>
-                        <TableRowColumn>You have not submitted any requests yet.</TableRowColumn>
-                        <TableRowColumn />
-                      </TableRow>
+                    <TableRow selectable={false}>
+                      <TableRowColumn>You have not submitted any requests yet.</TableRowColumn>
+                      <TableRowColumn />
+                    </TableRow>
                     )
                   }
                 </TableBody>

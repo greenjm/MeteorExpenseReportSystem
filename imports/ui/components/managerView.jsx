@@ -45,6 +45,17 @@ const ManagerView = React.createClass({
         console.log(err);
       }
     });
+    Meteor.call('notifications.respondHelper', approved,
+      request._id,
+      request.userId,
+      // (error) => {
+      //   if (error != null) {
+      //     this.setState({ dialogError: `Error: ${error.error}. ${error.reason}` });
+      //     return;
+      //   }
+      //   return;
+      // }
+    );
   },
 
   handleConfirmPress(req) {

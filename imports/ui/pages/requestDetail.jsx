@@ -8,6 +8,10 @@ import CircularProgress from 'material-ui/CircularProgress';
 import { hashHistory } from 'react-router';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
+import IconButton from 'material-ui/IconButton';
+import FlatButton from 'material-ui/FlatButton';
+import Dialog from 'material-ui/Dialog';
+import ContentClear from 'material-ui/svg-icons/content/clear';
 import Header from '../components/header.jsx';
 import '../../api/requests/requests.js';
 
@@ -63,6 +67,8 @@ const RequestDetail = React.createClass({
       isUploading: false,
       receipt: null,
       successfulSubmission: false,
+      receiptDialogOpen: false,
+      dialogError: '',
     };
   },
 
@@ -217,7 +223,42 @@ const RequestDetail = React.createClass({
     });
   },
 
+  confirmFileDelete() {
+    this.setState({ receiptDialogOpen: true });
+  },
+
+  closeReceiptDialog() {
+    this.setState({ receiptDialogOpen: false, dialogError: '' });
+  },
+
+  deleteReceipt() {
+    if (this.state.receipt) {
+      Meteor.call('receipts.remove', this.state.receipt._id, (err) => {
+        if (err != null) {
+          this.setState({ dialogError: `Error: ${err.error}. Reason: ${err.reason}` });
+          return;
+        }
+        this.closeReceiptDialog();
+      });
+    } else {
+      this.setState({ dialogError: 'No receipt object in React state' });
+    }
+  },
+
   render() {
+    const receiptDialogActions = [
+      <FlatButton
+        label="Cancel"
+        primary
+        onTouchTap={this.closeReceiptDialog}
+      />,
+      <FlatButton
+        label="Confirm"
+        primary
+        onTouchTap={this.deleteReceipt}
+      />,
+    ];
+
     let receiptRightColumn = null;
     if (this.state.isUploading) {
       receiptRightColumn = (
@@ -235,7 +276,19 @@ const RequestDetail = React.createClass({
       );
     } else {
       receiptRightColumn = (
-        <a href={this.state.receipt.url()} rel="noopener noreferrer" target="_blank">{this.state.receipt.name()}</a>
+        <div style={{ height: '48px' }}>
+          <div style={{ float: 'right' }}>
+            <IconButton onTouchTap={this.confirmFileDelete}>
+              <ContentClear />
+            </IconButton>
+          </div>
+          <a
+            style={{ top: '25%', position: 'relative' }}
+            href={this.state.receipt.url()} rel="noopener noreferrer" target="_blank"
+          >
+            {this.state.receipt.name()}
+          </a>
+        </div>
       );
     }
 
@@ -429,6 +482,17 @@ const RequestDetail = React.createClass({
             </Col>
           </Row>
         </Grid>
+
+        <Dialog
+          title="Remove Receipt?"
+          actions={receiptDialogActions}
+          modal={false}
+          open={this.state.receiptDialogOpen}
+          onRequestClose={this.closeReceiptDialog}
+        >
+          <p>Are you sure you want to remove this receipt?</p>
+          <div style={{ color: 'red' }}>{this.state.dialogError}</div>
+        </Dialog>
       </div>
     );
   },

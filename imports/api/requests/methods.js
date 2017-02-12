@@ -34,8 +34,8 @@ Meteor.methods({
     };
 
     Requests.schema.validate(newReq);
-
-    return Requests.insert(newReq);
+    const result = Requests.insert(newReq);
+    return result;
   },
 
   'requests.edit': function editRequest(id, desc, est, vend, prt, qty, unt) {
