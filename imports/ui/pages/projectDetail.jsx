@@ -12,6 +12,7 @@ import TextField from 'material-ui/TextField';
 import SelectField from 'material-ui/SelectField';
 import Checkbox from 'material-ui/Checkbox';
 import MenuItem from 'material-ui/MenuItem';
+import CircularProgress from 'material-ui/CircularProgress';
 import '../../api/projects/projects.js';
 import Header from '../components/header.jsx';
 
@@ -54,6 +55,7 @@ const ProjectDetail = React.createClass({
       mode: 'view',
       dialogError: '',
       dialogSuccess: '',
+      successfulSubmission: false,
     };
   },
 
@@ -130,13 +132,16 @@ const ProjectDetail = React.createClass({
       (err) => {
         if (err != null) {
           this.setState({ dialogError: `Error: ${err.error}. Reason: ${err.reason}` });
-          return;
+        } else {
+          setTimeout(this.dismissSpinner, 2000);
+          this.setState({ successfulSubmission: true });
         }
-        this.setState({ dialogSuccess: 'Project successfully updated.', dialogError: '' });
-
-        this.closeProjectDialog();
       }
     );
+  },
+
+  dismissSpinner() {
+    this.setState({ successfulSubmission: false });
   },
 
   createEmployeeMenuItem(item) {
@@ -271,7 +276,12 @@ const ProjectDetail = React.createClass({
                     </List>
                   </div>
                   <div style={{ color: 'red' }}>{this.state.dialogError}</div>
-                  <div style={{ color: 'green' }}>{this.state.dialogSuccess}</div>
+                  {this.state.successfulSubmission && (
+                    <div>
+                      <div style={{ display: 'inline-block' }}>Your project was updated successfully. </div>
+                      <CircularProgress size={20} style={{ margin: '3px' }} />
+                    </div>
+                  )}
                   { this.state.mode === 'edit' &&
                     <div style={{ float: 'right', margin: '10px' }}>
                       <FlatButton label="Cancel" onTouchTap={this.cancelEdit} />
