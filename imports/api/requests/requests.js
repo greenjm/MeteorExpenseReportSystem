@@ -13,29 +13,28 @@ Requests.schema = new SimpleSchema({
   projectId: { type: String, regEx: SimpleSchema.RegEx.Id },
   status: { type: Boolean, optional: true },
   statMsg: { type: String, optional: true },
-  bornOn: { type: Date,
-    autoValue: () => {
-      const date = Date.now();
-      return date;
-    },
-  },
-  description: { type: String },
-  estCost: { type: Number, decimal: true },
   vendor: { type: String },
+  description: { type: String },
   partNo: { type: String },
   quantity: { type: Number, defaultValue: 1 },
   unitCost: { type: Number, decimal: true },
+  estCost: { type: Number, decimal: true },
+  project: { type: String },
+  dateRequired: { type: String },
+  intendedUsage: { type: String },
   receipt: { type: Object, optional: true },
 });
 
 Factory.define('request', Requests, {
   userId: () => '',
   projectId: () => '',
-  bornOn: () => new Date(),
-  description: () => faker.lorem.sentence(5),
-  estCost: () => 1.00,
   vendor: () => faker.lorem.word,
+  description: () => faker.lorem.sentence(5),
   partNo: () => faker.lorem.word,
   quantity: () => 1,
   unitCost: () => 1.00,
+  estCost: () => 1.00,
+  project: () => faker.lorem.word,
+  dateRequired: () => new Date().toString(),
+  intendedUsage: () => faker.lorem.sentence(5),
 });

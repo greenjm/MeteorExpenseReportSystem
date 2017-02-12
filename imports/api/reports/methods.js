@@ -23,15 +23,13 @@ Meteor.methods({
   @param year {Number} year submitted
   @return {Boolean} true if successfully added
   */
-  'reports.create': function newUser(project, reqs, month, year) {
-    check(project, String);
+  'reports.create': function newUser(reqs, month, year) {
     check(reqs, Array);
-    check(month, String);
+    check(month, Number);
     check(year, Number);
 
     const newReport = {
       userId: Meteor.userId(),
-      projectId: project,
       approvedRequests: reqs,
       month,
       year,

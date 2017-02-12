@@ -69,6 +69,7 @@ const RequestDetail = React.createClass({
       editStyle: { display: 'none' },
       isUploading: false,
       receipt: null,
+      successfulSubmission: false,
       receiptDialogOpen: false,
       dialogError: '',
       isManager: false,
@@ -193,6 +194,10 @@ const RequestDetail = React.createClass({
     });
   },
 
+  goBack() {
+    hashHistory.push('/dashboard');
+  },
+
   saveRequest() {
     Meteor.call('requests.editWithProject',
       this.state.requestId,
@@ -207,6 +212,10 @@ const RequestDetail = React.createClass({
         if (err) {
           console.log(err);
         } else {
+          setTimeout(this.dismissSpinner, 2000);
+          this.setState({
+            successfulSubmission: true,
+          });
           this.cancelEdit();
         }
       }
@@ -222,6 +231,10 @@ const RequestDetail = React.createClass({
       //       return;
       // }
     );
+  },
+
+  dismissSpinner() {
+    this.setState({ successfulSubmission: false });
   },
 
   uploadReceipt(e) {
@@ -340,6 +353,11 @@ const RequestDetail = React.createClass({
                   primary
                   onClick={this.editRequest}
                   style={{ float: 'right' }}
+                />
+                <RaisedButton
+                  label="Cancel"
+                  onClick={this.goBack}
+                  style={{ float: 'right', marginRight: '6px' }}
                 />
               </Col>
             </Row>
@@ -494,6 +512,12 @@ const RequestDetail = React.createClass({
                   <TableRow selectable={false}>
                     <TableRowColumn />
                     <TableRowColumn>
+                      {this.state.successfulSubmission && (
+                        <div>
+                          <div style={{ display: 'inline-block' }}>Your request was updated successfully. </div>
+                          <CircularProgress size={20} style={{ margin: '3px' }} />
+                        </div>
+                      )}
                       <RaisedButton
                         label="Save Changes"
                         primary
