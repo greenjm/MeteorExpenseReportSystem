@@ -1,10 +1,8 @@
 import { Meteor } from 'meteor/meteor';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
   from 'material-ui/Table';
-import FloatingActionButton from 'material-ui/FloatingActionButton';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import FlatButton from 'material-ui/FlatButton';
-import Search from 'material-ui/svg-icons/action/search';
 import RaisedButton from 'material-ui/RaisedButton';
 import { hashHistory } from 'react-router';
 
@@ -100,9 +98,12 @@ const EmployeeView = React.createClass({
         <TableRowColumn>{item.statMsg}</TableRowColumn>
         <TableRowColumn>{item.estCost}</TableRowColumn>
         <TableRowColumn>
-          <FloatingActionButton mini style={{ margin: '3px' }} onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}>
-            <Search />
-          </FloatingActionButton>
+          <RaisedButton
+            onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}
+            label="View"
+            style={{ margin: '3px' }}
+            primary
+          />
           <RaisedButton
             onTouchTap={() => {
               Meteor.call('requests.delete', item._id);
@@ -147,9 +148,12 @@ const EmployeeView = React.createClass({
           <TableRowColumn>{item.statMsg}</TableRowColumn>
           <TableRowColumn>{item.estCost}</TableRowColumn>
           <TableRowColumn>
-            <FloatingActionButton mini style={{ margin: '3px' }} onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}>
-              <Search />
-            </FloatingActionButton>
+            <RaisedButton
+              onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}
+              label="View"
+              style={{ margin: '3px' }}
+              primary
+            />
           </TableRowColumn>
         </TableRow>
       );

@@ -59,4 +59,17 @@ Meteor.methods({
     const noteText = `${currentUser.profile.name} has ${reply} your request`;
     Meteor.call('notifications.create', reqUser, noteText, targetURL);
   },
+
+  'notifications.createEditHelper': function helpEditCreate(proj, managers, reqId) {
+    let i = 0;
+    const currentUser = Meteor.user();
+    check(proj, String);
+    check(managers, Array);
+    check(reqId, String);
+    const targetURL = `/requestDetail/${reqId}`;
+    const noteText = `${currentUser.profile.name} has resubmitted a request for the project: ${proj}`;
+    for (i = 0; i < managers.length; i += 1) {
+      Meteor.call('notifications.create', managers[i], noteText, targetURL);
+    }
+  },
 });
