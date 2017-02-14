@@ -1,13 +1,12 @@
 import { Meteor } from 'meteor/meteor';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
   from 'material-ui/Table';
-import FloatingActionButton from 'material-ui/FloatingActionButton';
 import { Tabs, Tab } from 'material-ui/Tabs';
-import Search from 'material-ui/svg-icons/action/search';
 import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
+import { hashHistory } from 'react-router';
 
 const React = require('react');
 
@@ -89,21 +88,27 @@ const ManagerView = React.createClass({
     this.setState({ statMsg: e.target.value });
   },
 
+  goTo(url) {
+    hashHistory.push(url);
+  },
+
   createProjectRow(item) {
     return (
       <TableRow selectable={false}>
         <TableRowColumn>{item.name}</TableRowColumn>
         <TableRowColumn>
-          <FloatingActionButton mini style={{ margin: '3px' }} href={`/#/project/view/${item._id}`}>
-            <Search />
-          </FloatingActionButton>
+          <RaisedButton
+            onTouchTap={() => { this.goTo(`/project/view/${item._id}`); }}
+            label="View"
+            style={{ margin: '3px' }}
+            primary
+          />
         </TableRowColumn>
       </TableRow>
     );
   },
 
   createRequestRow(item, index) {
-    const url = `/#/requestDetail/${item._id}`;
     let projectName = '';
     for (let i = 0; i < this.state.projects.length; i += 1) {
       const p = this.state.projects[i];
@@ -131,17 +136,20 @@ const ManagerView = React.createClass({
             label="Approve"
             primary
             onTouchTap={() => { this.handleConfirmPress(item); }}
+            style={{ margin: '3px' }}
           />
           <RaisedButton
             label="Deny"
             primary
             onTouchTap={() => { this.handleDenyPress(item); }}
+            style={{ margin: '3px' }}
           />
-          <a href={url}>
-            <FloatingActionButton mini style={{ margin: '3px' }}>
-              <Search />
-            </FloatingActionButton>
-          </a>
+          <RaisedButton
+            onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}
+            label="View"
+            style={{ margin: '3px' }}
+            primary
+          />
         </TableRowColumn>
       </TableRow>
     );

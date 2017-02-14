@@ -1,10 +1,8 @@
 import { Meteor } from 'meteor/meteor';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
   from 'material-ui/Table';
-import FloatingActionButton from 'material-ui/FloatingActionButton';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import FlatButton from 'material-ui/FlatButton';
-import Search from 'material-ui/svg-icons/action/search';
 import RaisedButton from 'material-ui/RaisedButton';
 import { hashHistory } from 'react-router';
 
@@ -37,6 +35,19 @@ const EmployeeView = React.createClass({
 
   goTo(url) {
     hashHistory.push(url);
+  },
+
+  removeItem(index) {
+    const filteredRequests = [];
+    for (let i = this.state.requests.length - 1; i >= 0; i -= 1) {
+      if (i !== index) {
+        filteredRequests.push(this.state.requests[i]);
+      }
+    }
+
+    this.setState({
+      requests: filteredRequests,
+    });
   },
 
   createProjectRow(item) {
@@ -94,6 +105,23 @@ const EmployeeView = React.createClass({
         <TableRowColumn style={{ width: '8%', textAlign: 'left', wordWrap: 'break-word' }}>{item.dateRequired}</TableRowColumn>
         <TableRowColumn style={{ width: '10%', textAlign: 'left', wordWrap: 'break-word' }}>{item.intendedUsage}</TableRowColumn>
         <TableRowColumn style={{ width: '5%' }}>{status}</TableRowColumn>
+        <TableRowColumn>
+          <RaisedButton
+            onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}
+            label="View"
+            style={{ margin: '3px' }}
+            primary
+          />
+          <RaisedButton
+            onTouchTap={() => {
+              Meteor.call('requests.delete', item._id);
+              this.removeItem(item._id);
+            }}
+            label="Delete"
+            style={{ margin: '3px' }}
+            primary
+          />
+        </TableRowColumn>
       </TableRow>
     );
   },
@@ -131,9 +159,12 @@ const EmployeeView = React.createClass({
           <TableRowColumn style={{ width: '15%' }}>{item.estCost}</TableRowColumn>
           <TableRowColumn style={{ width: '8%' }}>{item.project}</TableRowColumn>
           <TableRowColumn>
-            <FloatingActionButton mini style={{ margin: '3px' }} onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}>
-              <Search />
-            </FloatingActionButton>
+            <RaisedButton
+              onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}
+              label="View"
+              style={{ margin: '3px' }}
+              primary
+            />
           </TableRowColumn>
         </TableRow>
       );
