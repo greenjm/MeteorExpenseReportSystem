@@ -17,7 +17,21 @@ const RequestDetailContainer = createContainer(({ params }) => {
   const request = requestReady && Requests.findOne(requestId);
   const requestOwned = !!user && !!request && user._id === request.userId;
   const receipt = request && request.receipt && receiptReady && request.receipt.getFileRecord();
+
+  // Breadcrumbs
+  const breadcrumbs = [
+    {
+      page: 'User Dashboard',
+      url: '/#/dashboard',
+    },
+    {
+      page: 'Request Detail',
+      url: `/#/requestDetail/${requestId}`,
+    },
+  ];
+
   return {
+    breadcrumbs,
     user: !!user || false,
     isAdmin,
     requestReady,

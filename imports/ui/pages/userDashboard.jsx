@@ -17,6 +17,7 @@ const paperStyle = {
 
 const UserDashboard = React.createClass({
   propTypes: {
+    breadcrumbs: React.PropTypes.array,
     isAdmin: React.PropTypes.bool,
     name: React.PropTypes.string,
     employeeProjects: React.PropTypes.array,
@@ -30,6 +31,7 @@ const UserDashboard = React.createClass({
 
   getInitialState() {
     return {
+      breadcrumbs: [],
       name: '',
       employeeProjects: [],
       managerProjects: [],
@@ -46,6 +48,7 @@ const UserDashboard = React.createClass({
 
   componentWillMount() {
     this.setState({
+      breadcrumbs: this.props.breadcrumbs,
       name: this.props.name,
       employeeProjects: this.props.employeeProjects,
       managerProjects: this.props.managerProjects,
@@ -85,7 +88,14 @@ const UserDashboard = React.createClass({
       isManager: isManagerChange ? nextProps.isManager : this.state.isManager,
       isEmployee: isEmployeeChange ? nextProps.isEmployee : this.state.isEmployee,
       viewToggle: this.state.viewToggle || (this.props.isManager && !this.props.isEmployee),
+      breadcrumbs: nextProps.breadcrumbs,
     });
+  },
+
+  createBreadcrumb(item) {
+    return (
+      <li><a href={item.url}>{item.page}</a></li>
+    );
   },
 
   // Helpers
@@ -122,7 +132,11 @@ const UserDashboard = React.createClass({
     return (
       <div>
         <Header isAdmin={this.props.isAdmin} />
-        <Paper style={paperStyle} zDepth={1}>User Dashboard</Paper>
+        <Paper style={paperStyle} zDepth={1}>
+          <ul className="breadcrumb">
+            {this.state.breadcrumbs.map(this.createBreadcrumb)}
+          </ul>
+        </Paper>
         <br />
         {this.state.isManager &&
           <div style={{ float: 'right', marginRight: '10px' }}>

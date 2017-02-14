@@ -21,6 +21,7 @@ const paperStyle = {
 
 const SubmitRequest = React.createClass({
   propTypes: {
+    breadcrumbs: React.PropTypes.array,
     project: React.PropTypes.object,
     isAdmin: React.PropTypes.bool,
     projects: React.PropTypes.array,
@@ -28,6 +29,7 @@ const SubmitRequest = React.createClass({
 
   getInitialState() {
     return {
+      breadcrumbs: [],
       project: {},
       projects: [],
       description: '',
@@ -55,6 +57,7 @@ const SubmitRequest = React.createClass({
 
   componentWillMount() {
     this.setState({
+      breadcrumbs: this.props.breadcrumbs,
       project: this.props.project,
       projects: this.props.projects,
     });
@@ -70,7 +73,14 @@ const SubmitRequest = React.createClass({
     this.setState({
       project: projectChange ? nextProps.project : this.state.project,
       projects: projectsChange ? nextProps.projects : this.state.projects,
+      breadcrumbs: nextProps.breadcrumbs,
     });
+  },
+
+  createBreadcrumb(item) {
+    return (
+      <li><a href={item.url}>{item.page}</a></li>
+    );
   },
 
   cancelRequest() {
@@ -302,7 +312,11 @@ const SubmitRequest = React.createClass({
     return (
       <div>
         <Header isAdmin={this.props.isAdmin} />
-        <Paper style={paperStyle} zDepth={1}>Submit a Material Purchase Approval</Paper>
+        <Paper style={paperStyle} zDepth={1}>
+          <ul className="breadcrumb">
+            {this.state.breadcrumbs.map(this.createBreadcrumb)}
+          </ul>
+        </Paper>
         <br />
         <br />
         <div>

@@ -13,7 +13,35 @@ const SubmitRequestContainer = createContainer(({ params }) => {
   const projectSub = Meteor.subscribe('projects');
   const projectReady = projectSub.ready();
   const project = projectReady && Projects.findOne(projectId);
+
+  // Breadcrumbs
+  let breadcrumbs = [];
+  if (projectId !== null && projectId !== undefined) {
+    breadcrumbs = [
+      {
+        page: 'User Dashboard',
+        url: '/#/dashboard',
+      },
+      {
+        page: 'Submit MPA',
+        url: `/#/submitRequest/${projectId}`,
+      },
+    ];
+  } else {
+    breadcrumbs = [
+      {
+        page: 'User Dashboard',
+        url: '/#/dashboard',
+      },
+      {
+        page: 'Submit MPA',
+        url: '/#/submitRequest',
+      },
+    ];
+  }
+
   return {
+    breadcrumbs,
     user: !!user || false,
     isAdmin,
     projectReady,

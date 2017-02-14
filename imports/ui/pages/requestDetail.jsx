@@ -48,6 +48,7 @@ const RequestDetail = React.createClass({
 
   getInitialState() {
     return {
+      breadcrumbs: [],
       requestId: '',
       readDescription: '',
       description: '',
@@ -74,6 +75,7 @@ const RequestDetail = React.createClass({
 
   componentWillMount() {
     this.setState({
+      breadcrumbs: this.props.breadcrumbs,
       requestId: this.props.requestId,
       readDescription: this.props.description,
       description: this.props.description,
@@ -124,7 +126,14 @@ const RequestDetail = React.createClass({
       status: statusChange ? nextProps.status : this.state.status,
       statMsg: statMsgChange ? nextProps.statMsg : this.state.statMsg,
       receipt: receiptChange ? nextProps.receipt : this.state.receipt,
+      breadcrumbs: nextProps.breadcrumbs,
     });
+  },
+
+  createBreadcrumb(item) {
+    return (
+      <li><a href={item.url}>{item.page}</a></li>
+    );
   },
 
   // State Bindings
@@ -302,7 +311,11 @@ const RequestDetail = React.createClass({
     return (
       <div>
         <Header />
-        <Paper style={paperStyle} zDepth={1}>Expense Requests</Paper>
+        <Paper style={paperStyle} zDepth={1}>
+          <ul className="breadcrumb">
+            {this.state.breadcrumbs.map(this.createBreadcrumb)}
+          </ul>
+        </Paper>
         <br />
         <br />
         <Grid>

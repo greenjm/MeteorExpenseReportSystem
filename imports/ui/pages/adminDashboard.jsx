@@ -49,6 +49,7 @@ const AdminDashboard = React.createClass({
 
   getInitialState() {
     return {
+      breadcrumbs: [],
       projects: [],
       users: [],
       reports: [],
@@ -91,7 +92,16 @@ const AdminDashboard = React.createClass({
     if (nextProps.reportReady) {
       this.setState({ reports: nextProps.reports });
     }
-    this.setState({ userFilter: nextProps.userFilter, projectFilter: nextProps.projectFilter });
+    this.setState({ userFilter: nextProps.userFilter,
+      projectFilter: nextProps.projectFilter,
+      breadcrumbs: nextProps.breadcrumbs,
+    });
+  },
+
+  createBreadcrumb(item) {
+    return (
+      <li><a href={item.url}>{item.page}</a></li>
+    );
   },
 
   createUserRow(item) {
@@ -340,6 +350,7 @@ const AdminDashboard = React.createClass({
   },
 
   render() {
+    console.log(hashHistory);
     const userDialogActions = [
       <FlatButton
         label="Cancel"
@@ -369,7 +380,11 @@ const AdminDashboard = React.createClass({
     return (
       <div>
         <Header isAdmin={this.props.isAdmin} />
-        <Paper style={paperStyle} zDepth={1}>Admin Dashboard</Paper>
+        <Paper style={paperStyle} zDepth={1}>
+          <ul className="breadcrumb">
+            {this.state.breadcrumbs.map(this.createBreadcrumb)}
+          </ul>
+        </Paper>
         <br />
         <br />
         <Tabs>
