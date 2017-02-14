@@ -27,6 +27,7 @@ const Header = React.createClass({
       adminDashLink: null,
       notificationCount: 0,
       notifications: [],
+      logoSource: '/images/ScientiaLLC_Logo_No_Shadow-300x64.png',
     };
   },
 
@@ -79,7 +80,7 @@ const Header = React.createClass({
     return (
       <div>
         <AppBar
-          title="Expense Report"
+          title="Monthly Expense Report System"
           iconElementRight={
             <div>
               <IconMenu
@@ -117,7 +118,10 @@ const Header = React.createClass({
               </IconMenu>
             </div>
           }
-          showMenuIconButton={false}
+          iconElementLeft={
+            <a href="/#/"><img src={this.state.logoSource} alt="Scientia Logo" height="48" width="225" /></a>
+          }
+          showMenuIconButton
         />
       </div>);
   },
