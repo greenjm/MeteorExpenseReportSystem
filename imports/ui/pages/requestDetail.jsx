@@ -318,6 +318,7 @@ const RequestDetail = React.createClass({
           label="Upload Receipt"
           labelPosition="before"
           containerElement="label"
+          primary
         >
           <input type="file" onChange={this.uploadReceipt} style={fileInputStyle} />
         </RaisedButton>
@@ -369,6 +370,7 @@ const RequestDetail = React.createClass({
                 />
                 <RaisedButton
                   label="Cancel"
+                  primary
                   onClick={this.goBack}
                   style={{ float: 'right', marginRight: '6px' }}
                 />

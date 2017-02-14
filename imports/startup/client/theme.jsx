@@ -4,7 +4,8 @@ import {
   grey100, grey300, grey200,
   white, darkBlack, fullBlack,
 } from 'material-ui/styles/colors';
-import { fade } from 'material-ui/utils/colorManipulator';
+import { darken, fade } from 'material-ui/utils/colorManipulator';
+import typography from 'material-ui/styles/typography';
 
 export default function getTheme() {
   const palette = {
@@ -28,6 +29,18 @@ export default function getTheme() {
     palette,
     svgIcon: {
       color: palette.alternateTextColor,
+    },
+    raisedButton: {
+      color: palette.alternateTextColor,
+      textColor: palette.textColor,
+      primaryColor: '#ffae00',
+      primaryTextColor: palette.alternateTextColor,
+      secondaryColor: palette.accent1Color,
+      secondaryTextColor: palette.alternateTextColor,
+      disabledColor: darken(palette.alternateTextColor, 0.1),
+      disabledTextColor: fade(palette.textColor, 0.3),
+      fontSize: typography.fontStyleButtonFontSize,
+      fontWeight: typography.fontWeightMedium,
     },
   });
 }
