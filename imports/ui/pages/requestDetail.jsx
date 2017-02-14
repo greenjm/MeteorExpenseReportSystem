@@ -74,6 +74,10 @@ const RequestDetail = React.createClass({
       receiptDialogOpen: false,
       dialogError: '',
       isManager: false,
+      dateRequired: '',
+      readDateRequired: '',
+      intendedUsage: '',
+      readIntendedUsage: '',
       project: {},
       projects: [],
     };
@@ -101,6 +105,10 @@ const RequestDetail = React.createClass({
       project: this.props.project,
       readProject: this.props.project,
       projects: this.props.projects,
+      dateRequired: this.props.dateRequired,
+      readDateRequired: this.props.dateRequired,
+      intendedUsage: this.props.intendedUsage,
+      readIntendedUsage: this.props.intendedUsage,
       isManager: this.props.isManager,
     });
   },
@@ -121,6 +129,8 @@ const RequestDetail = React.createClass({
     const statusChange = this.state.status !== nextProps.status;
     const statMsgChange = this.state.statMsg !== nextProps.statMsg;
     const receiptChange = this.state.receipt !== nextProps.receipt;
+    const dateRequired = this.state.dateRequired !== nextProps.dateRequired;
+    const intendedUsage = this.state.intendedUsage !== nextProps.intendedUsage;
     const projectId = this.props.projectId !== nextProps.projectId;
     const project = this.props.project !== nextProps.project;
     const projects = this.props.projects !== nextProps.projects;
@@ -140,6 +150,8 @@ const RequestDetail = React.createClass({
       status: statusChange ? nextProps.status : this.state.status,
       statMsg: statMsgChange ? nextProps.statMsg : this.state.statMsg,
       receipt: receiptChange ? nextProps.receipt : this.state.receipt,
+      dateRequired: dateRequired ? nextProps.dateRequired : this.state.dateRequired,
+      intendedUsage: intendedUsage ? nextProps.intendedUsage : this.state.intendedUsage,
       projectId: projectId ? nextProps.projectId : this.props.projectId,
       project: project ? nextProps.project : this.props.project,
       readProject: project ? nextProps.project : this.props.project,
@@ -185,6 +197,14 @@ const RequestDetail = React.createClass({
     this.setState({ vendor: e.target.value });
   },
 
+  changeDateRequired(e) {
+    this.setState({ dateRequired: e.target.value });
+  },
+
+  changeIntendedUse(e) {
+    this.setState({ intendedUsage: e.target.value });
+  },
+
   editRequest() {
     this.setState({ readStyle: { display: 'none' }, editStyle: {} });
   },
@@ -200,6 +220,8 @@ const RequestDetail = React.createClass({
       unitCost: this.state.readUnitCost,
       vendor: this.state.readVendor,
       project: this.state.readProject,
+      dateRequired: this.props.readDateRequired,
+      intendedUsage: this.props.readIntendedUsage,
     });
   },
 
@@ -215,6 +237,8 @@ const RequestDetail = React.createClass({
       this.state.estCost,
       this.state.vendor,
       this.state.partNo,
+      this.state.dateRequired,
+      this.state.intendedUsage,
       +this.state.quantity,
       +this.state.unitCost,
       (err) => {
@@ -377,6 +401,7 @@ const RequestDetail = React.createClass({
               </Col>
             </Row>
           }
+          { }
           <br />
           <Row>
             <Col xs={12} sm={12} md={12} lg={12}>
@@ -484,6 +509,36 @@ const RequestDetail = React.createClass({
                         value={this.state.vendor}
                         fullWidth
                         onChange={this.changeVendor}
+                        style={this.state.editStyle}
+                      />
+                    </TableRowColumn>
+                  </TableRow>
+                  <TableRow selectable={false}>
+                    <TableRowColumn>
+                      <label htmlFor="name">Date Required</label>
+                    </TableRowColumn>
+                    <TableRowColumn>
+                      <p style={this.state.readStyle} >{this.state.readDateRequired}</p>
+                      <TextField
+                        hintText="Vendor"
+                        value={this.state.dateRequired}
+                        fullWidth
+                        onChange={this.changeDateRequired}
+                        style={this.state.editStyle}
+                      />
+                    </TableRowColumn>
+                  </TableRow>
+                  <TableRow selectable={false}>
+                    <TableRowColumn>
+                      <label htmlFor="name">Intended Usage</label>
+                    </TableRowColumn>
+                    <TableRowColumn>
+                      <p style={this.state.readStyle} >{this.state.readIntendedUsage}</p>
+                      <TextField
+                        hintText="Vendor"
+                        value={this.state.intendedUsage}
+                        fullWidth
+                        onChange={this.changeIntendedUse}
                         style={this.state.editStyle}
                       />
                     </TableRowColumn>

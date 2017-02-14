@@ -45,8 +45,8 @@ const SubmitRequest = React.createClass({
       partNum: '',
       partNumError: '',
       dialogError: '',
-      projectType: '',
-      projectTypeError: '',
+      // projectType: '',
+      // projectTypeError: '',
       dateRequired: '',
       dateRequiredError: '',
       intendedUsage: '',
@@ -270,13 +270,13 @@ const SubmitRequest = React.createClass({
   },
 
   // Project Type methods
-  handleProjectTypeChange(event) {
-    this.setState({ projectType: event.target.value, projectTypeError: '' });
-  },
+  // handleProjectTypeChange(event) {
+  //   this.setState({ projectType: event.target.value, projectTypeError: '' });
+  // },
 
-  projectTypeError(err) {
-    this.setState({ projectTypeError: err });
-  },
+  // projectTypeError(err) {
+  //   this.setState({ projectTypeError: err });
+  // },
 
   // Date Required methods
   handleDateRequiredChange(event) {
@@ -381,20 +381,6 @@ const SubmitRequest = React.createClass({
                         fullWidth
                       />
                       <TextField
-                        floatingLabelText="Total Cost"
-                        value={this.state.estimatedCost}
-                        onChange={this.handleEstimateChange}
-                        fullWidth
-                        readOnly
-                      />
-                      <TextField
-                        floatingLabelText="Project"
-                        value={this.state.projectType}
-                        onChange={this.handleProjectTypeChange}
-                        errorText={this.state.projectTypeError}
-                        fullWidth
-                      />
-                      <TextField
                         floatingLabelText="Date Required"
                         value={this.state.dateRequired}
                         onChange={this.handleDateRequiredChange}
@@ -407,6 +393,13 @@ const SubmitRequest = React.createClass({
                         onChange={this.handleIntendedUsageChange}
                         errorText={this.state.intendedUsageError}
                         fullWidth
+                      />
+                      <TextField
+                        floatingLabelText="Total Cost"
+                        value={this.state.estimatedCost}
+                        onChange={this.handleEstimateChange}
+                        fullWidth
+                        readOnly
                       />
                       <div style={{ color: 'red' }}>{this.state.dialogError}</div>
                       <div style={{ float: 'right', margin: '10px' }}>
