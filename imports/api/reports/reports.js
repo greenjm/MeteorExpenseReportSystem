@@ -9,14 +9,14 @@ Reports = new Mongo.Collection('reqports');
 
 Reports.schema = new SimpleSchema({
   userId: { type: String, regEx: SimpleSchema.RegEx.Id },
-  approvedRequests: { type: Array, optional: false },
-  month: { type: Number, optional: false },
-  year: { type: Number, optional: false },
+  approvedRequests: { type: [String] },
+  month: { type: Number },
+  year: { type: Number },
 });
 
 Factory.define('report', Reports, {
-  userId: () => '',
-  approvedRequests: () => [],
-  month: () => -1,
-  year: () => 0,
+  userId: '',
+  approvedRequests: [],
+  month: -1,
+  year: 0,
 });
