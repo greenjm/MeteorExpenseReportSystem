@@ -327,9 +327,9 @@ const AdminDashboard = React.createClass({
     const url = `/#/report/${item._id}`;
     return (
       <TableRow key={item._id} selectable={false}>
-        <TableRowColumn>{item.month}</TableRowColumn>
-        <TableRowColumn>{item.year}</TableRowColumn>
-        <TableRowColumn>{item.approvedRequests.length}</TableRowColumn>
+        <TableRowColumn style={{ width: '20%', textAlign: 'left' }}>{item.month + 1}</TableRowColumn>
+        <TableRowColumn style={{ width: '20%', textAlign: 'left' }}>{item.year}</TableRowColumn>
+        <TableRowColumn style={{ width: '20%', textAlign: 'left' }}>{item.approvedRequests.length}</TableRowColumn>
         <TableRowColumn style={actionsColStyle}>
           <a href={url}>
             <RaisedButton label="View Report (TODO)" primary />
@@ -464,15 +464,13 @@ const AdminDashboard = React.createClass({
             label="Monthly Expense Reports"
           >
             <Table selectable={false}>
-              <TableHeader displaySelectAll={false}>
-                <TableRow selectable={false}>
-                  <TableHeaderColumn>Month</TableHeaderColumn>
-                  <TableHeaderColumn>Year</TableHeaderColumn>
-                  <TableHeaderColumn># of Requests</TableHeaderColumn>
-                  <TableHeaderColumn>Actions</TableHeaderColumn>
-                </TableRow>
-              </TableHeader>
               <TableBody displayRowCheckbox={false}>
+                <TableRow selectable={false} style={{ color: 'rgb(158, 158, 158)' }}>
+                  <TableRowColumn style={{ width: '20%', textAlign: 'left', fontSize: '12px' }}>Month</TableRowColumn>
+                  <TableRowColumn style={{ width: '20%', textAlign: 'left', fontSize: '12px' }}>Year</TableRowColumn>
+                  <TableRowColumn style={{ width: '20%', textAlign: 'left', fontSize: '12px' }}># of Requests</TableRowColumn>
+                  <TableRowColumn style={{ width: '20%', textAlign: 'left', fontSize: '12px' }}>Actions</TableRowColumn>
+                </TableRow>
                 {this.state.reports.length > 0 ?
                   this.state.reports.map(this.createReportRow) :
                   (

@@ -29,9 +29,9 @@ Meteor.methods({
       quantity: qty,
       unitCost: unt,
       estCost: est,
-      // project: projType,
       dateRequired: date,
       intendedUsage: indUsage,
+      submitted: false,
     };
 
     Requests.schema.validate(newReq);

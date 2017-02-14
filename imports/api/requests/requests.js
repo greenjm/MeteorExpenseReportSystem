@@ -28,6 +28,7 @@ Requests.schema = new SimpleSchema({
   dateRequired: { type: String },
   intendedUsage: { type: String },
   receipt: { type: Object, optional: true },
+  submitted: { type: Boolean, defaultValue: false },
 });
 
 Factory.define('request', Requests, {
