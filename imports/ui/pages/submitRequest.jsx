@@ -87,7 +87,9 @@ const SubmitRequest = React.createClass({
     hashHistory.push('/dashboard');
   },
 
-  submitRequest() {
+  submitRequest(e) {
+    e.preventDefault();
+
     this.setState({ dialogError: '' });
 
     const requiredError = 'This field is required.';
@@ -162,7 +164,6 @@ const SubmitRequest = React.createClass({
       this.state.partNum,
       qtyNum,
       +unitCostNum.toFixed(2),
-      this.state.projectType,
       this.state.dateRequired,
       this.state.intendedUsage,
       (error, result) => {
