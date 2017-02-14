@@ -18,7 +18,7 @@ ul.breadcrumb li+li:before {
 
 /* Add a color to all links inside the list */
 ul.breadcrumb li a {
-    color: #00BCD4;
+    color: #ffae00;
     text-decoration: none;
 }
 
@@ -26,4 +26,8 @@ ul.breadcrumb li a {
 ul.breadcrumb li a:hover {
     color: #009AB2;
     text-decoration: underline;
+}
+
+body {
+    background-color: #8c8b86;
 }
