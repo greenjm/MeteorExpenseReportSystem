@@ -43,7 +43,16 @@ const UserDashboardContainer = createContainer(() => {
   const isEmployee = employeeProjects && employeeProjects.length > 0;
   const isManager = managerProjects && managerProjects.length > 0;
 
+  // Breadcrumbs
+  const breadcrumbs = [
+    {
+      page: 'User Dashboard',
+      url: '/#/dashboard',
+    },
+  ];
+
   return {
+    breadcrumbs,
     user: !!user || false,
     isAdmin,
     name,

@@ -24,7 +24,21 @@ const RequestDetailContainer = createContainer(({ params }) => {
   const managerProjects = (projectReady && user &&
     Projects.find({ managers: user._id }).fetch()) || [];
   const isManager = managerProjects && managerProjects.length > 0;
+
+  // Breadcrumbs
+  const breadcrumbs = [
+    {
+      page: 'User Dashboard',
+      url: '/#/dashboard',
+    },
+    {
+      page: 'Request Detail',
+      url: `/#/requestDetail/${requestId}`,
+    },
+  ];
+
   return {
+    breadcrumbs,
     user: !!user || false,
     isAdmin,
     requestReady,
