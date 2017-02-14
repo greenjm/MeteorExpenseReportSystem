@@ -5,6 +5,7 @@ import { Meteor } from 'meteor/meteor';
 import { hashHistory } from 'react-router';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import injectTapEventPlugin from 'react-tap-event-plugin';
+import getTheme from './theme.jsx';
 
 const React = require('react');
 const ReactDOM = require('react-dom');
@@ -22,7 +23,7 @@ const ManageRequests = require('../../ui/components/manageRequests.jsx');
 Meteor.startup(() => {
   injectTapEventPlugin();
   ReactDOM.render((
-    <MuiThemeProvider>
+    <MuiThemeProvider muiTheme={getTheme()}>
       <Router history={hashHistory}>
         <Route path="/adminDashboard" component={AdminDashboardContainer} />
         <Route path="/dashboard" component={UserDashboardContainer} />
