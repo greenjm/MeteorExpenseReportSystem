@@ -7,9 +7,11 @@ import Paper from 'material-ui/Paper';
 import CircularProgress from 'material-ui/CircularProgress';
 import { hashHistory } from 'react-router';
 import TextField from 'material-ui/TextField';
+import SelectField from 'material-ui/SelectField';
 import RaisedButton from 'material-ui/RaisedButton';
 import IconButton from 'material-ui/IconButton';
 import FlatButton from 'material-ui/FlatButton';
+import MenuItem from 'material-ui/MenuItem';
 import Dialog from 'material-ui/Dialog';
 import ContentClear from 'material-ui/svg-icons/content/clear';
 import Header from '../components/header.jsx';
@@ -51,6 +53,7 @@ const RequestDetail = React.createClass({
       breadcrumbs: [],
       requestId: '',
       readDescription: '',
+      projectId: '',
       description: '',
       estCost: 0,
       readPartNo: '',
@@ -70,6 +73,9 @@ const RequestDetail = React.createClass({
       successfulSubmission: false,
       receiptDialogOpen: false,
       dialogError: '',
+      isManager: false,
+      project: {},
+      projects: [],
     };
   },
 
@@ -77,6 +83,7 @@ const RequestDetail = React.createClass({
     this.setState({
       breadcrumbs: this.props.breadcrumbs,
       requestId: this.props.requestId,
+      projectId: this.props.projectId,
       readDescription: this.props.description,
       description: this.props.description,
       estCost: this.props.estCost,
@@ -91,6 +98,10 @@ const RequestDetail = React.createClass({
       status: this.props.status,
       statMsg: this.props.statMsg,
       receipt: this.props.receipt,
+      project: this.props.project,
+      readProject: this.props.project,
+      projects: this.props.projects,
+      isManager: this.props.isManager,
     });
   },
 
@@ -110,6 +121,9 @@ const RequestDetail = React.createClass({
     const statusChange = this.state.status !== nextProps.status;
     const statMsgChange = this.state.statMsg !== nextProps.statMsg;
     const receiptChange = this.state.receipt !== nextProps.receipt;
+    const projectId = this.props.projectId !== nextProps.projectId;
+    const project = this.props.project !== nextProps.project;
+    const projects = this.props.projects !== nextProps.projects;
     this.setState({
       requestId: requestIdChange ? nextProps.requestId : this.state.requestId,
       readDescription: descChange ? nextProps.description : this.state.description,
@@ -126,6 +140,10 @@ const RequestDetail = React.createClass({
       status: statusChange ? nextProps.status : this.state.status,
       statMsg: statMsgChange ? nextProps.statMsg : this.state.statMsg,
       receipt: receiptChange ? nextProps.receipt : this.state.receipt,
+      projectId: projectId ? nextProps.projectId : this.props.projectId,
+      project: project ? nextProps.project : this.props.project,
+      readProject: project ? nextProps.project : this.props.project,
+      projects: projects ? nextProps.projects : this.props.projects,
       breadcrumbs: nextProps.breadcrumbs,
     });
   },
@@ -181,6 +199,7 @@ const RequestDetail = React.createClass({
       quantity: this.state.readQuantity,
       unitCost: this.state.readUnitCost,
       vendor: this.state.readVendor,
+      project: this.state.readProject,
     });
   },
 
@@ -189,8 +208,9 @@ const RequestDetail = React.createClass({
   },
 
   saveRequest() {
-    Meteor.call('requests.edit',
+    Meteor.call('requests.editWithProject',
       this.state.requestId,
+      this.state.project._id,
       this.state.description,
       this.state.estCost,
       this.state.vendor,
@@ -208,6 +228,17 @@ const RequestDetail = React.createClass({
           this.cancelEdit();
         }
       }
+    );
+    Meteor.call('notifications.createEditHelper', this.state.project.name,
+      this.state.project.managers,
+      this.state.requestId,
+      //   (error) => {
+      //     if (error != null) {
+      //       this.setState({ dialogError: `Error: ${error.error}. ${error.reason}` });
+      //       return;
+      //     }
+      //       return;
+      // }
     );
   },
 
@@ -252,6 +283,14 @@ const RequestDetail = React.createClass({
     } else {
       this.setState({ dialogError: 'No receipt object in React state' });
     }
+  },
+
+  createProjectItem(item) {
+    return (<MenuItem value={item._id} key={item._id} primaryText={item.name} />);
+  },
+
+  handleProjectChange(event, index) {
+    this.setState({ project: this.state.projects[index] });
   },
 
   render() {
@@ -319,7 +358,7 @@ const RequestDetail = React.createClass({
         <br />
         <br />
         <Grid>
-          {!this.state.status &&
+          {(!this.state.status && !this.state.isManager) &&
             <Row>
               <Col xs={12} sm={12} md={12} lg={12}>
                 <RaisedButton
@@ -341,6 +380,22 @@ const RequestDetail = React.createClass({
             <Col xs={12} sm={12} md={12} lg={12}>
               <Table>
                 <TableBody displayRowCheckbox={false}>
+                  <TableRow selectable={false}>
+                    <TableRowColumn>
+                      <label htmlFor="name">Project</label>
+                    </TableRowColumn>
+                    <TableRowColumn>
+                      <p style={this.state.readStyle} >{this.state.project.name}</p>
+                      <SelectField
+                        value={this.state.project._id}
+                        onChange={this.handleProjectChange}
+                        style={this.state.editStyle}
+                        hintText="Hint text"
+                      >
+                        {this.state.projects.map(this.createProjectItem)}
+                      </SelectField>
+                    </TableRowColumn>
+                  </TableRow>
                   <TableRow selectable={false}>
                     <TableRowColumn>
                       <label htmlFor="name">Description</label>

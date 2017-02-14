@@ -80,9 +80,6 @@ const ManageRequests = React.createClass({
   },
 
   removeItem(index) {
-    // const filteredRequests = this.state.requests.filter((requests, i) => {
-    //     i == index;
-    //   });
     const filteredRequests = [];
     for (let i = this.state.requests.length - 1; i >= 0; i -= 1) {
       if (i !== index) {
