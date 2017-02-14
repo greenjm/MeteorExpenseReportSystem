@@ -5,7 +5,7 @@ import { Factory } from 'meteor/dburles:factory';
 /* global Reports:true*/
 /* eslint no-undef: "error"*/
 
-Reports = new Mongo.Collection('reqports');
+Reports = new Mongo.Collection('reports');
 
 Reports.schema = new SimpleSchema({
   userId: { type: String, regEx: SimpleSchema.RegEx.Id },

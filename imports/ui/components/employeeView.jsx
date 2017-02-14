@@ -176,7 +176,7 @@ const EmployeeView = React.createClass({
     const approvedRequests = [];
     for (let x = 0; x < this.state.requests.length; x += 1) {
       if (this.state.requests[x].status) {
-        approvedRequests.push(this.state.requests[x]);
+        approvedRequests.push(this.state.requests[x]._id);
       }
     }
 

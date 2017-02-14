@@ -50,6 +50,8 @@ const RequestDetailContainer = createContainer(({ params }) => {
     quantity: request ? request.quantity : 0,
     unitCost: request ? request.unitCost : 0,
     vendor: request ? request.vendor : '',
+    dateRequired: request ? request.dateRequired : '',
+    intendedUsage: request ? request.intendedUsage : '',
     status: request ? request.status : null,
     statMsg: request ? request.statMsg : '',
     receipt,
