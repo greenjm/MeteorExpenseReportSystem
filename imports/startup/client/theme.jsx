@@ -1,8 +1,8 @@
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import {
   grey900, grey500,
-  grey100, grey300, grey200,
-  white, darkBlack, fullBlack,
+  grey100, grey300, grey200, red500,
+  white, darkBlack, fullBlack, transparent,
 } from 'material-ui/styles/colors';
 import { darken, fade } from 'material-ui/utils/colorManipulator';
 import typography from 'material-ui/styles/typography';
@@ -41,6 +41,26 @@ export default function getTheme() {
       disabledTextColor: fade(palette.textColor, 0.3),
       fontSize: typography.fontStyleButtonFontSize,
       fontWeight: typography.fontWeightMedium,
+    },
+    flatButton: {
+      color: transparent,
+      buttonFilterColor: '#999999',
+      disabledTextColor: fade(palette.textColor, 0.3),
+      textColor: palette.textColor,
+      primaryTextColor: palette.textColor,
+      secondaryTextColor: palette.accent1Color,
+      fontSize: typography.fontStyleButtonFontSize,
+      fontWeight: typography.fontWeightMedium,
+    },
+    textField: {
+      textColor: palette.textColor,
+      hintColor: palette.disabledColor,
+      floatingLabelColor: palette.disabledColor,
+      disabledTextColor: palette.disabledColor,
+      errorColor: red500,
+      focusColor: palette.primary2Color,
+      backgroundColor: 'transparent',
+      borderColor: palette.borderColor,
     },
   });
 }

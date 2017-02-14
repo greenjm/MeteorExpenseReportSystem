@@ -129,6 +129,15 @@ Meteor.methods({
     return result.nModified === 1;
   },
 
+  'requests.submission': function submitReq(reqId) {
+    check(reqId, String);
+
+    const result = Requests.update({ _id: reqId },
+      { $set: { submitted: true } });
+
+    return result.nModified === 1;
+  },
+
   'requests.delete': function deleteReq(reqId) {
     check(reqId, String);
     const result = Requests.remove({ _id: reqId });
