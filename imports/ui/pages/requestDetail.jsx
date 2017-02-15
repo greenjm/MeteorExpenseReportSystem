@@ -51,6 +51,7 @@ const RequestDetail = React.createClass({
   getInitialState() {
     return {
       breadcrumbs: [],
+      requestOwner: '',
       requestId: '',
       readDescription: '',
       projectId: '',
@@ -80,12 +81,15 @@ const RequestDetail = React.createClass({
       readIntendedUsage: '',
       project: {},
       projects: [],
+      requestDialogOpen: false,
+      requestOwned: false,
     };
   },
 
   componentWillMount() {
     this.setState({
       breadcrumbs: this.props.breadcrumbs,
+      requestOwner: this.props.requestOwner,
       requestId: this.props.requestId,
       projectId: this.props.projectId,
       readDescription: this.props.description,
@@ -110,16 +114,20 @@ const RequestDetail = React.createClass({
       intendedUsage: this.props.intendedUsage,
       readIntendedUsage: this.props.intendedUsage,
       isManager: this.props.isManager,
+      requestOwned: this.props.requestOwned,
     });
   },
 
   componentWillReceiveProps(nextProps) {
     if (!nextProps.user ||
-        (nextProps.requestReady && !nextProps.requestOwned && !nextProps.isAdmin)) {
+        (nextProps.requestReady && !nextProps.requestOwned &&
+          !nextProps.isAdmin && !nextProps.isManager)) {
       hashHistory.push('/');
     }
 
+    const reqOwnerChange = this.state.requestOwner !== nextProps.requestOwner;
     const requestIdChange = this.state.requestId !== nextProps.requestId;
+    const reqOwnedChange = this.state.requestOwned !== nextProps.requestOwned;
     const descChange = this.state.description !== nextProps.description;
     const estCostChange = this.state.estCost !== nextProps.estCost;
     const partNoChange = this.state.partNo !== nextProps.partNo;
@@ -135,7 +143,9 @@ const RequestDetail = React.createClass({
     const project = this.props.project !== nextProps.project;
     const projects = this.props.projects !== nextProps.projects;
     this.setState({
+      requestOwner: reqOwnerChange ? nextProps.requestOwner : this.state.requestOwner,
       requestId: requestIdChange ? nextProps.requestId : this.state.requestId,
+      requestOwned: reqOwnedChange ? nextProps.requestOwned : this.state.requestOwned,
       readDescription: descChange ? nextProps.description : this.state.description,
       description: descChange ? nextProps.description : this.state.description,
       estCost: estCostChange ? nextProps.estCost : this.state.estCost,
@@ -319,6 +329,48 @@ const RequestDetail = React.createClass({
     this.setState({ project: this.state.projects[index] });
   },
 
+  serveRequest(approved, message) {
+    Meteor.call('requests.statEdit', this.state.requestId, approved, message, (err) => {
+      if (err) {
+        console.log(err);
+      }
+    });
+    Meteor.call('notifications.respondHelper', approved,
+      this.state.requestId,
+      this.state.requestOwner,
+      // (error) => {
+      //   if (error != null) {
+      //     this.setState({ dialogError: `Error: ${error.error}. ${error.reason}` });
+      //     return;
+      //   }
+      //   return;
+      // }
+    );
+  },
+
+  handleConfirmPress() {
+    this.serveRequest(true, '');
+  },
+
+  handleDenyPress() {
+    this.setState({
+      requestDialogOpen: true,
+    });
+  },
+
+  denyRequest() {
+    this.serveRequest(false, this.state.statMsg);
+    this.setState({
+      statMsg: '',
+      requestDialogOpen: false,
+    });
+    this.goBack();
+  },
+
+  denialChange(e) {
+    this.setState({ statMsg: e.target.value });
+  },
+
   render() {
     const receiptDialogActions = [
       <FlatButton
@@ -330,6 +382,19 @@ const RequestDetail = React.createClass({
         label="Confirm"
         primary
         onTouchTap={this.deleteReceipt}
+      />,
+    ];
+
+    const requestDialogActions = [
+      <FlatButton
+        label="Confirm"
+        primary
+        onTouchTap={this.denyRequest}
+      />,
+      <FlatButton
+        label="Cancel"
+        primary
+        onTouchTap={this.handleCancelPress}
       />,
     ];
 
@@ -367,6 +432,41 @@ const RequestDetail = React.createClass({
       );
     }
 
+    let requestEditButtons = null;
+    console.log(!this.state.status);
+    console.log(this.state.requestOwned);
+    if (!this.state.status && this.state.requestOwned) {
+      requestEditButtons = (<Col xs={12} sm={12} md={12} lg={12}>
+        <RaisedButton
+          label="Edit"
+          primary
+          onClick={this.editRequest}
+          style={{ float: 'right' }}
+        />
+        <RaisedButton
+          label="Cancel"
+          primary
+          onClick={this.goBack}
+          style={{ float: 'right', marginRight: '6px' }}
+        />
+      </Col>);
+    } else if (!this.state.status && !this.state.requestOwned) {
+      requestEditButtons = (<Col xs={12} sm={12} md={12} lg={12}>
+        <RaisedButton
+          label="Deny"
+          primary
+          onClick={this.handleDenyPress}
+          style={{ float: 'right' }}
+        />
+        <RaisedButton
+          label="Approve"
+          primary
+          onClick={this.handleConfirmPress}
+          style={{ float: 'right', marginRight: '6px' }}
+        />
+      </Col>);
+    }
+
     let statusValue = '';
     if (this.state.status) {
       statusValue = 'Approved';
@@ -385,25 +485,9 @@ const RequestDetail = React.createClass({
         <br />
         <br />
         <Grid>
-          {(!this.state.status && !this.state.isManager) &&
-            <Row>
-              <Col xs={12} sm={12} md={12} lg={12}>
-                <RaisedButton
-                  label="Edit"
-                  primary
-                  onClick={this.editRequest}
-                  style={{ float: 'right' }}
-                />
-                <RaisedButton
-                  label="Cancel"
-                  primary
-                  onClick={this.goBack}
-                  style={{ float: 'right', marginRight: '6px' }}
-                />
-              </Col>
-            </Row>
-          }
-          { }
+          <Row>
+            {requestEditButtons}
+          </Row>
           <br />
           <Row>
             <Col xs={12} sm={12} md={12} lg={12}>
@@ -620,6 +704,22 @@ const RequestDetail = React.createClass({
           <p>Are you sure you want to remove this receipt?</p>
           <div style={{ color: 'red' }}>{this.state.dialogError}</div>
         </Dialog>
+        <div>
+          <Dialog
+            title="Respond to request"
+            actions={requestDialogActions}
+            modal={false}
+            open={this.state.requestDialogOpen}
+          >
+            <TextField
+              name="denialText"
+              hintText="Reasons for denial"
+              floatingLabelText="Denial Message"
+              onChange={this.denialChange}
+              fullWidth
+            />
+          </Dialog>
+        </div>
       </div>
     );
   },

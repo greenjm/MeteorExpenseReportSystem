@@ -54,6 +54,7 @@ const RequestDetailContainer = createContainer(({ params }) => {
     intendedUsage: request ? request.intendedUsage : '',
     status: request ? request.status : null,
     statMsg: request ? request.statMsg : '',
+    requestOwner: request ? request.userId : '',
     receipt,
     requestOwned,
     isManager,
