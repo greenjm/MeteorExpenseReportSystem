@@ -121,7 +121,7 @@ const RequestDetail = React.createClass({
   componentWillReceiveProps(nextProps) {
     if (!nextProps.user ||
         (nextProps.requestReady && !nextProps.requestOwned &&
-          !nextProps.isAdmin && !nextProps.isManager)) {
+          !nextProps.isAdmin && (nextProps.projectReady && !nextProps.isManager))) {
       hashHistory.push('/');
     }
 
