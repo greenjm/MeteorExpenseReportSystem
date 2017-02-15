@@ -6,7 +6,7 @@ import './requests.js';
 /* eslint no-undef: "error"*/
 
 Meteor.methods({
-  'requests.create': function createRequest(proj, desc, est, vend, prt, qty, unt, projType, date, indUsage) {
+  'requests.create': function createRequest(proj, desc, est, vend, prt, qty, unt, date, indUsage) {
     const currentUserId = Meteor.userId();
     check(proj, String);
     check(desc, String);
@@ -15,22 +15,23 @@ Meteor.methods({
     check(prt, String);
     check(qty, Number);
     check(unt, Number);
-    check(projType, String);
+    // check(projType, String);
     check(date, String);
     check(indUsage, String);
 
     const newReq = {
       userId: currentUserId,
       projectId: proj,
+      bornOn: new Date(),
       vendor: vend,
       description: desc,
       partNo: prt,
       quantity: qty,
       unitCost: unt,
       estCost: est,
-      project: projType,
       dateRequired: date,
       intendedUsage: indUsage,
+      submitted: false,
     };
 
     Requests.schema.validate(newReq);
@@ -38,12 +39,14 @@ Meteor.methods({
     return result;
   },
 
-  'requests.edit': function editRequest(id, desc, est, vend, prt, qty, unt) {
+  'requests.edit': function editRequest(id, desc, est, vend, prt, dateReq, intUse, qty, unt) {
     check(id, String);
     check(desc, String);
     check(est, Number);
     check(vend, String);
     check(prt, String);
+    check(dateReq, String);
+    check(intUse, String);
     check(qty, Number);
     check(unt, Number);
 
@@ -64,6 +67,8 @@ Meteor.methods({
         estCost: est,
         vendor: vend,
         partNo: prt,
+        dateRequired: dateReq,
+        intendedUsage: intUse,
         quantity: qty,
         unitCost: unt,
       },
@@ -72,13 +77,15 @@ Meteor.methods({
     return result.nModified === 1;
   },
 
-  'requests.editWithProject': function editRequestProj(id, projId, desc, est, vend, prt, qty, unt) {
+  'requests.editWithProject': function editRequestProj(id, projId, desc, est, vend, prt, dateReq, intUse, qty, unt) {
     check(id, String);
     check(projId, String);
     check(desc, String);
     check(est, Number);
     check(vend, String);
     check(prt, String);
+    check(dateReq, String);
+    check(intUse, String);
     check(qty, Number);
     check(unt, Number);
 
@@ -100,6 +107,8 @@ Meteor.methods({
         estCost: est,
         vendor: vend,
         partNo: prt,
+        dateRequired: dateReq,
+        intendedUsage: intUse,
         quantity: qty,
         unitCost: unt,
         status: null,
@@ -116,6 +125,15 @@ Meteor.methods({
 
     const result = Requests.update({ _id: reqId },
         { $set: { status: stat, statMsg: msg } });
+
+    return result.nModified === 1;
+  },
+
+  'requests.submission': function submitReq(reqId) {
+    check(reqId, String);
+
+    const result = Requests.update({ _id: reqId },
+      { $set: { submitted: true } });
 
     return result.nModified === 1;
   },

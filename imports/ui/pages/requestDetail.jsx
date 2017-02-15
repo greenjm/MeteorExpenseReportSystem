@@ -51,6 +51,7 @@ const RequestDetail = React.createClass({
   getInitialState() {
     return {
       breadcrumbs: [],
+      requestOwner: '',
       requestId: '',
       readDescription: '',
       projectId: '',
@@ -74,14 +75,21 @@ const RequestDetail = React.createClass({
       receiptDialogOpen: false,
       dialogError: '',
       isManager: false,
+      dateRequired: '',
+      readDateRequired: '',
+      intendedUsage: '',
+      readIntendedUsage: '',
       project: {},
       projects: [],
+      requestDialogOpen: false,
+      requestOwned: false,
     };
   },
 
   componentWillMount() {
     this.setState({
       breadcrumbs: this.props.breadcrumbs,
+      requestOwner: this.props.requestOwner,
       requestId: this.props.requestId,
       projectId: this.props.projectId,
       readDescription: this.props.description,
@@ -101,17 +109,25 @@ const RequestDetail = React.createClass({
       project: this.props.project,
       readProject: this.props.project,
       projects: this.props.projects,
+      dateRequired: this.props.dateRequired,
+      readDateRequired: this.props.dateRequired,
+      intendedUsage: this.props.intendedUsage,
+      readIntendedUsage: this.props.intendedUsage,
       isManager: this.props.isManager,
+      requestOwned: this.props.requestOwned,
     });
   },
 
   componentWillReceiveProps(nextProps) {
     if (!nextProps.user ||
-        (nextProps.requestReady && !nextProps.requestOwned && !nextProps.isAdmin)) {
+        (nextProps.requestReady && !nextProps.requestOwned &&
+          !nextProps.isAdmin && (nextProps.projectReady && !nextProps.isManager))) {
       hashHistory.push('/');
     }
 
+    const reqOwnerChange = this.state.requestOwner !== nextProps.requestOwner;
     const requestIdChange = this.state.requestId !== nextProps.requestId;
+    const reqOwnedChange = this.state.requestOwned !== nextProps.requestOwned;
     const descChange = this.state.description !== nextProps.description;
     const estCostChange = this.state.estCost !== nextProps.estCost;
     const partNoChange = this.state.partNo !== nextProps.partNo;
@@ -121,11 +137,15 @@ const RequestDetail = React.createClass({
     const statusChange = this.state.status !== nextProps.status;
     const statMsgChange = this.state.statMsg !== nextProps.statMsg;
     const receiptChange = this.state.receipt !== nextProps.receipt;
+    const dateRequired = this.state.dateRequired !== nextProps.dateRequired;
+    const intendedUsage = this.state.intendedUsage !== nextProps.intendedUsage;
     const projectId = this.props.projectId !== nextProps.projectId;
     const project = this.props.project !== nextProps.project;
     const projects = this.props.projects !== nextProps.projects;
     this.setState({
+      requestOwner: reqOwnerChange ? nextProps.requestOwner : this.state.requestOwner,
       requestId: requestIdChange ? nextProps.requestId : this.state.requestId,
+      requestOwned: reqOwnedChange ? nextProps.requestOwned : this.state.requestOwned,
       readDescription: descChange ? nextProps.description : this.state.description,
       description: descChange ? nextProps.description : this.state.description,
       estCost: estCostChange ? nextProps.estCost : this.state.estCost,
@@ -140,6 +160,10 @@ const RequestDetail = React.createClass({
       status: statusChange ? nextProps.status : this.state.status,
       statMsg: statMsgChange ? nextProps.statMsg : this.state.statMsg,
       receipt: receiptChange ? nextProps.receipt : this.state.receipt,
+      dateRequired: dateRequired ? nextProps.dateRequired : this.state.dateRequired,
+      readDateRequired: dateRequired ? nextProps.dateRequired : this.state.dateRequired,
+      intendedUsage: intendedUsage ? nextProps.intendedUsage : this.state.intendedUsage,
+      readIntendedUsage: intendedUsage ? nextProps.intendedUsage : this.state.intendedUsage,
       projectId: projectId ? nextProps.projectId : this.props.projectId,
       project: project ? nextProps.project : this.props.project,
       readProject: project ? nextProps.project : this.props.project,
@@ -185,6 +209,14 @@ const RequestDetail = React.createClass({
     this.setState({ vendor: e.target.value });
   },
 
+  changeDateRequired(e) {
+    this.setState({ dateRequired: e.target.value });
+  },
+
+  changeIntendedUse(e) {
+    this.setState({ intendedUsage: e.target.value });
+  },
+
   editRequest() {
     this.setState({ readStyle: { display: 'none' }, editStyle: {} });
   },
@@ -200,6 +232,8 @@ const RequestDetail = React.createClass({
       unitCost: this.state.readUnitCost,
       vendor: this.state.readVendor,
       project: this.state.readProject,
+      dateRequired: this.props.readDateRequired,
+      intendedUsage: this.props.readIntendedUsage,
     });
   },
 
@@ -215,6 +249,8 @@ const RequestDetail = React.createClass({
       this.state.estCost,
       this.state.vendor,
       this.state.partNo,
+      this.state.dateRequired,
+      this.state.intendedUsage,
       +this.state.quantity,
       +this.state.unitCost,
       (err) => {
@@ -293,6 +329,56 @@ const RequestDetail = React.createClass({
     this.setState({ project: this.state.projects[index] });
   },
 
+  serveRequest(approved, message) {
+    Meteor.call('requests.statEdit', this.state.requestId, approved, message, (err) => {
+      if (err) {
+        console.log(err);
+      }
+    });
+    Meteor.call('notifications.respondHelper', approved,
+      this.state.requestId,
+      this.state.requestOwner,
+      // (error) => {
+      //   if (error != null) {
+      //     this.setState({ dialogError: `Error: ${error.error}. ${error.reason}` });
+      //     return;
+      //   }
+      //   return;
+      // }
+    );
+  },
+
+  handleConfirmPress() {
+    this.serveRequest(true, '');
+    this.goBack();
+  },
+
+  handleDenyPress() {
+    this.setState({
+      requestDialogOpen: true,
+    });
+  },
+
+  denyRequest() {
+    this.serveRequest(false, this.state.statMsg);
+    this.setState({
+      statMsg: '',
+      requestDialogOpen: false,
+    });
+    this.goBack();
+  },
+
+  denialChange(e) {
+    this.setState({ statMsg: e.target.value });
+  },
+
+  handleCancelPress() {
+    this.setState({
+      requestDialogOpen: false,
+      statMsg: '',
+    });
+  },
+
   render() {
     const receiptDialogActions = [
       <FlatButton
@@ -307,6 +393,19 @@ const RequestDetail = React.createClass({
       />,
     ];
 
+    const requestDialogActions = [
+      <FlatButton
+        label="Confirm"
+        primary
+        onTouchTap={this.denyRequest}
+      />,
+      <FlatButton
+        label="Cancel"
+        primary
+        onTouchTap={this.handleCancelPress}
+      />,
+    ];
+
     let receiptRightColumn = null;
     if (this.state.isUploading) {
       receiptRightColumn = (
@@ -318,6 +417,7 @@ const RequestDetail = React.createClass({
           label="Upload Receipt"
           labelPosition="before"
           containerElement="label"
+          primary
         >
           <input type="file" onChange={this.uploadReceipt} style={fileInputStyle} />
         </RaisedButton>
@@ -340,6 +440,39 @@ const RequestDetail = React.createClass({
       );
     }
 
+    let requestEditButtons = null;
+    if (!this.state.status && this.state.requestOwned) {
+      requestEditButtons = (<Col xs={12} sm={12} md={12} lg={12}>
+        <RaisedButton
+          label="Edit"
+          primary
+          onClick={this.editRequest}
+          style={{ float: 'right' }}
+        />
+        <RaisedButton
+          label="Cancel"
+          primary
+          onClick={this.goBack}
+          style={{ float: 'right', marginRight: '6px' }}
+        />
+      </Col>);
+    } else if (!this.state.status && !this.state.requestOwned) {
+      requestEditButtons = (<Col xs={12} sm={12} md={12} lg={12}>
+        <RaisedButton
+          label="Deny"
+          primary
+          onClick={this.handleDenyPress}
+          style={{ float: 'right' }}
+        />
+        <RaisedButton
+          label="Approve"
+          primary
+          onClick={this.handleConfirmPress}
+          style={{ float: 'right', marginRight: '6px' }}
+        />
+      </Col>);
+    }
+
     let statusValue = '';
     if (this.state.status) {
       statusValue = 'Approved';
@@ -358,23 +491,9 @@ const RequestDetail = React.createClass({
         <br />
         <br />
         <Grid>
-          {(!this.state.status && !this.state.isManager) &&
-            <Row>
-              <Col xs={12} sm={12} md={12} lg={12}>
-                <RaisedButton
-                  label="Edit"
-                  primary
-                  onClick={this.editRequest}
-                  style={{ float: 'right' }}
-                />
-                <RaisedButton
-                  label="Cancel"
-                  onClick={this.goBack}
-                  style={{ float: 'right', marginRight: '6px' }}
-                />
-              </Col>
-            </Row>
-          }
+          <Row>
+            {requestEditButtons}
+          </Row>
           <br />
           <Row>
             <Col xs={12} sm={12} md={12} lg={12}>
@@ -488,6 +607,36 @@ const RequestDetail = React.createClass({
                   </TableRow>
                   <TableRow selectable={false}>
                     <TableRowColumn>
+                      <label htmlFor="name">Date Required</label>
+                    </TableRowColumn>
+                    <TableRowColumn>
+                      <p style={this.state.readStyle} >{this.state.readDateRequired}</p>
+                      <TextField
+                        hintText="Vendor"
+                        value={this.state.dateRequired}
+                        fullWidth
+                        onChange={this.changeDateRequired}
+                        style={this.state.editStyle}
+                      />
+                    </TableRowColumn>
+                  </TableRow>
+                  <TableRow selectable={false}>
+                    <TableRowColumn>
+                      <label htmlFor="name">Intended Usage</label>
+                    </TableRowColumn>
+                    <TableRowColumn>
+                      <p style={this.state.readStyle} >{this.state.readIntendedUsage}</p>
+                      <TextField
+                        hintText="Vendor"
+                        value={this.state.intendedUsage}
+                        fullWidth
+                        onChange={this.changeIntendedUse}
+                        style={this.state.editStyle}
+                      />
+                    </TableRowColumn>
+                  </TableRow>
+                  <TableRow selectable={false}>
+                    <TableRowColumn>
                       <label htmlFor="name">Status</label>
                     </TableRowColumn>
                     <TableRowColumn>
@@ -561,6 +710,22 @@ const RequestDetail = React.createClass({
           <p>Are you sure you want to remove this receipt?</p>
           <div style={{ color: 'red' }}>{this.state.dialogError}</div>
         </Dialog>
+        <div>
+          <Dialog
+            title="Respond to request"
+            actions={requestDialogActions}
+            modal={false}
+            open={this.state.requestDialogOpen}
+          >
+            <TextField
+              name="denialText"
+              hintText="Reasons for denial"
+              floatingLabelText="Denial Message"
+              onChange={this.denialChange}
+              fullWidth
+            />
+          </Dialog>
+        </div>
       </div>
     );
   },

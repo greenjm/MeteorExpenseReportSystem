@@ -23,7 +23,7 @@ Meteor.methods({
   @param year {Number} year submitted
   @return {Boolean} true if successfully added
   */
-  'reports.create': function newUser(reqs, month, year) {
+  'reports.create': function createReport(reqs, month, year) {
     check(reqs, Array);
     check(month, Number);
     check(year, Number);

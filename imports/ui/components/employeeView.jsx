@@ -2,7 +2,6 @@ import { Meteor } from 'meteor/meteor';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
   from 'material-ui/Table';
 import { Tabs, Tab } from 'material-ui/Tabs';
-import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import { hashHistory } from 'react-router';
 
@@ -92,7 +91,7 @@ const EmployeeView = React.createClass({
     }
 
     return (
-      <TableRow onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}>
+      <TableRow>
         <TableRowColumn style={{ width: '5%', textAlign: 'left', wordWrap: 'break-word' }}>{index}</TableRowColumn>
         <TableRowColumn style={{ width: '8%', textAlign: 'left', wordWrap: 'break-word' }}>{projectName}</TableRowColumn>
         <TableRowColumn style={{ width: '15%', textAlign: 'left', wordWrap: 'break-word' }}>{item.vendor}</TableRowColumn>
@@ -176,8 +175,12 @@ const EmployeeView = React.createClass({
     const approvedRequests = [];
     for (let x = 0; x < this.state.requests.length; x += 1) {
       if (this.state.requests[x].status) {
-        approvedRequests.push(this.state.requests[x]);
+        approvedRequests.push(this.state.requests[x]._id);
       }
+    }
+
+    if (approvedRequests.length === 0) {
+      return;
     }
 
     const today = new Date();
@@ -212,10 +215,10 @@ const EmployeeView = React.createClass({
                 {this.state.projects.length > 0 ?
                   this.state.projects.map(this.createProjectRow) :
                   (
-                    <TableRow selectable={false}>
-                      <TableRowColumn>You do not belong to any projects.</TableRowColumn>
-                      <TableRowColumn />
-                    </TableRow>
+                  <TableRow selectable={false}>
+                    <TableRowColumn>You do not belong to any projects.</TableRowColumn>
+                    <TableRowColumn />
+                  </TableRow>
                   )
                 }
               </TableBody>
@@ -279,20 +282,20 @@ const EmployeeView = React.createClass({
                 {this.state.requests.length > 0 ?
                   this.state.requests.map(this.createReportRow) :
                   (
-                    <TableRow selectable={false}>
-                      <TableRowColumn>You have not submitted any requests yet.</TableRowColumn>
-                      <TableRowColumn />
-                    </TableRow>
+                  <TableRow selectable={false}>
+                    <TableRowColumn>You have not submitted any requests yet.</TableRowColumn>
+                    <TableRowColumn />
+                  </TableRow>
                   )
                 }
-                <FlatButton
-                  label="Submit Monthly Report"
-                  primary
-                  onTouchTap={this.submitReport}
-                  disabled={this.state.requests > 0}
-                />
               </TableBody>
             </Table>
+            <RaisedButton
+              label="Submit Monthly Report"
+              primary
+              style={{ float: 'right', margin: '10px' }}
+              onTouchTap={this.submitReport}
+            />
           </Tab>
         </Tabs>
       </div>

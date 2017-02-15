@@ -17,7 +17,7 @@ import MenuItem from 'material-ui/MenuItem';
 import '../../api/projects/projects.js';
 import Header from '../components/header.jsx';
 
-/* global Projects:true*/
+/* global Projects localStorage:true*/
 /* eslint no-undef: "error"*/
 
 const React = require('react');
@@ -71,6 +71,7 @@ const AdminDashboard = React.createClass({
       employeeError: '',
       userFilter: null,
       projectFilter: null,
+      startingTab: +localStorage.getItem('adminTab') || 0,
     };
   },
 
@@ -96,6 +97,10 @@ const AdminDashboard = React.createClass({
       projectFilter: nextProps.projectFilter,
       breadcrumbs: nextProps.breadcrumbs,
     });
+  },
+
+  updateTab(tab) {
+    localStorage.setItem('adminTab', +tab.props.index);
   },
 
   createBreadcrumb(item) {
@@ -327,12 +332,12 @@ const AdminDashboard = React.createClass({
     const url = `/#/report/${item._id}`;
     return (
       <TableRow key={item._id} selectable={false}>
-        <TableRowColumn>{item.month}</TableRowColumn>
-        <TableRowColumn>{item.year}</TableRowColumn>
-        <TableRowColumn>{item.approvedRequests.length}</TableRowColumn>
+        <TableRowColumn style={{ width: '20%', textAlign: 'left' }}>{item.month + 1}</TableRowColumn>
+        <TableRowColumn style={{ width: '20%', textAlign: 'left' }}>{item.year}</TableRowColumn>
+        <TableRowColumn style={{ width: '20%', textAlign: 'left' }}>{item.approvedRequests.length}</TableRowColumn>
         <TableRowColumn style={actionsColStyle}>
           <a href={url}>
-            <RaisedButton label="View Report (TODO)" primary />
+            <RaisedButton label="View Report" primary />
           </a>
         </TableRowColumn>
       </TableRow>);
@@ -387,8 +392,8 @@ const AdminDashboard = React.createClass({
         </Paper>
         <br />
         <br />
-        <Tabs>
-          <Tab index={0} label="Users" >
+        <Tabs initialSelectedIndex={this.state.startingTab}>
+          <Tab index={0} label="Users" onActive={this.updateTab}>
             <Table selectable={false}>
               <TableHeader displaySelectAll={false}>
                 <TableRow selectable={false}>
@@ -420,7 +425,7 @@ const AdminDashboard = React.createClass({
               </TableBody>
             </Table>
           </Tab>
-          <Tab index={1} label="Projects" >
+          <Tab index={1} label="Projects" onActive={this.updateTab}>
             <div>
               <Table selectable={false}>
                 <TableHeader displaySelectAll={false}>
@@ -462,17 +467,16 @@ const AdminDashboard = React.createClass({
           <Tab
             index={2}
             label="Monthly Expense Reports"
+            onActive={this.updateTab}
           >
             <Table selectable={false}>
-              <TableHeader displaySelectAll={false}>
-                <TableRow selectable={false}>
-                  <TableHeaderColumn>Month</TableHeaderColumn>
-                  <TableHeaderColumn>Year</TableHeaderColumn>
-                  <TableHeaderColumn># of Requests</TableHeaderColumn>
-                  <TableHeaderColumn>Actions</TableHeaderColumn>
-                </TableRow>
-              </TableHeader>
               <TableBody displayRowCheckbox={false}>
+                <TableRow selectable={false} style={{ color: 'rgb(158, 158, 158)' }}>
+                  <TableRowColumn style={{ width: '20%', textAlign: 'left', fontSize: '12px' }}>Month</TableRowColumn>
+                  <TableRowColumn style={{ width: '20%', textAlign: 'left', fontSize: '12px' }}>Year</TableRowColumn>
+                  <TableRowColumn style={{ width: '20%', textAlign: 'left', fontSize: '12px' }}># of Requests</TableRowColumn>
+                  <TableRowColumn style={{ width: '20%', textAlign: 'left', fontSize: '12px' }}>Actions</TableRowColumn>
+                </TableRow>
                 {this.state.reports.length > 0 ?
                   this.state.reports.map(this.createReportRow) :
                   (

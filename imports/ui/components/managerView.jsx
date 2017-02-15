@@ -120,17 +120,13 @@ const ManagerView = React.createClass({
 
     return (
       <TableRow key={index} selectable={false}>
-        <TableRowColumn style={{ width: '5%', textAlign: 'left' }}>{index}</TableRowColumn>
         <TableRowColumn style={{ width: '8%', textAlign: 'left' }}>{projectName}</TableRowColumn>
         <TableRowColumn style={{ width: '15%', textAlign: 'left' }}>{item.vendor}</TableRowColumn>
         <TableRowColumn style={{ width: '15%', textAlign: 'left' }}>{item.description}</TableRowColumn>
-        <TableRowColumn style={{ width: '5%', textAlign: 'left' }}>{item.partNo}</TableRowColumn>
-        <TableRowColumn style={{ width: '5%', textAlign: 'left' }}>{item.quantity}</TableRowColumn>
-        <TableRowColumn style={{ width: '5%', textAlign: 'left' }}>{item.unitCost}</TableRowColumn>
-        <TableRowColumn style={{ width: '5%', textAlign: 'left' }}>{item.estCost}</TableRowColumn>
-        <TableRowColumn style={{ width: '8%', textAlign: 'left' }}>"Project"</TableRowColumn>
-        <TableRowColumn style={{ width: '8%', textAlign: 'left' }}>"Date Required"</TableRowColumn>
-        <TableRowColumn style={{ width: '10%', textAlign: 'left' }}>"Intended Usage"</TableRowColumn>
+        <TableRowColumn style={{ width: '3%', textAlign: 'left' }}>{item.quantity}</TableRowColumn>
+        <TableRowColumn style={{ width: '3%', textAlign: 'left' }}>{item.estCost}</TableRowColumn>
+        <TableRowColumn style={{ width: '8%', textAlign: 'left' }}>{item.dateRequired}</TableRowColumn>
+        <TableRowColumn style={{ width: '10%', textAlign: 'left' }}>{item.intendedUsage}</TableRowColumn>
         <TableRowColumn>
           <RaisedButton
             label="Approve"
@@ -184,10 +180,10 @@ const ManagerView = React.createClass({
                   {this.state.projects.length > 0 ?
                     this.state.projects.map(this.createProjectRow) :
                     (
-                      <TableRow selectable={false}>
-                        <TableRowColumn>You do not belong to any projects.</TableRowColumn>
-                        <TableRowColumn />
-                      </TableRow>
+                    <TableRow selectable={false}>
+                      <TableRowColumn>You do not belong to any projects.</TableRowColumn>
+                      <TableRowColumn />
+                    </TableRow>
                     )
                   }
                 </TableBody>
@@ -197,27 +193,23 @@ const ManagerView = React.createClass({
               <Table selectable={false}>
                 <TableBody displayRowCheckbox={false}>
                   <TableRow selectable={false} style={{ color: 'rgb(158, 158, 158)' }}>
-                    <TableRowColumn style={{ width: '5%', textAlign: 'left', fontSize: '12px' }}>Item</TableRowColumn>
                     <TableRowColumn style={{ width: '8%', textAlign: 'left', fontSize: '12px' }}>Project Name</TableRowColumn>
                     <TableRowColumn style={{ width: '15%', textAlign: 'left', fontSize: '12px' }}>
                       Vendor Name, Address, Phone Number, & Website
                     </TableRowColumn>
                     <TableRowColumn style={{ width: '15%', textAlign: 'left', fontSize: '12px' }}>Item Description</TableRowColumn>
-                    <TableRowColumn style={{ width: '5%', textAlign: 'left', fontSize: '12px' }}>Part Number</TableRowColumn>
-                    <TableRowColumn style={{ width: '5%', textAlign: 'left', fontSize: '12px' }}>Quantity</TableRowColumn>
-                    <TableRowColumn style={{ width: '5%', textAlign: 'left', fontSize: '12px' }}>Unit Cost</TableRowColumn>
-                    <TableRowColumn style={{ width: '5%', textAlign: 'left', fontSize: '12px' }}>Total Cost</TableRowColumn>
-                    <TableRowColumn style={{ width: '8%', textAlign: 'left', fontSize: '12px' }}>Project</TableRowColumn>
+                    <TableRowColumn style={{ width: '3%', textAlign: 'left', fontSize: '12px' }}>Quantity</TableRowColumn>
+                    <TableRowColumn style={{ width: '3%', textAlign: 'left', fontSize: '12px' }}>Total Cost</TableRowColumn>
                     <TableRowColumn style={{ width: '8%', textAlign: 'left', fontSize: '12px' }}>Date Required</TableRowColumn>
                     <TableRowColumn style={{ width: '10%', textAlign: 'left', fontSize: '12px' }}>Intended Program Usage</TableRowColumn>
                   </TableRow>
                   {this.state.requests.length > 0 ?
                     this.state.requests.map(this.createRequestRow) :
                     (
-                      <TableRow selectable={false}>
-                        <TableRowColumn>No requests require your attention.</TableRowColumn>
-                        <TableRowColumn />
-                      </TableRow>
+                    <TableRow selectable={false}>
+                      <TableRowColumn>No requests require your attention.</TableRowColumn>
+                      <TableRowColumn />
+                    </TableRow>
                     )
                   }
                 </TableBody>
