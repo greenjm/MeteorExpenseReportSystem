@@ -5,6 +5,9 @@ import Header from '../components/header.jsx';
 import ManagerView from '../components/managerView.jsx';
 import EmployeeView from '../components/employeeView.jsx';
 
+/* global localStorage:true*/
+/* eslint no-undef: "error"*/
+
 const React = require('react');
 
 // Styles
@@ -40,9 +43,9 @@ const UserDashboard = React.createClass({
       users: [],
       isManager: false,
       isEmployee: false,
-      viewToggle: false,
-      currentEmployeeTab: 0,
-      currentManagerTab: 0,
+      viewToggle: localStorage.getItem('viewToggle') || false,
+      currentEmployeeTab: localStorage.getItem('currentEmployeeTab') || 0,
+      currentManagerTab: localStorage.getItem('currentManagerTab') || 0,
     };
   },
 
@@ -101,14 +104,17 @@ const UserDashboard = React.createClass({
   // Helpers
   toggleView() {
     this.setState({ viewToggle: !this.state.viewToggle });
+    localStorage.setItem('viewToggle', this.state.viewToggle);
   },
 
   updateEmployeeTab(tab) {
     this.setState({ currentEmployeeTab: +tab.props.index });
+    localStorage.setItem('currentEmployeeTab', this.state.currentEmployeeTab);
   },
 
   updateManagerTab(tab) {
     this.setState({ currentManagerTab: +tab.props.index });
+    localStorage.setItem('currentManagerTab', this.state.currentManagerTab);
   },
 
   // Links
