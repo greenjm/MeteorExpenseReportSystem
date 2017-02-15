@@ -17,7 +17,7 @@ import MenuItem from 'material-ui/MenuItem';
 import '../../api/projects/projects.js';
 import Header from '../components/header.jsx';
 
-/* global Projects:true*/
+/* global Projects localStorage:true*/
 /* eslint no-undef: "error"*/
 
 const React = require('react');
@@ -71,6 +71,7 @@ const AdminDashboard = React.createClass({
       employeeError: '',
       userFilter: null,
       projectFilter: null,
+      startingTab: +localStorage.getItem('adminTab') || 0,
     };
   },
 
@@ -96,6 +97,10 @@ const AdminDashboard = React.createClass({
       projectFilter: nextProps.projectFilter,
       breadcrumbs: nextProps.breadcrumbs,
     });
+  },
+
+  updateTab(tab) {
+    localStorage.setItem('adminTab', +tab.props.index);
   },
 
   createBreadcrumb(item) {
@@ -387,8 +392,8 @@ const AdminDashboard = React.createClass({
         </Paper>
         <br />
         <br />
-        <Tabs>
-          <Tab index={0} label="Users" >
+        <Tabs initialSelectedIndex={this.state.startingTab}>
+          <Tab index={0} label="Users" onActive={this.updateTab}>
             <Table selectable={false}>
               <TableHeader displaySelectAll={false}>
                 <TableRow selectable={false}>
@@ -420,7 +425,7 @@ const AdminDashboard = React.createClass({
               </TableBody>
             </Table>
           </Tab>
-          <Tab index={1} label="Projects" >
+          <Tab index={1} label="Projects" onActive={this.updateTab}>
             <div>
               <Table selectable={false}>
                 <TableHeader displaySelectAll={false}>
@@ -462,6 +467,7 @@ const AdminDashboard = React.createClass({
           <Tab
             index={2}
             label="Monthly Expense Reports"
+            onActive={this.updateTab}
           >
             <Table selectable={false}>
               <TableBody displayRowCheckbox={false}>

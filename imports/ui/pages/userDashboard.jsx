@@ -5,6 +5,9 @@ import Header from '../components/header.jsx';
 import ManagerView from '../components/managerView.jsx';
 import EmployeeView from '../components/employeeView.jsx';
 
+/* global localStorage:true*/
+/* eslint no-undef: "error"*/
+
 const React = require('react');
 
 // Styles
@@ -30,6 +33,7 @@ const UserDashboard = React.createClass({
   },
 
   getInitialState() {
+    console.log(localStorage);
     return {
       breadcrumbs: [],
       name: '',
@@ -40,9 +44,9 @@ const UserDashboard = React.createClass({
       users: [],
       isManager: false,
       isEmployee: false,
-      viewToggle: false,
-      currentEmployeeTab: 0,
-      currentManagerTab: 0,
+      viewToggle: localStorage.getItem('viewToggle') === 'true' || false,
+      currentEmployeeTab: +localStorage.getItem('currentEmployeeTab') || 0,
+      currentManagerTab: +localStorage.getItem('currentManagerTab') || 0,
     };
   },
 
@@ -100,15 +104,18 @@ const UserDashboard = React.createClass({
 
   // Helpers
   toggleView() {
+    localStorage.setItem('viewToggle', !this.state.viewToggle);
     this.setState({ viewToggle: !this.state.viewToggle });
   },
 
   updateEmployeeTab(tab) {
     this.setState({ currentEmployeeTab: +tab.props.index });
+    localStorage.setItem('currentEmployeeTab', +tab.props.index);
   },
 
   updateManagerTab(tab) {
     this.setState({ currentManagerTab: +tab.props.index });
+    localStorage.setItem('currentManagerTab', +tab.props.index);
   },
 
   // Links
@@ -152,14 +159,14 @@ const UserDashboard = React.createClass({
           <ManagerView
             projects={this.state.managerProjects}
             requests={this.state.managerRequests}
-            currentTab={this.state.currentManagerTab}
+            currentTab={+this.state.currentManagerTab}
             updateTab={this.updateManagerTab}
           />
         ) : (
           <EmployeeView
             projects={this.state.employeeProjects}
             requests={this.state.myRequests}
-            currentTab={this.state.currentEmployeeTab}
+            currentTab={+this.state.currentEmployeeTab}
             updateTab={this.updateEmployeeTab}
           />
         )
