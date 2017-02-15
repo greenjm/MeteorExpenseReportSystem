@@ -20,7 +20,7 @@ Meteor.publish('reports', function reportsPublish() {
   return Reports.find({ userId: this.userId }).fetch();
 });
 
-Meteor.publish('requestOne', function retrieveReport(reportId) {
+Meteor.publish('reportOne', function retrieveReport(reportId) {
   check(reportId, String);
 
   const currentUser = Meteor.users.findOne(this.userId);

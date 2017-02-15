@@ -337,7 +337,7 @@ const AdminDashboard = React.createClass({
         <TableRowColumn style={{ width: '20%', textAlign: 'left' }}>{item.approvedRequests.length}</TableRowColumn>
         <TableRowColumn style={actionsColStyle}>
           <a href={url}>
-            <RaisedButton label="View Report (TODO)" primary />
+            <RaisedButton label="View Report" primary />
           </a>
         </TableRowColumn>
       </TableRow>);

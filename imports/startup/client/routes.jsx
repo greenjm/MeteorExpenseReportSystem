@@ -19,6 +19,7 @@ const SubmitRequestContainer = require('../../ui/components/submitRequestContain
 const SubmitReportContainer = require('../../ui/components/submitReportContainer.jsx');
 const RequestDetailContainer = require('../../ui/components/requestDetailContainer.jsx');
 const ManageRequests = require('../../ui/components/manageRequests.jsx');
+const ReportDetailContainer = require('../../ui/components/reportDetailContainer.jsx');
 
 Meteor.startup(() => {
   injectTapEventPlugin();
@@ -34,6 +35,7 @@ Meteor.startup(() => {
         <Route path="/submitReport" component={SubmitReportContainer} />
         <Route path="/requestDetail/:requestId" component={RequestDetailContainer} />
         <Route path="/manageRequests" component={ManageRequests} />
+        <Route path="/report/:reportId" component={ReportDetailContainer} />
       </Router>
     </MuiThemeProvider>
   ), document.getElementById('app'));

@@ -92,7 +92,7 @@ const EmployeeView = React.createClass({
     }
 
     return (
-      <TableRow onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}>
+      <TableRow>
         <TableRowColumn style={{ width: '5%', textAlign: 'left', wordWrap: 'break-word' }}>{index}</TableRowColumn>
         <TableRowColumn style={{ width: '8%', textAlign: 'left', wordWrap: 'break-word' }}>{projectName}</TableRowColumn>
         <TableRowColumn style={{ width: '15%', textAlign: 'left', wordWrap: 'break-word' }}>{item.vendor}</TableRowColumn>
@@ -249,10 +249,10 @@ const EmployeeView = React.createClass({
                   {this.state.requests.length > 0 ?
                     this.state.requests.map(this.createRequestRow) :
                     (
-                    <TableRow selectable={false}>
-                      <TableRowColumn>You have not submitted any requests yet.</TableRowColumn>
-                      <TableRowColumn />
-                    </TableRow>
+                      <TableRow selectable={false}>
+                        <TableRowColumn>You have not submitted any requests yet.</TableRowColumn>
+                        <TableRowColumn />
+                      </TableRow>
                     )
                   }
                 </TableBody>
