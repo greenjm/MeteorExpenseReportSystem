@@ -43,9 +43,9 @@ const UserDashboard = React.createClass({
       users: [],
       isManager: false,
       isEmployee: false,
-      viewToggle: localStorage.getItem('viewToggle') || false,
-      currentEmployeeTab: localStorage.getItem('currentEmployeeTab') || 0,
-      currentManagerTab: localStorage.getItem('currentManagerTab') || 0,
+      viewToggle: localStorage.getItem('viewToggle') === 'true' || false,
+      currentEmployeeTab: +localStorage.getItem('currentEmployeeTab') || 0,
+      currentManagerTab: +localStorage.getItem('currentManagerTab') || 0,
     };
   },
 
@@ -103,18 +103,18 @@ const UserDashboard = React.createClass({
 
   // Helpers
   toggleView() {
+    localStorage.setItem('viewToggle', !this.state.viewToggle);
     this.setState({ viewToggle: !this.state.viewToggle });
-    localStorage.setItem('viewToggle', this.state.viewToggle);
   },
 
   updateEmployeeTab(tab) {
     this.setState({ currentEmployeeTab: +tab.props.index });
-    localStorage.setItem('currentEmployeeTab', this.state.currentEmployeeTab);
+    localStorage.setItem('currentEmployeeTab', +tab.props.index);
   },
 
   updateManagerTab(tab) {
     this.setState({ currentManagerTab: +tab.props.index });
-    localStorage.setItem('currentManagerTab', this.state.currentManagerTab);
+    localStorage.setItem('currentManagerTab', +tab.props.index);
   },
 
   // Links
@@ -158,14 +158,14 @@ const UserDashboard = React.createClass({
           <ManagerView
             projects={this.state.managerProjects}
             requests={this.state.managerRequests}
-            currentTab={this.state.currentManagerTab}
+            currentTab={+this.state.currentManagerTab}
             updateTab={this.updateManagerTab}
           />
         ) : (
           <EmployeeView
             projects={this.state.employeeProjects}
             requests={this.state.myRequests}
-            currentTab={this.state.currentEmployeeTab}
+            currentTab={+this.state.currentEmployeeTab}
             updateTab={this.updateEmployeeTab}
           />
         )
