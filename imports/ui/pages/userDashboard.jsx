@@ -33,6 +33,7 @@ const UserDashboard = React.createClass({
   },
 
   getInitialState() {
+    console.log(localStorage);
     return {
       breadcrumbs: [],
       name: '',

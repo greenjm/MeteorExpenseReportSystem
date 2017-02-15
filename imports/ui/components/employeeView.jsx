@@ -180,6 +180,10 @@ const EmployeeView = React.createClass({
       }
     }
 
+    if (approvedRequests.length === 0) {
+      return;
+    }
+
     const today = new Date();
 
     Meteor.call('reports.create', approvedRequests, today.getMonth(), today.getFullYear(),
