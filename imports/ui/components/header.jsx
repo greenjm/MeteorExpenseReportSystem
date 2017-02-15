@@ -113,7 +113,6 @@ const Header = React.createClass({
               >
                 {this.state.userDashLink}
                 {this.state.adminDashLink}
-                <MenuItem primaryText="Profile" />
                 <MenuItem primaryText="Sign out" onTouchTap={this.logout} />
               </IconMenu>
             </div>
