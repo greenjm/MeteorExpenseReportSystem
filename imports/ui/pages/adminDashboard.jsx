@@ -415,11 +415,11 @@ const AdminDashboard = React.createClass({
                 {this.state.listUsers.length > 0 ?
                   this.state.listUsers.map(this.createUserRow) :
                   (
-                  <TableRow selectable={false}>
-                    <TableRowColumn>No users found.</TableRowColumn>
-                    <TableRowColumn />
-                    <TableRowColumn />
-                  </TableRow>
+                    <TableRow selectable={false}>
+                      <TableRowColumn>No users found.</TableRowColumn>
+                      <TableRowColumn />
+                      <TableRowColumn />
+                    </TableRow>
                   )
                 }
               </TableBody>

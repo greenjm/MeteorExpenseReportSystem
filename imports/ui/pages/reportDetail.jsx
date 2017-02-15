@@ -70,15 +70,13 @@ const ReportDetail = React.createClass({
     );
   },
 
-  createRequestRow(request, index) {
+  createRequestRow(request) {
     return (
       <TableRow selectable={false}>
-        <TableRowColumn style={{ width: '5%' }}>{index}</TableRowColumn>
         <TableRowColumn style={{ width: '15%' }}>{request.vendor}</TableRowColumn>
         <TableRowColumn style={{ width: '15%' }}>{request.description}</TableRowColumn>
         <TableRowColumn style={{ width: '5%' }}>{request.partNo}</TableRowColumn>
         <TableRowColumn style={{ width: '5%' }}>{request.quantity}</TableRowColumn>
-        <TableRowColumn style={{ width: '5%' }}>{request.unitCost}</TableRowColumn>
         <TableRowColumn style={{ width: '5%' }}>{request.estCost}</TableRowColumn>
         <TableRowColumn style={{ width: '5%' }}>{request.dateRequired}</TableRowColumn>
         <TableRowColumn style={{ width: '10%' }}>{request.intendedUsage}</TableRowColumn>
@@ -118,7 +116,7 @@ const ReportDetail = React.createClass({
                       <TableRowColumn style={{ width: '33%' }}>
                         <TextField
                           floatingLabelText="Month"
-                          value={this.state.month}
+                          value={this.state.month + 1}
                           readOnly
                         />
                       </TableRowColumn>
@@ -136,14 +134,12 @@ const ReportDetail = React.createClass({
                 <Table>
                   <TableBody displayRowCheckbox={false}>
                     <TableRow selectable={false} style={{ color: 'rgb(158, 158, 158)' }}>
-                      <TableRowColumn style={{ width: '5%', textAlign: 'left', fontSize: '12px' }}>Item</TableRowColumn>
                       <TableRowColumn style={{ width: '15%', textAlign: 'left', fontSize: '12px' }}>
                         Vendor Name, Address, Phone Number, & Website
                       </TableRowColumn>
                       <TableRowColumn style={{ width: '15%', textAlign: 'left', fontSize: '12px' }}>Item Description</TableRowColumn>
                       <TableRowColumn style={{ width: '5%', textAlign: 'left', fontSize: '12px' }}>Part Number</TableRowColumn>
                       <TableRowColumn style={{ width: '5%', textAlign: 'left', fontSize: '12px' }}>Quantity</TableRowColumn>
-                      <TableRowColumn style={{ width: '5%', textAlign: 'left', fontSize: '12px' }}>Unit Cost</TableRowColumn>
                       <TableRowColumn style={{ width: '5%', textAlign: 'left', fontSize: '12px' }}>Total Cost</TableRowColumn>
                       <TableRowColumn style={{ width: '5%', textAlign: 'left', fontSize: '12px' }}>Date Required</TableRowColumn>
                       <TableRowColumn style={{ width: '10%', textAlign: 'left', fontSize: '12px' }}>Intended Program Usage</TableRowColumn>
