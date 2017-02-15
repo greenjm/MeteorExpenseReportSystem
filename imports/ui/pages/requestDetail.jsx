@@ -350,6 +350,7 @@ const RequestDetail = React.createClass({
 
   handleConfirmPress() {
     this.serveRequest(true, '');
+    this.goBack();
   },
 
   handleDenyPress() {
@@ -369,6 +370,13 @@ const RequestDetail = React.createClass({
 
   denialChange(e) {
     this.setState({ statMsg: e.target.value });
+  },
+
+  handleCancelPress() {
+    this.setState({
+      requestDialogOpen: false,
+      statMsg: '',
+    });
   },
 
   render() {
@@ -433,8 +441,6 @@ const RequestDetail = React.createClass({
     }
 
     let requestEditButtons = null;
-    console.log(!this.state.status);
-    console.log(this.state.requestOwned);
     if (!this.state.status && this.state.requestOwned) {
       requestEditButtons = (<Col xs={12} sm={12} md={12} lg={12}>
         <RaisedButton
