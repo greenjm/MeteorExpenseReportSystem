@@ -289,14 +289,14 @@ const EmployeeView = React.createClass({
                   </TableRow>
                   )
                 }
-                <FlatButton
-                  label="Submit Monthly Report"
-                  primary
-                  onTouchTap={this.submitReport}
-                  disabled={this.state.requests > 0}
-                />
               </TableBody>
             </Table>
+            <RaisedButton
+              label="Submit Monthly Report"
+              primary
+              style={{ float: 'right', margin: '10px' }}
+              onTouchTap={this.submitReport}
+            />
           </Tab>
         </Tabs>
       </div>
