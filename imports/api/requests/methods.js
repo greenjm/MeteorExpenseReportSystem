@@ -6,6 +6,19 @@ import './requests.js';
 /* eslint no-undef: "error"*/
 
 Meteor.methods({
+  /**
+  Creates a new MPA for the current user.
+  @param proj {String} the project's ID
+  @param desc {String} the request's description
+  @param est {Number} the estimated total cost (qty * unt)
+  @param vend {String} the vendor's name
+  @param prt {String} the part number
+  @param qty {Number} the quantity
+  @param unt {Number} the unit cost
+  @param date {String} the date MPA is needed
+  @param indUsage {String} the intended usage
+  @return {Boolean} true if insert succeeded
+  */
   'requests.create': function createRequest(proj, desc, est, vend, prt, qty, unt, date, indUsage) {
     const currentUserId = Meteor.userId();
     check(proj, String);
@@ -39,6 +52,19 @@ Meteor.methods({
     return result;
   },
 
+  /**
+  Edits the request with the given ID.
+  @param id {String} the request's ID
+  @param desc {String} new description
+  @param est {Number} new estimated cost
+  @param vend {String} new vendor
+  @param prt {String} new part number
+  @param dateReq {String} new date required
+  @param intUse {String} new intended usage
+  @param qty {Number} new quantity
+  @param unt {Number} new unit cost
+  @return {Boolean} true if exactly one request was updated
+  */
   'requests.edit': function editRequest(id, desc, est, vend, prt, dateReq, intUse, qty, unt) {
     check(id, String);
     check(desc, String);
@@ -77,6 +103,20 @@ Meteor.methods({
     return result.nModified === 1;
   },
 
+  /**
+  Edits a request, changing the project it is for
+  @param id {String} the request's ID
+  @param projId {String} the project's ID
+  @param desc {String} new description
+  @param est {Number} new estimated cost
+  @param vend {String} new vendor
+  @param prt {String} new part number
+  @param dateReq {String} new date required
+  @param intUse {String} new intended usage
+  @param qty {Number} new quantity
+  @param unt {Number} new unit cost
+  @return {Boolean} true if exactly one request was updated
+  */
   'requests.editWithProject': function editRequestProj(id, projId, desc, est, vend, prt, dateReq, intUse, qty, unt) {
     check(id, String);
     check(projId, String);
@@ -118,6 +158,13 @@ Meteor.methods({
     return result.nModified === 1;
   },
 
+  /**
+  Updates a request's status
+  @param reqId {String} the request's ID
+  @param stat {Boolean} the status to set the request to
+  @param msg {String} the status message to give
+  @return {Boolean} true if exactly one request was updated
+  */
   'requests.statEdit': function apprDeclReq(reqId, stat, msg) {
     check(reqId, String);
     check(stat, Boolean);
@@ -129,6 +176,11 @@ Meteor.methods({
     return result.nModified === 1;
   },
 
+  /**
+  Sets a request to submitted (used for MERs)
+  @param reqId {String} the request's ID
+  @return {Boolean} true if exactly one request was updated
+  */
   'requests.submission': function submitReq(reqId) {
     check(reqId, String);
 
@@ -138,14 +190,14 @@ Meteor.methods({
     return result.nModified === 1;
   },
 
+  /**
+  Deletes the given request
+  @param reqId {String} the request's ID
+  @return {Boolean} true if the delete was successful
+  */
   'requests.delete': function deleteReq(reqId) {
     check(reqId, String);
     const result = Requests.remove({ _id: reqId });
     return result;
   },
-
-  // 'requests.addReceipt': function addReqReceipt(reqId, recpt) {
-  //   check(reqId, String);
-  //   check(recpt, Object);
-  // },
 });
