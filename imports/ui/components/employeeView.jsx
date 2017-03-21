@@ -194,7 +194,13 @@ const EmployeeView = React.createClass({
           this.setState({
             requests: [],
           });
-          console.log('success');
+          for (var x = 0; x < approvedRequests.length; x++) {
+            Meteor.call('requests.submission', approvedRequests[x], (error) => {
+              if (error) {
+                console.log('Could not mark request as submitted');
+              }
+            });
+          }
         }
       });
   },
