@@ -142,6 +142,7 @@ const RequestDetail = React.createClass({
     const projectId = this.props.projectId !== nextProps.projectId;
     const project = this.props.project !== nextProps.project;
     const projects = this.props.projects !== nextProps.projects;
+
     this.setState({
       requestOwner: reqOwnerChange ? nextProps.requestOwner : this.state.requestOwner,
       requestId: requestIdChange ? nextProps.requestId : this.state.requestId,
@@ -654,7 +655,6 @@ const RequestDetail = React.createClass({
                     </TableRowColumn>
                     <TableRowColumn>
                       <TextField
-                        hintText="Pending"
                         value={this.state.statMsg}
                         fullWidth
                         readOnly
