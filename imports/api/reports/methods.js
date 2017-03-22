@@ -17,7 +17,6 @@ Reports.deny({
 Meteor.methods({
   /**
   Creates a new report in the database
-  @param project {String} project id
   @param reqs {Array} list of approved requests
   @param month {String} month submitted
   @param year {Number} year submitted

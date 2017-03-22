@@ -21,14 +21,20 @@ Receipts.deny({
 });
 
 Meteor.methods({
+  /**
+  Attaches a receipt to a specific request.
+  @param reqId {String} the request's ID
+  @param fileObj {Object} GridFS file object to attach
+  @return {Boolean} true if the update succeeded
+  */
   'receipts.attachToRequest': function attachRequestReceipt(reqId, fileObj) {
     check(reqId, String);
     check(fileObj, Match.Any);
     if (this.userId) {
       const req = Requests.findOne(reqId);
       if (req && req.userId === this.userId) {
-        Requests.update({ _id: reqId }, { $set: { receipt: fileObj } });
-        return reqId;
+        const result = Requests.update({ _id: reqId }, { $set: { receipt: fileObj } });
+        return result;
       }
       throw new Meteor.Error('receipts.attachToRequest.badReq',
         'The request either does not exist or belongs to a different user');
@@ -36,6 +42,11 @@ Meteor.methods({
     throw new Meteor.Error('receipts.attachToRequest.unauthorized', 'You are not logged in');
   },
 
+  /**
+  Removes a receipt and detaches it from the corresponding request
+  @param id {String} the receipt's ID
+  @return {Boolean} true if the receipt was removed and detached
+  */
   'receipts.remove': function removeReceipt(id) {
     check(id, String);
 
@@ -44,9 +55,10 @@ Meteor.methods({
       if (receipt && receipt.owner === this.userId && receipt.requestId) {
         const request = Requests.findOne(receipt.requestId);
         if (request && request.userId === this.userId && request.receipt) {
-          Receipts.remove({ _id: receipt._id });
-          return Requests.update({ _id: request._id },
+          const removed = Receipts.remove({ _id: receipt._id });
+          const updated = Requests.update({ _id: request._id },
             { $set: { receipt: null } });
+          return removed && updated;
         }
         throw new Meteor.Error('receipts.remove.badReq',
           'The request belongs to a different user or does not contain the receipt');
