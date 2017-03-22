@@ -297,7 +297,7 @@ const EmployeeView = React.createClass({
               </TableBody>
             </Table>
             <RaisedButton
-              label="Submit Monthly Report"
+              label="Submit MER"
               primary
               style={{ float: 'right', margin: '10px' }}
               onTouchTap={this.submitReport}
