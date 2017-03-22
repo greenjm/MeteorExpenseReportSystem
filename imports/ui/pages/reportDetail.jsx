@@ -80,6 +80,9 @@ const ReportDetail = React.createClass({
         <TableRowColumn style={{ width: '5%' }}>{request.estCost}</TableRowColumn>
         <TableRowColumn style={{ width: '5%' }}>{request.dateRequired}</TableRowColumn>
         <TableRowColumn style={{ width: '10%' }}>{request.intendedUsage}</TableRowColumn>
+        <TableRowColumn style={{ width: '10%' }}>
+          <a href={request.receipt.url()} rel="noopener noreferrer" target="_blank">Receipt</a>
+        </TableRowColumn>
       </TableRow>
     );
   },
@@ -143,6 +146,7 @@ const ReportDetail = React.createClass({
                       <TableRowColumn style={{ width: '5%', textAlign: 'left', fontSize: '12px' }}>Total Cost</TableRowColumn>
                       <TableRowColumn style={{ width: '5%', textAlign: 'left', fontSize: '12px' }}>Date Required</TableRowColumn>
                       <TableRowColumn style={{ width: '10%', textAlign: 'left', fontSize: '12px' }}>Intended Program Usage</TableRowColumn>
+                      <TableRowColumn style={{ width: '10%', textAlign: 'left', fontSize: '12px' }}>Receipt</TableRowColumn>
                     </TableRow>
                     {this.state.approvedRequests.map(this.createRequestRow)}
                   </TableBody>
