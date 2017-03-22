@@ -18,3 +18,15 @@ Meteor.publish('receipts', function receiptsPublish() {
 
   return receipts;
 });
+
+Meteor.publish('reportReceipts', function reportReceipts(requestIds) {
+  const currentUser = Meteor.users.findOne(this.userId);
+
+  if (!currentUser.profile.isAdmin) {
+    return null;
+  }
+
+  const receipts = Receipts.find({ requestId: { $in: requestIds } });
+
+  return receipts;
+});

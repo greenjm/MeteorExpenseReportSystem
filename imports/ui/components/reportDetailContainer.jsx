@@ -16,16 +16,21 @@ const ReportDetailContainer = createContainer(({ params }) => {
   // Subscriptions
   const reportSub = Meteor.subscribe('reports');
   const requestSub = Meteor.subscribe('requests');
-
+  
   // Ready
   const reportReady = reportSub.ready();
   const requestReady = requestSub.ready();
-
+  
   // Data
   const report = reportReady && Reports.findOne(reportId);
+
+  const receiptSub = Meteor.subscribe('reportReceipts', report ? report.approvedRequests : []);
+  const receiptReady = receiptSub.ready();
+
   const requests = [];
   for (let x = 0; reportReady && x < report.approvedRequests.length; x += 1) {
     const request = requestReady && Requests.findOne(report.approvedRequests[x]);
+    request.receipt = request.receipt && receiptReady && request.receipt.getFileRecord();
     requests.push(request);
   }
 
@@ -50,7 +55,6 @@ const ReportDetailContainer = createContainer(({ params }) => {
     report,
     mode,
     userId: report ? report.userId : '',
-    // approvedRequests: report ? report.approvedRequests : [],
     approvedRequests: requests,
     month: report ? report.month : 0,
     year: report ? report.year : 0,

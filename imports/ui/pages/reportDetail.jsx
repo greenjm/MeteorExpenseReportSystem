@@ -71,9 +71,6 @@ const ReportDetail = React.createClass({
   },
 
   createRequestRow(request) {
-    console.log(request.receipt);
-    // var receipt = Receipts.findOne(request.receipt._id);
-    // console.log(receipt);
     return (
       <TableRow selectable={false}>
         <TableRowColumn style={{ width: '15%' }}>{request.vendor}</TableRowColumn>
