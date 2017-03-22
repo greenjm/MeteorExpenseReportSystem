@@ -194,7 +194,13 @@ const EmployeeView = React.createClass({
           this.setState({
             requests: [],
           });
-          console.log('success');
+          for (var x = 0; x < approvedRequests.length; x++) {
+            Meteor.call('requests.submission', approvedRequests[x], (error) => {
+              if (error) {
+                console.log('Could not mark request as submitted');
+              }
+            });
+          }
         }
       });
   },
@@ -291,7 +297,7 @@ const EmployeeView = React.createClass({
               </TableBody>
             </Table>
             <RaisedButton
-              label="Submit Monthly Report"
+              label="Submit MER"
               primary
               style={{ float: 'right', margin: '10px' }}
               onTouchTap={this.submitReport}
