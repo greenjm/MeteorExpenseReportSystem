@@ -194,9 +194,9 @@ const EmployeeView = React.createClass({
           this.setState({
             requests: [],
           });
-          for (var x = 0; x < approvedRequests.length; x++) {
-            Meteor.call('requests.submission', approvedRequests[x], (error) => {
-              if (error) {
+          for (let x = 0; x < approvedRequests.length; x += 1) {
+            Meteor.call('requests.submission', approvedRequests[x], (err) => {
+              if (err) {
                 console.log('Could not mark request as submitted');
               }
             });

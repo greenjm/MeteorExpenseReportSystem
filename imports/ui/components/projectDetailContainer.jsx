@@ -40,6 +40,21 @@ const ProjectDetailContainer = createContainer(({ params }) => {
   const managers = userReady && projectReady && usersInProjectReady &&
     Meteor.users.find({ _id: { $in: project.managers } }).fetch();
 
+  const projectEmployees = [];
+  if (employees) {
+    for (let i = 0; i < employees.length; i += 1) {
+      const emp = { isManager: false, item: employees[i] };
+      for (let j = 0; j < managers.length; j += 1) {
+        if (managers[j]._id === emp.item._id) {
+          emp.isManager = true;
+          break;
+        }
+      }
+      projectEmployees.push(emp);
+    }
+    console.log(projectEmployees);
+  }
+
   // Breadcrumbs
   let breadcrumbs = [];
   if (mode === 'edit') {
@@ -75,8 +90,7 @@ const ProjectDetailContainer = createContainer(({ params }) => {
     projectReady,
     mode,
     name: project ? project.name : '',
-    managers: managers || [],
-    employees: employees || [],
+    employees: projectEmployees,
     bornOn: project ? project.bornOn.toString() : '',
     active: project ? !!project.isActive : false,
     users: userReady ? users : [],

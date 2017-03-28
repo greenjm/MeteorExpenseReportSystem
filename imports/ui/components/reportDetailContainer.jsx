@@ -16,11 +16,11 @@ const ReportDetailContainer = createContainer(({ params }) => {
   // Subscriptions
   const reportSub = Meteor.subscribe('reports');
   const requestSub = Meteor.subscribe('requests');
-  
+
   // Ready
   const reportReady = reportSub.ready();
   const requestReady = requestSub.ready();
-  
+
   // Data
   const report = reportReady && Reports.findOne(reportId);
 

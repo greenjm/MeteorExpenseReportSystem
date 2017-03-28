@@ -43,7 +43,6 @@ const ProjectDetail = React.createClass({
       projectId: '',
       Name: '',
       inactiveDate: null,
-      Managers: [],
       ManagerNames: [],
       Employees: [],
       EmployeeNames: [],
@@ -67,7 +66,6 @@ const ProjectDetail = React.createClass({
 
     const projectIdChange = this.state.projectId !== nextProps.projectId;
     const nameChange = this.state.Name !== nextProps.name;
-    const managersChange = this.state.Managers !== nextProps.managers;
     const employeesChange = this.state.Employees !== nextProps.employees;
     const bornOnChange = this.state.BornOn !== nextProps.bornOn;
     const activeChange = this.state.Active !== nextProps.active;
@@ -77,7 +75,6 @@ const ProjectDetail = React.createClass({
     this.setState({
       projectId: projectIdChange ? nextProps.projectId : this.state.projectId,
       Name: nameChange ? nextProps.name : this.state.Name,
-      Managers: managersChange ? nextProps.managers : this.state.Managers,
       Employees: employeesChange ? nextProps.employees : this.state.Employees,
       BornOn: bornOnChange ? nextProps.bornOn.toString() : this.state.BornOn,
       Active: activeChange ? nextProps.active : this.state.Active,
@@ -114,16 +111,8 @@ const ProjectDetail = React.createClass({
     const users = this.state.users;
     const selected = users.splice(index, 1);
     const employees = this.state.Employees;
-    employees.push(selected[0]);
+    employees.push({ isManager: false, item: selected[0] });
     this.setState({ users, Employees: employees });
-  },
-
-  handleManagerSelect(event, index) {
-    const users = this.state.users;
-    const selected = users.splice(index, 1);
-    const managers = this.state.Managers;
-    managers.push(selected[0]);
-    this.setState({ users, Managers: managers });
   },
 
   editProject(e) {
@@ -132,11 +121,20 @@ const ProjectDetail = React.createClass({
       this.setState({ nameError: 'This field is required.' });
       return;
     }
+    const employees = [];
+    const managers = [];
+    for (let i = 0; i < this.state.Employees.length; i += 1) {
+      const item = this.state.Employees[i];
+      employees.push(item.item);
+      if (item.isManager) {
+        managers.push(item.item);
+      }
+    }
     Meteor.call('projects.edit', this.state.projectId,
       this.state.Name,
       !!this.state.Active,
-      this.state.Employees,
-      this.state.Managers,
+      employees,
+      managers,
       (err) => {
         if (err != null) {
           this.setState({ dialogError: `Error: ${err.error}. Reason: ${err.reason}` });
@@ -163,6 +161,13 @@ const ProjectDetail = React.createClass({
   },
 
   createEmployeeListItem(item, index) {
+    const leftIcon = (
+      <Checkbox
+        checked={item.isManager}
+        onCheck={() => { this.toggleIsManager(index); }}
+        disabled={this.state.mode === 'view'}
+      />
+    );
     const rightIcon = (
       <IconButton
         tooltip="remove"
@@ -173,8 +178,9 @@ const ProjectDetail = React.createClass({
     );
     return (
       <ListItem
+        leftCheckbox={leftIcon}
         rightIconButton={this.state.mode === 'edit' ? rightIcon : null}
-        primaryText={item.profile.name}
+        primaryText={item.item.profile.name}
       />
     );
   },
@@ -183,33 +189,14 @@ const ProjectDetail = React.createClass({
     const users = this.state.users;
     const employees = this.state.Employees;
     const removed = employees.splice(index, 1);
-    users.push(removed[0]);
-    this.setState({ users, selectedEmployees: employees });
+    users.push(removed[0].item);
+    this.setState({ users, Employees: employees });
   },
 
-  createManagerListItem(item, index) {
-    const rightIcon = (
-      <IconButton
-        tooltip="remove"
-        onTouchTap={() => { this.removeProjectManager(index); }}
-      >
-        <ContentClear />
-      </IconButton>
-    );
-    return (
-      <ListItem
-        rightIconButton={this.state.mode === 'edit' ? rightIcon : null}
-        primaryText={item.profile.name}
-      />
-    );
-  },
-
-  removeProjectManager(index) {
-    const users = this.state.users;
-    const managers = this.state.Managers;
-    const removed = managers.splice(index, 1);
-    users.push(removed[0]);
-    this.setState({ users, Managers: managers });
+  toggleIsManager(index) {
+    const employees = this.state.Employees;
+    employees[index].isManager = !employees[index].isManager;
+    this.setState({ Employees: employees });
   },
 
   render() {
@@ -259,34 +246,19 @@ const ProjectDetail = React.createClass({
                     disabled={this.state.mode === 'view'}
                     style={{ textAlign: 'left' }}
                   />
-                  <div style={{ display: 'inline' }} >
-                    <SelectField
-                      floatingLabelText="Add Employee"
-                      style={{ float: 'right' }}
-                      onChange={this.handleEmployeeSelect}
-                      disabled={this.state.mode === 'view'}
-                    >
-                      {this.state.users.map(this.createEmployeeMenuItem)}
-                    </SelectField>
-                    <List style={{ width: '30%' }} >
-                      <ListItem primaryText="Employees" style={{ fontWeight: 'bold' }} />
-                      {this.state.Employees.map(this.createEmployeeListItem)}
-                    </List>
-                  </div>
-                  <div style={{ display: 'inline' }} >
-                    <SelectField
-                      floatingLabelText="Add Manager"
-                      onChange={this.handleManagerSelect}
-                      style={{ float: 'right' }}
-                      disabled={this.state.mode === 'view'}
-                    >
-                      {this.state.users.map(this.createEmployeeMenuItem)}
-                    </SelectField>
-                    <List style={{ width: '30%' }} >
-                      <ListItem primaryText="Managers" style={{ fontWeight: 'bold' }} />
-                      {this.state.Managers.map(this.createManagerListItem)}
-                    </List>
-                  </div>
+                  <SelectField
+                    floatingLabelText="Add Employee"
+                    style={{ float: 'right' }}
+                    onChange={this.handleEmployeeSelect}
+                    disabled={this.state.mode === 'view'}
+                    fullWidth
+                  >
+                    {this.state.users.map(this.createEmployeeMenuItem)}
+                  </SelectField>
+                  <br /><br /><br />
+                  <List style={{ textAlign: 'left' }}>
+                    {this.state.Employees.map(this.createEmployeeListItem)}
+                  </List>
                   <div style={{ color: 'red' }}>{this.state.dialogError}</div>
                   {this.state.successfulSubmission && (
                     <div>
