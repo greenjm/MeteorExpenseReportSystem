@@ -107,7 +107,7 @@ const Login = React.createClass({
           />
           <CardText>
             <TextField
-              hintText="email"
+              floatingLabelText="Email"
               fullWidth
               value={this.state.username}
               errorText={this.state.usernameError}
@@ -115,7 +115,7 @@ const Login = React.createClass({
               onChange={this.handleUsernameChange}
             />
             <TextField
-              hintText="password"
+              floatingLabelText="Password"
               type="password"
               fullWidth
               value={this.state.password}
