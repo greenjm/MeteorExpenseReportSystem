@@ -7,6 +7,7 @@ import FlatButton from 'material-ui/FlatButton';
 import Paper from 'material-ui/Paper';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
+import DatePicker from 'material-ui/DatePicker';
 import Header from '../components/header.jsx';
 
 const React = require('react');
@@ -280,8 +281,8 @@ const SubmitRequest = React.createClass({
   // },
 
   // Date Required methods
-  handleDateRequiredChange(event) {
-    this.setState({ dateRequired: event.target.value, dateRequiredError: '' });
+  handleDateRequiredChange(_, date) {
+    this.setState({ dateRequired: date, dateRequiredError: '' });
   },
 
   dateRequiredError(err) {
@@ -381,9 +382,10 @@ const SubmitRequest = React.createClass({
                         errorText={this.state.unitCostError}
                         fullWidth
                       />
-                      <TextField
+                      <DatePicker
                         floatingLabelText="Date Required"
                         value={this.state.dateRequired}
+                        autoOk
                         onChange={this.handleDateRequiredChange}
                         errorText={this.state.dateRequiredError}
                         fullWidth
