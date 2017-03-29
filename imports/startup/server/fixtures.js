@@ -47,7 +47,7 @@ function seedProjects() {
     Projects.insert({
       name: `Test Project ${i}`,
       managers: [user._id],
-      employees: [emp._id],
+      employees: [emp._id, user._id],
       bornOn: new Date(),
       isActive: true,
       inactiveDate: null,

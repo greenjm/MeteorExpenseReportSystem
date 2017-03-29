@@ -3,6 +3,7 @@
 
 
 import { Meteor } from 'meteor/meteor';
+import { check } from 'meteor/check';
 import '../receipts.js';
 import '../../requests/requests.js';
 
@@ -20,6 +21,7 @@ Meteor.publish('receipts', function receiptsPublish() {
 });
 
 Meteor.publish('reportReceipts', function reportReceipts(requestIds) {
+  check(requestIds, Array);
   const currentUser = Meteor.users.findOne(this.userId);
 
   if (!currentUser.profile.isAdmin) {

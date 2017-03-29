@@ -8,6 +8,7 @@ import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowCol
 import { Tabs, Tab } from 'material-ui/Tabs';
 import ContentClear from 'material-ui/svg-icons/content/clear';
 import Dialog from 'material-ui/Dialog';
+import Checkbox from 'material-ui/Checkbox';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
@@ -56,7 +57,6 @@ const AdminDashboard = React.createClass({
       listUsers: [],
       allUsers: [],
       selectedEmployees: [],
-      selectedManagers: [],
       editUserDialogOpen: false,
       newProjectDialogOpen: false,
       editUserId: '',
@@ -197,7 +197,6 @@ const AdminDashboard = React.createClass({
     this.setState({
       newProjectDialogOpen: false,
       selectedEmployees: [],
-      selectedManagers: [],
       users: this.state.listUsers.slice(),
     });
   },
@@ -210,19 +209,11 @@ const AdminDashboard = React.createClass({
     this.setState({ newProjectName: event.target.value, projectNameError: '' });
   },
 
-  handleManagerChange(event, index) {
-    const users = this.state.users;
-    const selected = users.splice(index, 1);
-    const managers = this.state.selectedManagers;
-    managers.push(selected[0]);
-    this.setState({ users, selectedManagers: managers, managerError: '' });
-  },
-
   handleEmployeeChange(event, index) {
     const users = this.state.users;
     const selected = users.splice(index, 1);
     const employees = this.state.selectedEmployees;
-    employees.push(selected[0]);
+    employees.push({ isManager: false, item: selected[0] });
     this.setState({ users, selectedEmployees: employees, employeeError: '' });
   },
 
@@ -257,9 +248,18 @@ const AdminDashboard = React.createClass({
       this.emptyProjectFieldError();
       return;
     }
+    const employees = [];
+    const managers = [];
+    for (let i = 0; i < this.state.selectedEmployees.length; i += 1) {
+      const item = this.state.selectedEmployees[i];
+      employees.push(item.item);
+      if (item.isManager) {
+        managers.push(item.item);
+      }
+    }
     Meteor.call('projects.create', this.state.newProjectName,
-      this.state.selectedEmployees,
-      this.state.selectedManagers,
+      employees,
+      managers,
       (err) => {
         if (err != null) {
           this.setState({ dialogError: `Error: ${err.error}. Reason: ${err.reason}` });
@@ -279,6 +279,11 @@ const AdminDashboard = React.createClass({
   },
 
   createEmployeeListItem(item, index) {
+    const leftIcon = (
+      <Checkbox
+        onCheck={() => { this.toggleIsManager(index); }}
+      />
+    );
     const rightIcon = (
       <IconButton
         tooltip="remove"
@@ -289,8 +294,9 @@ const AdminDashboard = React.createClass({
     );
     return (
       <ListItem
+        leftCheckbox={leftIcon}
         rightIconButton={rightIcon}
-        primaryText={item.profile.name}
+        primaryText={item.item.profile.name}
       />
     );
   },
@@ -299,33 +305,14 @@ const AdminDashboard = React.createClass({
     const users = this.state.users;
     const employees = this.state.selectedEmployees;
     const removed = employees.splice(index, 1);
-    users.push(removed[0]);
+    users.push(removed[0].item);
     this.setState({ users, selectedEmployees: employees });
   },
 
-  createManagerListItem(item, index) {
-    const rightIcon = (
-      <IconButton
-        tooltip="remove"
-        onTouchTap={() => { this.removeProjectManager(index); }}
-      >
-        <ContentClear />
-      </IconButton>
-    );
-    return (
-      <ListItem
-        rightIconButton={rightIcon}
-        primaryText={item.profile.name}
-      />
-    );
-  },
-
-  removeProjectManager(index) {
-    const users = this.state.users;
-    const managers = this.state.selectedManagers;
-    const removed = managers.splice(index, 1);
-    users.push(removed[0]);
-    this.setState({ users, selectedManagers: managers });
+  toggleIsManager(index) {
+    const employees = this.state.selectedEmployees;
+    employees[index].isManager = !employees[index].isManager;
+    this.setState({ selectedEmployees: employees });
   },
 
   createReportRow(item) {
@@ -355,7 +342,6 @@ const AdminDashboard = React.createClass({
   },
 
   render() {
-    console.log(hashHistory);
     const userDialogActions = [
       <FlatButton
         label="Cancel"
@@ -535,33 +521,18 @@ const AdminDashboard = React.createClass({
             name="newProjectName"
             onChange={this.handleProjectNameChange}
           />
-          <div>
-            <SelectField
-              value=""
-              onChange={this.handleEmployeeChange}
-              errorText={this.state.employeeError}
-              floatingLabelText="Select Employees"
-            >
-              {this.state.users.map(this.createUserMenuItem)}
-            </SelectField>
-            <SelectField
-              value=""
-              onChange={this.handleManagerChange}
-              errorText={this.state.managerError}
-              floatingLabelText="Select Managers"
-              style={{ float: 'right' }}
-            >
-              {this.state.users.map(this.createUserMenuItem)}
-            </SelectField>
-          </div>
-          <div>
-            <List style={{ float: 'left' }} >
-              {this.state.selectedEmployees.map(this.createEmployeeListItem)}
-            </List>
-            <List style={{ float: 'right' }} >
-              {this.state.selectedManagers.map(this.createManagerListItem)}
-            </List>
-          </div>
+          <SelectField
+            value=""
+            onChange={this.handleEmployeeChange}
+            errorText={this.state.employeeError}
+            floatingLabelText="Select Employees"
+            fullWidth
+          >
+            {this.state.users.map(this.createUserMenuItem)}
+          </SelectField>
+          <List>
+            {this.state.selectedEmployees.map(this.createEmployeeListItem)}
+          </List>
           <div style={{ color: 'red' }}>{this.state.dialogError}</div>
         </Dialog>
       </div>
