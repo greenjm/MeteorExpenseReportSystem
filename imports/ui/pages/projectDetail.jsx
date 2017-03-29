@@ -7,7 +7,7 @@ import ContentClear from 'material-ui/svg-icons/content/clear';
 import { List, ListItem } from 'material-ui/List';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
 import Paper from 'material-ui/Paper';
-import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import SelectField from 'material-ui/SelectField';
 import Checkbox from 'material-ui/Checkbox';
@@ -268,8 +268,8 @@ const ProjectDetail = React.createClass({
                   )}
                   { this.state.mode === 'edit' &&
                     <div style={{ float: 'right', margin: '10px' }}>
-                      <FlatButton label="Cancel" onTouchTap={this.cancelEdit} />
-                      <FlatButton type="submit" label="Save" primary />
+                      <RaisedButton label="Cancel" onTouchTap={this.cancelEdit} primary />
+                      <RaisedButton type="submit" label="Save" primary />
                     </div>
                   }
                 </form>
