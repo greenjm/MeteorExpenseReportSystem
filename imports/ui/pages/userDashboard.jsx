@@ -61,7 +61,7 @@ const UserDashboard = React.createClass({
       users: this.props.users,
       isManager: this.props.isManager,
       isEmployee: this.props.isEmployee,
-      viewToggle: this.state.viewToggle || (this.props.isManager && !this.props.isEmployee),
+      viewToggle: this.state.viewToggle && this.props.isManager,
     });
   },
 
@@ -91,7 +91,7 @@ const UserDashboard = React.createClass({
       users: usersChange ? nextProps.users : this.state.users,
       isManager: isManagerChange ? nextProps.isManager : this.state.isManager,
       isEmployee: isEmployeeChange ? nextProps.isEmployee : this.state.isEmployee,
-      viewToggle: this.state.viewToggle || (this.props.isManager && !this.props.isEmployee),
+      viewToggle: this.state.viewToggle && this.props.isManager,
       breadcrumbs: nextProps.breadcrumbs,
     });
   },
