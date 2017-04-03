@@ -101,7 +101,7 @@ const Login = React.createClass({
       <form onSubmit={this.login}>
         <Card style={cardStyle}>
           <CardHeader
-            title="Meteor Expense Report"
+            title="Monthly Expense Report"
             subtitle="Login"
             expandable={false}
           />
