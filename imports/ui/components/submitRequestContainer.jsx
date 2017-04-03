@@ -46,7 +46,7 @@ const SubmitRequestContainer = createContainer(({ params }) => {
     isAdmin,
     projectReady,
     project: project || {},
-    projects: Projects.find().fetch(),
+    projects: Projects.find({ employees: user._id }).fetch(),
   };
 }, SubmitRequestPage);
 
