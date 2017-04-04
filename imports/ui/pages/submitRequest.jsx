@@ -376,7 +376,7 @@ const SubmitRequest = React.createClass({
                       />
                       <TextField
                         floatingLabelText="Unit Cost"
-                        value={this.state.unitCost}
+                        value={this.state.unitCost.toFixed(2)}
                         onChange={this.handleUnitCostChange}
                         errorText={this.state.unitCostError}
                         fullWidth
@@ -397,7 +397,7 @@ const SubmitRequest = React.createClass({
                       />
                       <TextField
                         floatingLabelText="Total Cost"
-                        value={this.state.estimatedCost}
+                        value={this.state.estimatedCost.toFixed(2)}
                         onChange={this.handleEstimateChange}
                         fullWidth
                         readOnly

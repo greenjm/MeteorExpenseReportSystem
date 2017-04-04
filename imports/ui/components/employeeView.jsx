@@ -98,8 +98,8 @@ const EmployeeView = React.createClass({
         <TableRowColumn style={{ width: '15%', textAlign: 'left', wordWrap: 'break-word' }}>{item.description}</TableRowColumn>
         <TableRowColumn style={{ width: '5%', textAlign: 'left', wordWrap: 'break-word' }}>{item.partNo}</TableRowColumn>
         <TableRowColumn style={{ width: '5%', textAlign: 'left', wordWrap: 'break-word' }}>{item.quantity}</TableRowColumn>
-        <TableRowColumn style={{ width: '5%', textAlign: 'left', wordWrap: 'break-word' }}>{item.unitCost}</TableRowColumn>
-        <TableRowColumn style={{ width: '5%', textAlign: 'left', wordWrap: 'break-word' }}>{item.estCost}</TableRowColumn>
+        <TableRowColumn style={{ width: '5%', textAlign: 'left', wordWrap: 'break-word' }}>${item.unitCost.toFixed(2)}</TableRowColumn>
+        <TableRowColumn style={{ width: '5%', textAlign: 'left', wordWrap: 'break-word' }}>${item.estCost.toFixed(2)}</TableRowColumn>
         <TableRowColumn style={{ width: '8%', textAlign: 'left', wordWrap: 'break-word' }}>{item.dateRequired}</TableRowColumn>
         <TableRowColumn style={{ width: '10%', textAlign: 'left', wordWrap: 'break-word' }}>{item.intendedUsage}</TableRowColumn>
         <TableRowColumn style={{ width: '5%' }}>{status}</TableRowColumn>
@@ -152,9 +152,9 @@ const EmployeeView = React.createClass({
           <TableRowColumn style={{ width: '10%' }}>{item.dateRequired}</TableRowColumn>
           <TableRowColumn style={{ width: '10%' }}>{projectName}</TableRowColumn>
           <TableRowColumn style={{ width: '35%' }}>{item.intendedUsage}</TableRowColumn>
-          <TableRowColumn style={{ width: '10%' }}>{item.estCost}</TableRowColumn>
+          <TableRowColumn style={{ width: '10%' }}>${item.estCost.toFixed(2)}</TableRowColumn>
           <TableRowColumn style={{ width: '15%' }}>&nbsp;</TableRowColumn>
-          <TableRowColumn style={{ width: '15%' }}>{item.estCost}</TableRowColumn>
+          <TableRowColumn style={{ width: '15%' }}>${item.estCost.toFixed(2)}</TableRowColumn>
           <TableRowColumn style={{ width: '8%' }}>{item.project}</TableRowColumn>
           <TableRowColumn>
             <RaisedButton
