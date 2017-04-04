@@ -8,7 +8,8 @@ import { Factory } from 'meteor/dburles:factory';
 Notifications = new Mongo.Collection('notifications');
 
 Notifications.schema = new SimpleSchema({
-  userId: { type: String, regEx: SimpleSchema.RegEx.Id },
+  userIds: { type: [String], regEx: SimpleSchema.RegEx.Id },
+  reqId: { type: String, regEx: SimpleSchema.RegEx.Id },
   text: { type: String },
   URL: { type: String },
   isRead: { type: Boolean, defaultValue: false },
@@ -21,7 +22,8 @@ Notifications.schema = new SimpleSchema({
 });
 
 Factory.define('notification', Notifications, {
-  userId: () => '',
+  userIds: () => [],
+  reqId: () => '',
   text: () => '',
   URL: () => '',
   isRead: () => false,
