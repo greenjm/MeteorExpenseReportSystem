@@ -81,7 +81,7 @@ const EmployeeView = React.createClass({
     });
     
     let status = '';
-    if (item.status === undefined) {
+    if (item.status === undefined || item.status === null) {
       status = 'Pending';
     } else if (item.status) {
       status = 'Approved';

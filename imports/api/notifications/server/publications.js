@@ -11,6 +11,6 @@ Meteor.publish('notifications', function notificationsPublish() {
     return [];
   }
 
-  const notifications = Notifications.find({ userId: this.userId, isRead: false });
+  const notifications = Notifications.find({ userIds: this.userId, isRead: false });
   return notifications;
 });
