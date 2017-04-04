@@ -72,15 +72,14 @@ const EmployeeView = React.createClass({
   },
 
   createRequestRow(item, index) {
-    let projectName = '';
-    for (let i = 0; i < this.state.projects.length; i += 1) {
-      const p = this.state.projects[i];
-      if (p._id === item.projectId) {
-        projectName = p.name;
-        break;
+    Meteor.call('projects.name', item.projectId, (err, results) => {
+      if (err) {
+        console.log(err);
+      } else {
+        this.projectName = results;
       }
-    }
-
+    });
+    
     let status = '';
     if (item.status === undefined) {
       status = 'Pending';
@@ -93,7 +92,7 @@ const EmployeeView = React.createClass({
     return (
       <TableRow>
         <TableRowColumn style={{ width: '5%', textAlign: 'left', wordWrap: 'break-word' }}>{index}</TableRowColumn>
-        <TableRowColumn style={{ width: '8%', textAlign: 'left', wordWrap: 'break-word' }}>{projectName}</TableRowColumn>
+        <TableRowColumn style={{ width: '8%', textAlign: 'left', wordWrap: 'break-word' }}>{this.projectName}</TableRowColumn>
         <TableRowColumn style={{ width: '15%', textAlign: 'left', wordWrap: 'break-word' }}>{item.vendor}</TableRowColumn>
         <TableRowColumn style={{ width: '15%', textAlign: 'left', wordWrap: 'break-word' }}>{item.description}</TableRowColumn>
         <TableRowColumn style={{ width: '5%', textAlign: 'left', wordWrap: 'break-word' }}>{item.partNo}</TableRowColumn>
