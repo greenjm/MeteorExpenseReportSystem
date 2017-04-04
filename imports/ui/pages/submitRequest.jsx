@@ -209,7 +209,7 @@ const SubmitRequest = React.createClass({
 
   // Estimated cost methods
   handleEstimateChange(event) {
-    this.setState({ estimatedCost: event.target.value, estimatedCostError: '' });
+    this.setState({ estimatedCost: event.target.value.toFixed(2), estimatedCostError: '' });
   },
 
   estimateError(err) {
@@ -376,7 +376,7 @@ const SubmitRequest = React.createClass({
                       />
                       <TextField
                         floatingLabelText="Unit Cost"
-                        value={this.state.unitCost.toFixed(2)}
+                        value={this.state.unitCost}
                         onChange={this.handleUnitCostChange}
                         errorText={this.state.unitCostError}
                         fullWidth
@@ -397,7 +397,7 @@ const SubmitRequest = React.createClass({
                       />
                       <TextField
                         floatingLabelText="Total Cost"
-                        value={this.state.estimatedCost.toFixed(2)}
+                        value={this.state.estimatedCost}
                         onChange={this.handleEstimateChange}
                         fullWidth
                         readOnly
