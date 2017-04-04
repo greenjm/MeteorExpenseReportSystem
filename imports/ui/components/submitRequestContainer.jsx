@@ -14,6 +14,13 @@ const SubmitRequestContainer = createContainer(({ params }) => {
   const projectReady = projectSub.ready();
   const project = projectReady && Projects.findOne(projectId);
 
+  let projects = [];
+  if (isAdmin) {
+    projects = Projects.find().fetch();
+  } else {
+    projects = user && Projects.find({ employees: user._id }).fetch();
+  }
+
   // Breadcrumbs
   let breadcrumbs = [];
   if (projectId !== null && projectId !== undefined) {
@@ -46,7 +53,7 @@ const SubmitRequestContainer = createContainer(({ params }) => {
     isAdmin,
     projectReady,
     project: project || {},
-    projects: Projects.find({ employees: user._id }).fetch(),
+    projects,
   };
 }, SubmitRequestPage);
 
