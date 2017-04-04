@@ -3,6 +3,9 @@ import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowCol
   from 'material-ui/Table';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import RaisedButton from 'material-ui/RaisedButton';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
+import TextField from 'material-ui/TextField';
 import { hashHistory } from 'react-router';
 
 const React = require('react');
@@ -19,6 +22,9 @@ const EmployeeView = React.createClass({
     return {
       projects: this.props.projects,
       requests: this.props.requests,
+      months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      currentMonth: new Date().getMonth(),
+      currentYear: new Date().getFullYear(),
     };
   },
 
@@ -170,6 +176,14 @@ const EmployeeView = React.createClass({
     return '';
   },
 
+  handleMonthSelect(event, index) {
+    this.setState({ currentMonth: index });
+  },
+
+  handleYearChange(event) {
+    this.setState({ currentYear: event.target.value });
+  },
+
   submitReport() {
     const approvedRequests = [];
     for (let x = 0; x < this.state.requests.length; x += 1) {
@@ -184,7 +198,7 @@ const EmployeeView = React.createClass({
 
     const today = new Date();
 
-    Meteor.call('reports.create', approvedRequests, today.getMonth(), today.getFullYear(),
+    Meteor.call('reports.create', approvedRequests, this.state.currentMonth, this.state.currentYear,
       (error, result) => {
         if (error != null) {
           console.log(error);
@@ -294,6 +308,31 @@ const EmployeeView = React.createClass({
                 }
               </TableBody>
             </Table>
+            <SelectField
+              floatingLabelText="Month"
+              style={{ float: 'left', margin: '10px' }}
+              onChange={this.handleMonthSelect}
+              value={this.state.currentMonth}
+            >
+              <MenuItem value={0} primaryText="Jan" />
+              <MenuItem value={1} primaryText="Feb" />
+              <MenuItem value={2} primaryText="Mar" />
+              <MenuItem value={3} primaryText="Apr" />
+              <MenuItem value={4} primaryText="May" />
+              <MenuItem value={5} primaryText="June" />
+              <MenuItem value={6} primaryText="July" />
+              <MenuItem value={7} primaryText="Aug" />
+              <MenuItem value={8} primaryText="Sep" />
+              <MenuItem value={9} primaryText="Oct" />
+              <MenuItem value={10} primaryText="Nov" />
+              <MenuItem value={11} primaryText="Dec" />
+            </SelectField>
+            <TextField
+              floatingLabelText="Year"
+              value={this.state.currentYear}
+              onChange={this.handleYearChange}
+              style={{ margin: '10px' }}
+            />
             <RaisedButton
               label="Submit MER"
               primary
