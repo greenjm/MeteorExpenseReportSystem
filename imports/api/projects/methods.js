@@ -103,4 +103,15 @@ Meteor.methods({
     }
     throw new Meteor.Error('projects.edit.unauthorized', 'You do not have permission to edit projects.');
   },
+
+  /**
+  Returns the name of the project with the specified id.
+  @param id {String} the project's ID
+  */
+  'projects.name': function viewName(id) {
+    check(id, String);
+    var project = Projects.find({ _id: id }).fetch();
+
+    return project[0].name;
+  },
 });
