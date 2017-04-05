@@ -19,6 +19,7 @@ const EmployeeView = React.createClass({
     return {
       projects: this.props.projects,
       requests: this.props.requests,
+      incompleteRequests: 0,
     };
   },
 
@@ -171,13 +172,22 @@ const EmployeeView = React.createClass({
 
   submitReport() {
     const approvedRequests = [];
+    const notApprovedRequests = [];
     for (let x = 0; x < this.state.requests.length; x += 1) {
       if (this.state.requests[x].status) {
-        approvedRequests.push(this.state.requests[x]._id);
+        if (this.state.requests[x].receipt) {
+          approvedRequests.push(this.state.requests[x]._id);
+        }
+        else {
+          notApprovedRequests.push(this.state.requests[x]);
+        }
       }
     }
 
     if (approvedRequests.length === 0) {
+      if (notApprovedRequests.length > 0) {
+        this.setState({ incompleteRequests: notApprovedRequests.length });
+      }
       return;
     }
 
@@ -190,7 +200,8 @@ const EmployeeView = React.createClass({
         }
         if (result) {
           this.setState({
-            requests: [],
+            requests: notApprovedRequests,
+            incompleteRequests: notApprovedRequests.length,
           });
           for (let x = 0; x < approvedRequests.length; x += 1) {
             Meteor.call('requests.submission', approvedRequests[x], (err) => {
@@ -293,6 +304,14 @@ const EmployeeView = React.createClass({
                 }
               </TableBody>
             </Table>
+            {this.state.incompleteRequests != 0 && (
+              <div
+              style={{ float: 'left', color: '#f44336', margin: '10px'}}>
+                There {this.state.incompleteRequests == 1 ? "is" : "are"} {this.state.incompleteRequests} approved
+                MPA{this.state.incompleteRequests == 1 ? "" : "s"} missing a receipt. {this.state.incompleteRequests == 1 ? "It was " : "They were "}
+                not submitted.
+              </div>
+            )}
             <RaisedButton
               label="Submit MER"
               primary
