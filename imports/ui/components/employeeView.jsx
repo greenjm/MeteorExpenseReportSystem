@@ -239,7 +239,7 @@ const EmployeeView = React.createClass({
               </TableBody>
             </Table>
           </Tab>
-          <Tab index={1} label="Material Purchase Approvals" onActive={this.props.updateTab} >
+          <Tab index={1} label="Material Purchase Approvals (MPA)" onActive={this.props.updateTab} >
             <div>
               <Table selectable={false} style={{ tableLayout: 'auto', wordWrap: 'break-word' }}>
                 <TableBody displayRowCheckbox={false}>
@@ -280,7 +280,7 @@ const EmployeeView = React.createClass({
           </Tab>
           <Tab
             index={2}
-            label="Monthly Expense Report"
+            label="Monthly Expense Report (MER)"
             onActive={this.props.updateTab}
           >
             <Table selectable={false}>
