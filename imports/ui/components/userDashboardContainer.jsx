@@ -22,10 +22,18 @@ const UserDashboardContainer = createContainer(() => {
   let userReady = null;
 
   // Projects and Requests
-  const employeeProjects = (projectReady && user &&
-    Projects.find({ employees: user._id }).fetch()) || [];
-  const managerProjects = (projectReady && user &&
-    Projects.find({ managers: user._id }).fetch()) || [];
+  let employeeProjects = [];
+  if (isAdmin && projectReady) {
+    employeeProjects = Projects.find().fetch();
+  } else {
+    employeeProjects = user && Projects.find({ employees: user._id }).fetch();
+  }
+  let managerProjects = [];
+  if (isAdmin && projectReady) {
+    managerProjects = Projects.find().fetch();
+  } else {
+    managerProjects = (user && projectReady && Projects.find({ managers: user._id }).fetch()) || [];
+  }
   const myRequests = (requestReady && user &&
     Requests.find({ userId: user._id, submitted: false }).fetch()) || [];
   const managerIds = [];
