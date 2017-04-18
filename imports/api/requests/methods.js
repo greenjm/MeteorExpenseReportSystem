@@ -47,6 +47,10 @@ Meteor.methods({
       submitted: false,
     };
 
+    if (est <= 75) {
+      newReq.status = true;
+    }
+
     Requests.schema.validate(newReq);
     const result = Requests.insert(newReq);
     return result;
