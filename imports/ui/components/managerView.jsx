@@ -124,7 +124,7 @@ const ManagerView = React.createClass({
         <TableRowColumn style={{ width: '15%', textAlign: 'left' }}>{item.vendor}</TableRowColumn>
         <TableRowColumn style={{ width: '15%', textAlign: 'left' }}>{item.description}</TableRowColumn>
         <TableRowColumn style={{ width: '3%', textAlign: 'left' }}>{item.quantity}</TableRowColumn>
-        <TableRowColumn style={{ width: '3%', textAlign: 'left' }}>{item.estCost}</TableRowColumn>
+        <TableRowColumn style={{ width: '3%', textAlign: 'left' }}>${item.estCost.toFixed(2)}</TableRowColumn>
         <TableRowColumn style={{ width: '8%', textAlign: 'left' }}>{item.dateRequired}</TableRowColumn>
         <TableRowColumn style={{ width: '10%', textAlign: 'left' }}>{item.intendedUsage}</TableRowColumn>
         <TableRowColumn>

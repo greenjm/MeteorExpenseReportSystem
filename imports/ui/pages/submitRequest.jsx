@@ -209,7 +209,7 @@ const SubmitRequest = React.createClass({
 
   // Estimated cost methods
   handleEstimateChange(event) {
-    this.setState({ estimatedCost: event.target.value, estimatedCostError: '' });
+    this.setState({ estimatedCost: event.target.value.toFixed(2), estimatedCostError: '' });
   },
 
   estimateError(err) {

@@ -29,7 +29,7 @@ const SubmitReport = React.createClass({
       isAdmin: React.PropTypes.bool,
     };
   },
-
+  
   getInitialState() {
     return {
       requests: [],
