@@ -121,7 +121,7 @@ const SubmitRequest = React.createClass({
       hasError = true;
     }
 
-    if (this.state.dateRequired === '') {
+    if (this.state.dateRequired.toString() === '') {
       this.dateRequiredError(requiredError);
       hasError = true;
     }
@@ -165,7 +165,7 @@ const SubmitRequest = React.createClass({
       this.state.partNum,
       qtyNum,
       +unitCostNum.toFixed(2),
-      this.state.dateRequired,
+      this.state.dateRequired.toString(),
       this.state.intendedUsage,
       (error, result) => {
         if (error != null) {
