@@ -25,8 +25,8 @@ const UserDashboardContainer = createContainer(() => {
   let employeeProjects = [];
   if (isAdmin && projectReady) {
     employeeProjects = Projects.find().fetch();
-  } else {
-    employeeProjects = user && Projects.find({ employees: user._id }).fetch();
+  } else if (user && projectReady) {
+    employeeProjects = Projects.find({ employees: user._id }).fetch();
   }
   let managerProjects = [];
   if (isAdmin && projectReady) {

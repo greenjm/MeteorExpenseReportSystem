@@ -80,7 +80,7 @@ const EmployeeView = React.createClass({
         this.projectName = results;
       }
     });
-    
+
     let status = '';
     if (item.status === undefined || item.status === null) {
       status = 'Pending';
@@ -304,12 +304,13 @@ const EmployeeView = React.createClass({
                 }
               </TableBody>
             </Table>
-            {this.state.incompleteRequests != 0 && (
+            {this.state.incompleteRequests !== 0 && (
               <div
-              style={{ float: 'left', color: '#f44336', margin: '10px'}}>
-                There {this.state.incompleteRequests == 1 ? "is" : "are"} {this.state.incompleteRequests} approved
-                MPA{this.state.incompleteRequests == 1 ? "" : "s"} missing a receipt. {this.state.incompleteRequests == 1 ? "It was " : "They were "}
-                not submitted.
+                style={{ float: 'left', color: '#f44336', margin: '10px' }}
+              >
+                There {this.state.incompleteRequests === 1 ? 'is' : 'are'} {this.state.incompleteRequests} approved
+                MPA{this.state.incompleteRequests === 1 ? '' : 's'} missing a receipt.
+                {this.state.incompleteRequests === 1 ? 'It was ' : 'They were '} not submitted.
               </div>
             )}
             <RaisedButton
