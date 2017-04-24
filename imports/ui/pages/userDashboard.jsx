@@ -1,9 +1,16 @@
 import { hashHistory } from 'react-router';
 import Toggle from 'material-ui/Toggle';
+import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
+  from 'material-ui/Table';
+import { Tabs, Tab } from 'material-ui/Tabs';
+import RaisedButton from 'material-ui/RaisedButton';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
+import FlatButton from 'material-ui/FlatButton';
+import Dialog from 'material-ui/Dialog';
+import TextField from 'material-ui/TextField';
 import Paper from 'material-ui/Paper';
 import Header from '../components/header.jsx';
-import ManagerView from '../components/managerView.jsx';
-import EmployeeView from '../components/employeeView.jsx';
 
 /* global localStorage:true*/
 /* eslint no-undef: "error"*/
@@ -35,6 +42,8 @@ const UserDashboard = React.createClass({
   getInitialState() {
     return {
       breadcrumbs: [],
+      incompleteRequests: 0,
+      requestFilter: null,
       name: '',
       employeeProjects: [],
       managerProjects: [],
@@ -45,7 +54,9 @@ const UserDashboard = React.createClass({
       isEmployee: false,
       viewToggle: localStorage.getItem('viewToggle') === 'true' || false,
       currentEmployeeTab: +localStorage.getItem('currentEmployeeTab') || 0,
-      currentManagerTab: +localStorage.getItem('currentManagerTab') || 0,
+      requestDialogOpen: false,
+      statMsg: '',
+      requestToDeny: {},
     };
   },
 
@@ -102,9 +113,58 @@ const UserDashboard = React.createClass({
   },
 
   // Helpers
-  toggleView() {
-    localStorage.setItem('viewToggle', !this.state.viewToggle);
-    this.setState({ viewToggle: !this.state.viewToggle });
+  goTo(url) {
+    hashHistory.push(url);
+  },
+
+  serveRequest(request, approved, message) {
+    Meteor.call('requests.statEdit', request._id, approved, message, (err) => {
+      if (err) {
+        console.log(err);
+      }
+    });
+    Meteor.call('notifications.respondHelper', approved,
+      request._id,
+      request.userId,
+      // (error) => {
+      //   if (error != null) {
+      //     this.setState({ dialogError: `Error: ${error.error}. ${error.reason}` });
+      //     return;
+      //   }
+      //   return;
+      // }
+    );
+  },
+
+  handleConfirmPress(req) {
+    this.serveRequest(req, true, '');
+  },
+
+  handleDenyPress(request) {
+    this.setState({
+      requestDialogOpen: true,
+      requestToDeny: request });
+  },
+
+  denyRequest() {
+    this.serveRequest(this.state.requestToDeny, false, this.state.statMsg);
+    this.setState({
+      requestToDeny: {},
+      statMsg: '',
+      requestDialogOpen: false,
+    });
+  },
+
+  handleCancelPress() {
+    this.setState({
+      requestToDeny: {},
+      requestDialogOpen: false,
+      statMsg: '',
+    });
+  },
+
+  denialChange(e) {
+    this.setState({ statMsg: e.target.value });
   },
 
   updateEmployeeTab(tab) {
@@ -112,29 +172,255 @@ const UserDashboard = React.createClass({
     localStorage.setItem('currentEmployeeTab', +tab.props.index);
   },
 
-  updateManagerTab(tab) {
-    this.setState({ currentManagerTab: +tab.props.index });
-    localStorage.setItem('currentManagerTab', +tab.props.index);
+  removeItem(index) {
+    const filteredRequests = [];
+    for (let i = this.state.myRequests.length - 1; i >= 0; i -= 1) {
+      if (i !== index) {
+        filteredRequests.push(this.state.myRequests[i]);
+      }
+    }
+
+    this.setState({
+      myRequests: filteredRequests,
+    });
   },
 
-  // Links
-  submitRequest() {
-    hashHistory.push('/submitRequest');
+  createProjectRow(item) {
+    return (
+      <TableRow selectable={false}>
+        <TableRowColumn>{item.name}</TableRowColumn>
+        <TableRowColumn>
+          <RaisedButton
+            onTouchTap={() => { this.goTo(`/project/view/${item._id}`); }}
+            label="View Project Details"
+            style={{ margin: '3px' }}
+            primary
+          />
+          <RaisedButton
+            onTouchTap={() => { this.goTo(`/submitRequest/${item._id}`); }}
+            label="Submit New MPA"
+            style={{ margin: '3px' }}
+            primary
+          />
+        </TableRowColumn>
+      </TableRow>
+    );
   },
 
-  manageRequests() {
-    hashHistory.push('/manageRequests');
+  createRequestRow(item, index) {
+    Meteor.call('projects.name', item.projectId, (err, results) => {
+      if (err) {
+        console.log(err);
+      } else {
+        this.projectName = results;
+      }
+    });
+
+    let status = '';
+    if (item.status === undefined || item.status === null) {
+      status = 'Pending';
+    } else if (item.status) {
+      status = 'Approved';
+    } else {
+      status = 'Denied';
+    }
+
+    return (
+      <TableRow>
+        <TableRowColumn style={{ width: '5%', textAlign: 'left', wordWrap: 'break-word' }}>{index}</TableRowColumn>
+        <TableRowColumn style={{ width: '8%', textAlign: 'left', wordWrap: 'break-word' }}>{this.projectName}</TableRowColumn>
+        <TableRowColumn style={{ width: '15%', textAlign: 'left', wordWrap: 'break-word' }}>{item.vendor}</TableRowColumn>
+        <TableRowColumn style={{ width: '15%', textAlign: 'left', wordWrap: 'break-word' }}>{item.description}</TableRowColumn>
+        <TableRowColumn style={{ width: '5%', textAlign: 'left', wordWrap: 'break-word' }}>{item.partNo}</TableRowColumn>
+        <TableRowColumn style={{ width: '5%', textAlign: 'left', wordWrap: 'break-word' }}>{item.quantity}</TableRowColumn>
+        <TableRowColumn style={{ width: '5%', textAlign: 'left', wordWrap: 'break-word' }}>{item.unitCost}</TableRowColumn>
+        <TableRowColumn style={{ width: '5%', textAlign: 'left', wordWrap: 'break-word' }}>{item.estCost}</TableRowColumn>
+        <TableRowColumn style={{ width: '8%', textAlign: 'left', wordWrap: 'break-word' }}>{item.dateRequired}</TableRowColumn>
+        <TableRowColumn style={{ width: '10%', textAlign: 'left', wordWrap: 'break-word' }}>{item.intendedUsage}</TableRowColumn>
+        <TableRowColumn style={{ width: '5%' }}>{status}</TableRowColumn>
+        <TableRowColumn>
+          <RaisedButton
+            onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}
+            label="View"
+            style={{ margin: '3px' }}
+            primary
+          />
+          <RaisedButton
+            onTouchTap={() => {
+              Meteor.call('requests.delete', item._id);
+              this.removeItem(item._id);
+            }}
+            label="Delete"
+            style={{ margin: '3px' }}
+            primary
+          />
+        </TableRowColumn>
+      </TableRow>
+    );
   },
 
-  viewRequests() {
-    hashHistory.push('/viewRequests');
+  createReportRow(item) {
+    let projectName = '';
+    for (let i = 0; i < this.state.employeeProjects.length; i += 1) {
+      const p = this.state.employeeProjects[i];
+      if (p._id === item.projectId) {
+        projectName = p.name;
+        break;
+      }
+    }
+
+    let status = '';
+    const style = {};
+    if (item.status === undefined) {
+      status = 'Pending';
+      style.backgroundColor = '#fff;';
+    } else if (item.status) {
+      status = 'Approved';
+      style.backgroundColor = '#a8ffa0;';
+    } else {
+      status = 'Denied';
+    }
+
+    if (status === 'Approved') {
+      return (
+        <TableRow selectable={false} style={style} key={item._id}>
+          <TableRowColumn style={{ width: '10%' }}>{item.dateRequired}</TableRowColumn>
+          <TableRowColumn style={{ width: '10%' }}>{projectName}</TableRowColumn>
+          <TableRowColumn style={{ width: '35%' }}>{item.intendedUsage}</TableRowColumn>
+          <TableRowColumn style={{ width: '10%' }}>{item.estCost}</TableRowColumn>
+          <TableRowColumn style={{ width: '15%' }}>&nbsp;</TableRowColumn>
+          <TableRowColumn style={{ width: '15%' }}>{item.estCost}</TableRowColumn>
+          <TableRowColumn style={{ width: '8%' }}>{item.project}</TableRowColumn>
+          <TableRowColumn>
+            <RaisedButton
+              onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}
+              label="View"
+              style={{ margin: '3px' }}
+              primary
+            />
+          </TableRowColumn>
+        </TableRow>
+      );
+    }
+    return '';
   },
 
   submitReport() {
-    hashHistory.push('/submitReport');
+    const approvedRequests = [];
+    const notApprovedRequests = [];
+    for (let x = 0; x < this.state.myRequests.length; x += 1) {
+      if (this.state.myRequests[x].status) {
+        if (this.state.myRequests[x].receipt) {
+          approvedRequests.push(this.state.myRequests[x]._id);
+        }
+        else {
+          notApprovedRequests.push(this.state.myRequests[x]);
+        }
+      }
+    }
+
+    if (approvedRequests.length === 0) {
+      if (notApprovedRequests.length > 0) {
+        this.setState({ incompleteRequests: notApprovedRequests.length });
+      }
+      return;
+    }
+
+    const today = new Date();
+
+    Meteor.call('reports.create', approvedRequests, today.getMonth(), today.getFullYear(),
+      (error, result) => {
+        if (error != null) {
+          console.log(error);
+        }
+        if (result) {
+          this.setState({
+            myRequests: notApprovedRequests,
+            incompleteRequests: notApprovedRequests.length,
+          });
+          for (let x = 0; x < approvedRequests.length; x += 1) {
+            Meteor.call('requests.submission', approvedRequests[x], (err) => {
+              if (err) {
+                console.log('Could not mark request as submitted');
+              }
+            });
+          }
+        }
+      });
+  },
+
+  createManagerRequestRow(item, index) {
+    if (this.state.requestFilter === null || item.projectId === this.state.requestFilter) {
+      let projectName = '';
+      for (let i = 0; i < this.state.managerProjects.length; i += 1) {
+        const p = this.state.managerProjects[i];
+        if (p._id === item.projectId) {
+          projectName = p.name;
+          break;
+        }
+      }
+
+      return (
+        <TableRow key={index} selectable={false}>
+          <TableRowColumn style={{ width: '8%', textAlign: 'left' }}>{projectName}</TableRowColumn>
+          <TableRowColumn style={{ width: '15%', textAlign: 'left' }}>{item.vendor}</TableRowColumn>
+          <TableRowColumn style={{ width: '15%', textAlign: 'left' }}>{item.description}</TableRowColumn>
+          <TableRowColumn style={{ width: '3%', textAlign: 'left' }}>{item.quantity}</TableRowColumn>
+          <TableRowColumn style={{ width: '3%', textAlign: 'left' }}>{item.estCost}</TableRowColumn>
+          <TableRowColumn style={{ width: '8%', textAlign: 'left' }}>{item.dateRequired}</TableRowColumn>
+          <TableRowColumn style={{ width: '10%', textAlign: 'left' }}>{item.intendedUsage}</TableRowColumn>
+          <TableRowColumn>
+            <RaisedButton
+              label="Approve"
+              primary
+              onTouchTap={() => { this.handleConfirmPress(item); }}
+              style={{ margin: '3px' }}
+            />
+            <RaisedButton
+              label="Deny"
+              primary
+              onTouchTap={() => { this.handleDenyPress(item); }}
+              style={{ margin: '3px' }}
+            />
+            <RaisedButton
+              onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}
+              label="View"
+              style={{ margin: '3px' }}
+              primary
+            />
+          </TableRowColumn>
+        </TableRow>
+      );
+    }
+  },
+
+  createRequestFilterItem(item) {
+    return (
+      <MenuItem value={item._id} primaryText={item.name} />
+    );
+  },
+
+  handleRequestFilterChange(event, index, value) {
+    this.setState({ requestFilter: value });
   },
 
   render() {
+    let tab = this.state.currentEmployeeTab;
+    if (tab === 3 && !this.state.isManager) {
+      tab = 0;
+    }
+    const requestDialogActions = [
+      <FlatButton
+        label="Confirm"
+        primary
+        onTouchTap={this.denyRequest}
+      />,
+      <FlatButton
+        label="Cancel"
+        primary
+        onTouchTap={this.handleCancelPress}
+      />,
+    ];
     return (
       <div>
         <Header isAdmin={this.props.isAdmin} />
@@ -144,32 +430,181 @@ const UserDashboard = React.createClass({
           </ul>
         </Paper>
         <br />
-        {this.state.isManager &&
-          <div style={{ float: 'right', marginRight: '10px' }}>
-            <Toggle
-              label={this.state.viewToggle ? 'Manager View' : 'Employee View'}
-              toggled={this.state.viewToggle}
-              onToggle={this.toggleView}
+        <div>
+          <Tabs value={tab}>
+            <Tab value={0} index={0} label="Projects" onActive={this.updateEmployeeTab} >
+              <Table selectable={false}>
+                <TableHeader displaySelectAll={false}>
+                  <TableRow selectable={false}>
+                    <TableHeaderColumn>Project Name</TableHeaderColumn>
+                    <TableHeaderColumn>Actions</TableHeaderColumn>
+                  </TableRow>
+                </TableHeader>
+                <TableBody displayRowCheckbox={false}>
+                  {this.state.employeeProjects.length > 0 ?
+                    this.state.employeeProjects.map(this.createProjectRow) :
+                    (
+                    <TableRow selectable={false}>
+                      <TableRowColumn>You do not belong to any projects.</TableRowColumn>
+                      <TableRowColumn />
+                    </TableRow>
+                    )
+                  }
+                </TableBody>
+              </Table>
+            </Tab>
+            <Tab value={1} index={1} label="My MPAs" onActive={this.updateEmployeeTab} >
+              <div>
+                <Table selectable={false} style={{ tableLayout: 'auto', wordWrap: 'break-word' }}>
+                  <TableBody displayRowCheckbox={false}>
+                    <TableRow selectable={false} style={{ color: 'rgb(158, 158, 158)' }}>
+                      <TableRowColumn style={{ width: '5%', textAlign: 'left', fontSize: '12px' }}>Item</TableRowColumn>
+                      <TableRowColumn style={{ width: '8%', textAlign: 'left', fontSize: '12px' }}>Project Name</TableRowColumn>
+                      <TableRowColumn style={{ width: '15%', textAlign: 'left', fontSize: '12px' }}>
+                        Vendor Name, Address, Phone Number, & Website
+                      </TableRowColumn>
+                      <TableRowColumn style={{ width: '15%', textAlign: 'left', fontSize: '12px' }}>Item Description</TableRowColumn>
+                      <TableRowColumn style={{ width: '5%', textAlign: 'left', fontSize: '12px' }}>Part Number</TableRowColumn>
+                      <TableRowColumn style={{ width: '5%', textAlign: 'left', fontSize: '12px' }}>Quantity</TableRowColumn>
+                      <TableRowColumn style={{ width: '5%', textAlign: 'left', fontSize: '12px' }}>Unit Cost</TableRowColumn>
+                      <TableRowColumn style={{ width: '5%', textAlign: 'left', fontSize: '12px' }}>Total Cost</TableRowColumn>
+                      <TableRowColumn style={{ width: '5%', textAlign: 'left', fontSize: '12px' }}>Date Required</TableRowColumn>
+                      <TableRowColumn style={{ width: '10%', textAlign: 'left', fontSize: '12px' }}>Intended Program Usage</TableRowColumn>
+                      <TableRowColumn style={{ width: '5%', textAlign: 'left', fontSize: '12px' }}>Status</TableRowColumn>
+                      <TableRowColumn style={{ width: '5%', textAlign: 'left' }}>&nbsp;</TableRowColumn>
+                    </TableRow>
+                    {this.state.myRequests.length > 0 ?
+                      this.state.myRequests.map(this.createRequestRow) :
+                      (
+                      <TableRow selectable={false}>
+                        <TableRowColumn>You have not submitted any requests yet.</TableRowColumn>
+                        <TableRowColumn />
+                      </TableRow>
+                      )
+                    }
+                  </TableBody>
+                </Table>
+                <RaisedButton
+                  primary
+                  label="Submit New MPA"
+                  style={{ float: 'right', margin: '10px' }}
+                  onTouchTap={() => { this.goTo('/submitRequest'); }}
+                />
+              </div>
+            </Tab>
+            <Tab
+              value={2}
+              index={2}
+              label="My MER"
+              onActive={this.updateEmployeeTab}
+            >
+              <Table selectable={false}>
+                <TableBody displayRowCheckbox={false}>
+                  <TableRow selectable={false} style={{ color: 'rgb(158, 158, 158)' }}>
+                    <TableRowColumn style={{ width: '10%', textAlign: 'left', fontSize: '12px' }}>Date</TableRowColumn>
+                    <TableRowColumn style={{ width: '35%', textAlign: 'left', fontSize: '12px' }}>Description and Purpose of Expenditure</TableRowColumn>
+                    <TableRowColumn style={{ width: '10%', textAlign: 'left', fontSize: '12px' }}>Amount</TableRowColumn>
+                    <TableRowColumn style={{ width: '20%', textAlign: 'left', fontSize: '12px' }}>Paid by Scientia</TableRowColumn>
+                    <TableRowColumn style={{ width: '20%', textAlign: 'left', fontSize: '12px' }}>Due Employee</TableRowColumn>
+                    <TableRowColumn style={{ width: '8%', textAlign: 'left', fontSize: '12px' }}>Project/Charge Number</TableRowColumn>
+                  </TableRow>
+                  {this.state.myRequests.length > 0 ?
+                    this.state.myRequests.map(this.createReportRow) :
+                    (
+                    <TableRow selectable={false}>
+                      <TableRowColumn>You have not submitted any requests yet.</TableRowColumn>
+                      <TableRowColumn />
+                    </TableRow>
+                    )
+                  }
+                </TableBody>
+              </Table>
+              {this.state.incompleteRequests !== 0 && (
+                <div
+                  style={{ float: 'left', color: '#f44336', margin: '10px' }}
+                >
+                  There {this.state.incompleteRequests === 1 ? 'is' : 'are'} {this.state.incompleteRequests} approved
+                  MPA{this.state.incompleteRequests === 1 ? '' : 's'} missing a receipt.
+                  {this.state.incompleteRequests === 1 ? 'It was ' : 'They were '} not submitted.
+                </div>
+              )}
+              <RaisedButton
+                label="Submit MER"
+                primary
+                style={{ float: 'right', margin: '10px' }}
+                onTouchTap={this.submitReport}
+              />
+            </Tab>
+            {this.state.isManager &&
+            <Tab
+              value={3}
+              index={3}
+              label="Manage MPAs"
+              onActive={this.updateEmployeeTab}
+            >
+              <Table selectable={false}>
+                <TableHeader displaySelectAll={false}>
+                  <TableRow selectable={false}>
+                    <TableHeaderColumn>
+                      <SelectField
+                        floatingLabelText="Filter by Project"
+                        value={this.state.requestFilter}
+                        style={{ verticalAlign: 'bottom' }}
+                        onChange={this.handleRequestFilterChange}
+                      >
+                        {this.state.managerProjects.map(this.createRequestFilterItem)}
+                      </SelectField>
+                      <FlatButton
+                        label="Clear Filter"
+                        primary
+                        onTouchTap={() => { this.setState({ requestFilter: null }) }}
+                      />
+                    </TableHeaderColumn>
+                  </TableRow>
+                </TableHeader>
+                <TableBody displayRowCheckbox={false}>
+                  <TableRow selectable={false} style={{ color: 'rgb(158, 158, 158)' }}>
+                    <TableRowColumn style={{ width: '8%', textAlign: 'left', fontSize: '12px' }}>Project Name</TableRowColumn>
+                    <TableRowColumn style={{ width: '15%', textAlign: 'left', fontSize: '12px' }}>
+                      Vendor Name, Address, Phone Number, & Website
+                    </TableRowColumn>
+                    <TableRowColumn style={{ width: '15%', textAlign: 'left', fontSize: '12px' }}>Item Description</TableRowColumn>
+                    <TableRowColumn style={{ width: '3%', textAlign: 'left', fontSize: '12px' }}>Quantity</TableRowColumn>
+                    <TableRowColumn style={{ width: '3%', textAlign: 'left', fontSize: '12px' }}>Total Cost</TableRowColumn>
+                    <TableRowColumn style={{ width: '8%', textAlign: 'left', fontSize: '12px' }}>Date Required</TableRowColumn>
+                    <TableRowColumn style={{ width: '10%', textAlign: 'left', fontSize: '12px' }}>Intended Program Usage</TableRowColumn>
+                  </TableRow>
+                  {this.state.managerRequests.length > 0 ?
+                    this.state.managerRequests.map(this.createManagerRequestRow) :
+                    (
+                    <TableRow selectable={false}>
+                      <TableRowColumn>No requests require your attention.</TableRowColumn>
+                      <TableRowColumn />
+                    </TableRow>
+                    )
+                  }
+                </TableBody>
+              </Table>
+            </Tab>
+            }
+          </Tabs>
+        </div>
+        <div>
+          <Dialog
+            title="Respond to request"
+            actions={requestDialogActions}
+            modal={false}
+            open={this.state.requestDialogOpen}
+          >
+            <TextField
+              name="denialText"
+              hintText="Reasons for denial"
+              floatingLabelText="Denial Message"
+              onChange={this.denialChange}
+              fullWidth
             />
-          </div>
-        }
-        <br />
-        { this.state.viewToggle ? (
-          <ManagerView
-            projects={this.state.managerProjects}
-            requests={this.state.managerRequests}
-            currentTab={+this.state.currentManagerTab}
-            updateTab={this.updateManagerTab}
-          />
-        ) : (
-          <EmployeeView
-            projects={this.state.employeeProjects}
-            requests={this.state.myRequests}
-            currentTab={+this.state.currentEmployeeTab}
-            updateTab={this.updateEmployeeTab}
-          />
-        )
-        }
+          </Dialog>
+        </div>
       </div>
     );
   },
