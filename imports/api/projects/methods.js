@@ -110,7 +110,7 @@ Meteor.methods({
   */
   'projects.name': function viewName(id) {
     check(id, String);
-    var project = Projects.find({ _id: id }).fetch();
+    const project = Projects.find({ _id: id }).fetch();
 
     return project[0].name;
   },

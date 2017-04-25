@@ -1,13 +1,11 @@
+import { Meteor } from 'meteor/meteor';
 import { hashHistory } from 'react-router';
-import Toggle from 'material-ui/Toggle';
-import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
+import { Table, TableHeader, TableHeaderColumn, TableRow }
   from 'material-ui/Table';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
-import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
+import { Card, CardActions, CardHeader, CardText } from 'material-ui/Card';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import RaisedButton from 'material-ui/RaisedButton';
-import Popover from 'material-ui/Popover';
-import Menu from 'material-ui/Menu';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import FlatButton from 'material-ui/FlatButton';
@@ -111,53 +109,14 @@ const UserDashboard = React.createClass({
     });
   },
 
-  createBreadcrumb(item) {
-    return (
-      <li><a href={item.url}>{item.page}</a></li>
-    );
-  },
-
   // Helpers
-  goTo(url) {
-    hashHistory.push(url);
-  },
-
-  serveRequest(request, approved, message) {
-    Meteor.call('requests.statEdit', request._id, approved, message, (err) => {
-      if (err) {
-        console.log(err);
+  getUserName(userId) {
+    for (let i = 0; i < this.state.users.length; i += 1) {
+      if (this.state.users[i]._id === userId) {
+        return this.state.users[i].profile.name;
       }
-    });
-    Meteor.call('notifications.respondHelper', approved,
-      request._id,
-      request.userId,
-      // (error) => {
-      //   if (error != null) {
-      //     this.setState({ dialogError: `Error: ${error.error}. ${error.reason}` });
-      //     return;
-      //   }
-      //   return;
-      // }
-    );
-  },
-
-  handleConfirmPress(req) {
-    this.serveRequest(req, true, '');
-  },
-
-  handleDenyPress(request) {
-    this.setState({
-      requestDialogOpen: true,
-      requestToDeny: request });
-  },
-
-  denyRequest() {
-    this.serveRequest(this.state.requestToDeny, false, this.state.statMsg);
-    this.setState({
-      requestToDeny: {},
-      statMsg: '',
-      requestDialogOpen: false,
-    });
+    }
+    return '';
   },
 
   handleCancelPress() {
@@ -207,7 +166,7 @@ const UserDashboard = React.createClass({
     );
   },
 
-  createRequestCard(item, index) {
+  createRequestCard(item) {
     Meteor.call('projects.name', item.projectId, (err, results) => {
       if (err) {
         console.log(err);
@@ -231,21 +190,23 @@ const UserDashboard = React.createClass({
           <CardHeader
             title={this.projectName}
             subtitle={`Submitted on ${dateFormat(item.bornOn, 'mmmm d, yyyy')}`}
-            actAsExpander={true}
-            showExpandableButton={true}
+            actAsExpander
+            showExpandableButton
           />
           <CardText>
             <strong>Current Status: </strong>{status}
           </CardText>
           <CardActions>
             <FlatButton label="View" onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }} />
-            <FlatButton label="Delete" onTouchTap={() => {
+            <FlatButton
+              label="Delete"
+              onTouchTap={() => {
                 Meteor.call('requests.delete', item._id);
                 this.removeItem(item._id);
-              }} 
+              }}
             />
           </CardActions>
-          <CardText expandable={true}>
+          <CardText expandable>
             <strong>Vendor: </strong>{item.vendor}<br />
             <strong>Description: </strong>{item.description}<br />
             <strong>Part Number: </strong>{item.partNo}<br />
@@ -271,7 +232,6 @@ const UserDashboard = React.createClass({
         }
       }
 
-      const status = 'Approved';
       const style = {};
       if (item.receipt) {
         style.backgroundColor = '#a8ffa0';
@@ -281,15 +241,15 @@ const UserDashboard = React.createClass({
         <Col xs={12} sm={12} md={6} lg={4} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
           <Card style={style}>
             <CardHeader
-              title={this.projectName}
+              title={projectName}
               subtitle={`Submitted on ${dateFormat(item.bornOn, 'mmmm d, yyyy')}`}
-              actAsExpander={true}
-              showExpandableButton={true}
+              actAsExpander
+              showExpandableButton
             />
             <CardActions>
               <FlatButton label="View" onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }} />
             </CardActions>
-            <CardText expandable={true}>
+            <CardText expandable>
               <strong>Date Required: </strong>{dateFormat(item.dateRequired, 'mmmm d, yyyy')}<br />
               <strong>Vendor: </strong>{item.vendor}<br />
               <strong>Description: </strong>{item.description}<br />
@@ -310,8 +270,7 @@ const UserDashboard = React.createClass({
       if (this.state.myRequests[x].status) {
         if (this.state.myRequests[x].receipt) {
           approvedRequests.push(this.state.myRequests[x]._id);
-        }
-        else {
+        } else {
           notApprovedRequests.push(this.state.myRequests[x]);
         }
       }
@@ -347,16 +306,55 @@ const UserDashboard = React.createClass({
       });
   },
 
-  getUserName(userId) {
-    for (let i = 0; i < this.state.users.length; i += 1) {
-      if (this.state.users[i]._id === userId) {
-        return this.state.users[i].profile.name;
+  serveRequest(request, approved, message) {
+    Meteor.call('requests.statEdit', request._id, approved, message, (err) => {
+      if (err) {
+        console.log(err);
       }
-    }
-    return '';
+    });
+    Meteor.call('notifications.respondHelper', approved,
+      request._id,
+      request.userId,
+      // (error) => {
+      //   if (error != null) {
+      //     this.setState({ dialogError: `Error: ${error.error}. ${error.reason}` });
+      //     return;
+      //   }
+      //   return;
+      // }
+    );
   },
 
-  createManagerRequestCard(item, index) {
+  handleConfirmPress(req) {
+    this.serveRequest(req, true, '');
+  },
+
+  handleDenyPress(request) {
+    this.setState({
+      requestDialogOpen: true,
+      requestToDeny: request });
+  },
+
+  denyRequest() {
+    this.serveRequest(this.state.requestToDeny, false, this.state.statMsg);
+    this.setState({
+      requestToDeny: {},
+      statMsg: '',
+      requestDialogOpen: false,
+    });
+  },
+
+  createBreadcrumb(item) {
+    return (
+      <li><a href={item.url}>{item.page}</a></li>
+    );
+  },
+
+  goTo(url) {
+    hashHistory.push(url);
+  },
+
+  createManagerRequestCard(item) {
     if (this.state.requestFilter === null || item.projectId === this.state.requestFilter) {
       let projectName = '';
       for (let i = 0; i < this.state.managerProjects.length; i += 1) {
@@ -373,15 +371,15 @@ const UserDashboard = React.createClass({
             <CardHeader
               title={projectName}
               subtitle={`Submitted by ${this.getUserName(item.userId)} on ${dateFormat(item.bornOn, 'mmmm d, yyyy')}`}
-              actAsExpander={true}
-              showExpandableButton={true}
+              actAsExpander
+              showExpandableButton
             />
             <CardActions>
               <FlatButton label="Approve" onTouchTap={() => { this.handleConfirmPress(item); }} />
               <FlatButton label="Deny" onTouchTap={() => { this.handleDenyPress(item); }} />
               <FlatButton label="View" onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }} />
             </CardActions>
-            <CardText expandable={true}>
+            <CardText expandable>
               <strong>Vendor: </strong>{item.vendor}<br />
               <strong>Description: </strong>{item.description}<br />
               <strong>Quantity: </strong>{item.quantity}<br />
@@ -393,6 +391,7 @@ const UserDashboard = React.createClass({
         </Col>
       );
     }
+    return null;
   },
 
   createRequestFilterItem(item) {
@@ -439,13 +438,13 @@ const UserDashboard = React.createClass({
                   {this.state.employeeProjects.length > 0 ?
                     this.state.employeeProjects.map(this.createProjectCard) :
                     (
-                      <Col lg={12} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
-                        <Card>
-                          <CardHeader
-                            title="You do not currently belong to any projects"
-                          />
-                        </Card>
-                      </Col>
+                    <Col lg={12} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
+                      <Card>
+                        <CardHeader
+                          title="You do not currently belong to any projects"
+                        />
+                      </Card>
+                    </Col>
                     )
                   }
                 </Row>
@@ -461,20 +460,20 @@ const UserDashboard = React.createClass({
                     onTouchTap={() => { this.goTo('/submitRequest'); }}
                   />
                 </div>
-                <div style={{ clear: 'both', position: 'relative' }}></div>
+                <div style={{ clear: 'both', position: 'relative' }} />
                 <div>
                   <Grid style={{ width: '100%' }}>
                     <Row>
                       {this.state.myRequests.length > 0 ?
                         this.state.myRequests.map(this.createRequestCard) :
                         (
-                          <Col lg={12} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
-                            <Card>
-                              <CardHeader
-                                title="You have no outstanding MPAs"
-                              />
-                            </Card>
-                          </Col>
+                        <Col lg={12} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
+                          <Card>
+                            <CardHeader
+                              title="You have no outstanding MPAs"
+                            />
+                          </Card>
+                        </Col>
                         )
                       }
                     </Row>
@@ -494,13 +493,13 @@ const UserDashboard = React.createClass({
                     {this.state.myRequests.length > 0 ?
                       this.state.myRequests.map(this.createReportCard) :
                       (
-                        <Col lg={12} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
-                          <Card>
-                            <CardHeader
-                              title="You have no outstanding MPAs"
-                            />
-                          </Card>
-                        </Col>
+                      <Col lg={12} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
+                        <Card>
+                          <CardHeader
+                            title="You have no outstanding MPAs"
+                          />
+                        </Card>
+                      </Col>
                       )
                     }
                   </Row>
@@ -523,38 +522,38 @@ const UserDashboard = React.createClass({
               </div>
             </Tab>
             {this.state.isManager &&
-            <Tab
-              value={3}
-              index={3}
-              label="Manage MPAs"
-              onActive={this.updateEmployeeTab}
-            >
-              <Table selectable={false}>
-                <TableHeader displaySelectAll={false}>
-                  <TableRow selectable={false}>
-                    <TableHeaderColumn>
-                      <SelectField
-                        floatingLabelText="Filter by Project"
-                        value={this.state.requestFilter}
-                        style={{ verticalAlign: 'bottom' }}
-                        onChange={this.handleRequestFilterChange}
-                      >
-                        {this.state.managerProjects.map(this.createRequestFilterItem)}
-                      </SelectField>
-                      <FlatButton
-                        label="Clear Filter"
-                        primary
-                        onTouchTap={() => { this.setState({ requestFilter: null }) }}
-                      />
-                    </TableHeaderColumn>
-                  </TableRow>
-                </TableHeader>
-              </Table>
-              <Grid style={{ width: '95%' }}>
-                <Row>
-                  {this.state.managerRequests.length > 0 ?
-                    this.state.managerRequests.map(this.createManagerRequestCard) :
-                    (
+              <Tab
+                value={3}
+                index={3}
+                label="Manage MPAs"
+                onActive={this.updateEmployeeTab}
+              >
+                <Table selectable={false}>
+                  <TableHeader displaySelectAll={false}>
+                    <TableRow selectable={false}>
+                      <TableHeaderColumn>
+                        <SelectField
+                          floatingLabelText="Filter by Project"
+                          value={this.state.requestFilter}
+                          style={{ verticalAlign: 'bottom' }}
+                          onChange={this.handleRequestFilterChange}
+                        >
+                          {this.state.managerProjects.map(this.createRequestFilterItem)}
+                        </SelectField>
+                        <FlatButton
+                          label="Clear Filter"
+                          primary
+                          onTouchTap={() => { this.setState({ requestFilter: null }); }}
+                        />
+                      </TableHeaderColumn>
+                    </TableRow>
+                  </TableHeader>
+                </Table>
+                <Grid style={{ width: '95%' }}>
+                  <Row>
+                    {this.state.managerRequests.length > 0 ?
+                      this.state.managerRequests.map(this.createManagerRequestCard) :
+                      (
                       <Col lg={12} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
                         <Card>
                           <CardHeader
@@ -562,11 +561,11 @@ const UserDashboard = React.createClass({
                           />
                         </Card>
                       </Col>
-                    )
-                  }
-                </Row>
-              </Grid>
-            </Tab>
+                      )
+                    }
+                  </Row>
+                </Grid>
+              </Tab>
             }
           </Tabs>
         </div>
