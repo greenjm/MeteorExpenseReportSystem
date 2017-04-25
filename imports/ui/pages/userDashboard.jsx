@@ -2,8 +2,12 @@ import { hashHistory } from 'react-router';
 import Toggle from 'material-ui/Toggle';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
   from 'material-ui/Table';
+import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
+import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import RaisedButton from 'material-ui/RaisedButton';
+import Popover from 'material-ui/Popover';
+import Menu from 'material-ui/Menu';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import FlatButton from 'material-ui/FlatButton';
@@ -16,6 +20,7 @@ import Header from '../components/header.jsx';
 /* eslint no-undef: "error"*/
 
 const React = require('react');
+const dateFormat = require('dateformat');
 
 // Styles
 const paperStyle = {
@@ -185,29 +190,24 @@ const UserDashboard = React.createClass({
     });
   },
 
-  createProjectRow(item) {
+  createProjectCard(item) {
     return (
-      <TableRow selectable={false}>
-        <TableRowColumn>{item.name}</TableRowColumn>
-        <TableRowColumn>
-          <RaisedButton
-            onTouchTap={() => { this.goTo(`/project/view/${item._id}`); }}
-            label="View Project Details"
-            style={{ margin: '3px' }}
-            primary
+      <Col xs={12} sm={12} md={6} lg={6} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
+        <Card>
+          <CardHeader
+            title={item.name}
+            subtitle={`Project started ${dateFormat(item.bornOn, 'mmmm d, yyyy')}`}
           />
-          <RaisedButton
-            onTouchTap={() => { this.goTo(`/submitRequest/${item._id}`); }}
-            label="Submit New MPA"
-            style={{ margin: '3px' }}
-            primary
-          />
-        </TableRowColumn>
-      </TableRow>
+          <CardActions>
+            <FlatButton label="View Project Details" onTouchTap={() => { this.goTo(`/project/view/${item._id}`); }} />
+            <FlatButton label="Submit New MPA" onTouchTap={() => { this.goTo(`/submitRequest/${item._id}`); }} />
+          </CardActions>
+        </Card>
+      </Col>
     );
   },
 
-  createRequestRow(item, index) {
+  createRequestCard(item, index) {
     Meteor.call('projects.name', item.projectId, (err, results) => {
       if (err) {
         console.log(err);
@@ -226,80 +226,78 @@ const UserDashboard = React.createClass({
     }
 
     return (
-      <TableRow>
-        <TableRowColumn style={{ width: '5%', textAlign: 'left', wordWrap: 'break-word' }}>{index}</TableRowColumn>
-        <TableRowColumn style={{ width: '8%', textAlign: 'left', wordWrap: 'break-word' }}>{this.projectName}</TableRowColumn>
-        <TableRowColumn style={{ width: '15%', textAlign: 'left', wordWrap: 'break-word' }}>{item.vendor}</TableRowColumn>
-        <TableRowColumn style={{ width: '15%', textAlign: 'left', wordWrap: 'break-word' }}>{item.description}</TableRowColumn>
-        <TableRowColumn style={{ width: '5%', textAlign: 'left', wordWrap: 'break-word' }}>{item.partNo}</TableRowColumn>
-        <TableRowColumn style={{ width: '5%', textAlign: 'left', wordWrap: 'break-word' }}>{item.quantity}</TableRowColumn>
-        <TableRowColumn style={{ width: '5%', textAlign: 'left', wordWrap: 'break-word' }}>{item.unitCost}</TableRowColumn>
-        <TableRowColumn style={{ width: '5%', textAlign: 'left', wordWrap: 'break-word' }}>{item.estCost}</TableRowColumn>
-        <TableRowColumn style={{ width: '8%', textAlign: 'left', wordWrap: 'break-word' }}>{item.dateRequired}</TableRowColumn>
-        <TableRowColumn style={{ width: '10%', textAlign: 'left', wordWrap: 'break-word' }}>{item.intendedUsage}</TableRowColumn>
-        <TableRowColumn style={{ width: '5%' }}>{status}</TableRowColumn>
-        <TableRowColumn>
-          <RaisedButton
-            onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}
-            label="View"
-            style={{ margin: '3px' }}
-            primary
+      <Col xs={12} sm={12} md={6} lg={4} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
+        <Card>
+          <CardHeader
+            title={this.projectName}
+            subtitle={`Submitted on ${dateFormat(item.bornOn, 'mmmm d, yyyy')}`}
+            actAsExpander={true}
+            showExpandableButton={true}
           />
-          <RaisedButton
-            onTouchTap={() => {
-              Meteor.call('requests.delete', item._id);
-              this.removeItem(item._id);
-            }}
-            label="Delete"
-            style={{ margin: '3px' }}
-            primary
-          />
-        </TableRowColumn>
-      </TableRow>
+          <CardText>
+            <strong>Current Status: </strong>{status}
+          </CardText>
+          <CardActions>
+            <FlatButton label="View" onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }} />
+            <FlatButton label="Delete" onTouchTap={() => {
+                Meteor.call('requests.delete', item._id);
+                this.removeItem(item._id);
+              }} 
+            />
+          </CardActions>
+          <CardText expandable={true}>
+            <strong>Vendor: </strong>{item.vendor}<br />
+            <strong>Description: </strong>{item.description}<br />
+            <strong>Part Number: </strong>{item.partNo}<br />
+            <strong>Quantity: </strong>{item.quantity}<br />
+            <strong>Unit Cost: </strong>{item.unitCost}<br />
+            <strong>Estimated Cost: </strong>{item.estCost}<br />
+            <strong>Date Required: </strong>{dateFormat(item.dateRequired, 'mmmm d, yyyy')}<br />
+            <strong>Intended Usage: </strong>{item.intendedUsage}<br />
+          </CardText>
+        </Card>
+      </Col>
     );
   },
 
-  createReportRow(item) {
-    let projectName = '';
-    for (let i = 0; i < this.state.employeeProjects.length; i += 1) {
-      const p = this.state.employeeProjects[i];
-      if (p._id === item.projectId) {
-        projectName = p.name;
-        break;
+  createReportCard(item) {
+    if (item.status) {
+      let projectName = '';
+      for (let i = 0; i < this.state.employeeProjects.length; i += 1) {
+        const p = this.state.employeeProjects[i];
+        if (p._id === item.projectId) {
+          projectName = p.name;
+          break;
+        }
       }
-    }
 
-    let status = '';
-    const style = {};
-    if (item.status === undefined) {
-      status = 'Pending';
-      style.backgroundColor = '#fff;';
-    } else if (item.status) {
-      status = 'Approved';
-      style.backgroundColor = '#a8ffa0;';
-    } else {
-      status = 'Denied';
-    }
+      const status = 'Approved';
+      const style = {};
+      if (item.receipt) {
+        style.backgroundColor = '#a8ffa0';
+      }
 
-    if (status === 'Approved') {
       return (
-        <TableRow selectable={false} style={style} key={item._id}>
-          <TableRowColumn style={{ width: '10%' }}>{item.dateRequired}</TableRowColumn>
-          <TableRowColumn style={{ width: '10%' }}>{projectName}</TableRowColumn>
-          <TableRowColumn style={{ width: '35%' }}>{item.intendedUsage}</TableRowColumn>
-          <TableRowColumn style={{ width: '10%' }}>{item.estCost}</TableRowColumn>
-          <TableRowColumn style={{ width: '15%' }}>&nbsp;</TableRowColumn>
-          <TableRowColumn style={{ width: '15%' }}>{item.estCost}</TableRowColumn>
-          <TableRowColumn style={{ width: '8%' }}>{item.project}</TableRowColumn>
-          <TableRowColumn>
-            <RaisedButton
-              onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}
-              label="View"
-              style={{ margin: '3px' }}
-              primary
+        <Col xs={12} sm={12} md={6} lg={4} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
+          <Card style={style}>
+            <CardHeader
+              title={this.projectName}
+              subtitle={`Submitted on ${dateFormat(item.bornOn, 'mmmm d, yyyy')}`}
+              actAsExpander={true}
+              showExpandableButton={true}
             />
-          </TableRowColumn>
-        </TableRow>
+            <CardActions>
+              <FlatButton label="View" onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }} />
+            </CardActions>
+            <CardText expandable={true}>
+              <strong>Date Required: </strong>{dateFormat(item.dateRequired, 'mmmm d, yyyy')}<br />
+              <strong>Vendor: </strong>{item.vendor}<br />
+              <strong>Description: </strong>{item.description}<br />
+              <strong>Intended Usage: </strong>{item.intendedUsage}<br />
+              <strong>Estimated Cost: </strong>{item.estCost}<br />
+            </CardText>
+          </Card>
+        </Col>
       );
     }
     return '';
@@ -349,7 +347,16 @@ const UserDashboard = React.createClass({
       });
   },
 
-  createManagerRequestRow(item, index) {
+  getUserName(userId) {
+    for (let i = 0; i < this.state.users.length; i += 1) {
+      if (this.state.users[i]._id === userId) {
+        return this.state.users[i].profile.name;
+      }
+    }
+    return '';
+  },
+
+  createManagerRequestCard(item, index) {
     if (this.state.requestFilter === null || item.projectId === this.state.requestFilter) {
       let projectName = '';
       for (let i = 0; i < this.state.managerProjects.length; i += 1) {
@@ -361,35 +368,29 @@ const UserDashboard = React.createClass({
       }
 
       return (
-        <TableRow key={index} selectable={false}>
-          <TableRowColumn style={{ width: '8%', textAlign: 'left' }}>{projectName}</TableRowColumn>
-          <TableRowColumn style={{ width: '15%', textAlign: 'left' }}>{item.vendor}</TableRowColumn>
-          <TableRowColumn style={{ width: '15%', textAlign: 'left' }}>{item.description}</TableRowColumn>
-          <TableRowColumn style={{ width: '3%', textAlign: 'left' }}>{item.quantity}</TableRowColumn>
-          <TableRowColumn style={{ width: '3%', textAlign: 'left' }}>{item.estCost}</TableRowColumn>
-          <TableRowColumn style={{ width: '8%', textAlign: 'left' }}>{item.dateRequired}</TableRowColumn>
-          <TableRowColumn style={{ width: '10%', textAlign: 'left' }}>{item.intendedUsage}</TableRowColumn>
-          <TableRowColumn>
-            <RaisedButton
-              label="Approve"
-              primary
-              onTouchTap={() => { this.handleConfirmPress(item); }}
-              style={{ margin: '3px' }}
+        <Col xs={12} sm={12} md={6} lg={4} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
+          <Card>
+            <CardHeader
+              title={projectName}
+              subtitle={`Submitted by ${this.getUserName(item.userId)} on ${dateFormat(item.bornOn, 'mmmm d, yyyy')}`}
+              actAsExpander={true}
+              showExpandableButton={true}
             />
-            <RaisedButton
-              label="Deny"
-              primary
-              onTouchTap={() => { this.handleDenyPress(item); }}
-              style={{ margin: '3px' }}
-            />
-            <RaisedButton
-              onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}
-              label="View"
-              style={{ margin: '3px' }}
-              primary
-            />
-          </TableRowColumn>
-        </TableRow>
+            <CardActions>
+              <FlatButton label="Approve" onTouchTap={() => { this.handleConfirmPress(item); }} />
+              <FlatButton label="Deny" onTouchTap={() => { this.handleDenyPress(item); }} />
+              <FlatButton label="View" onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }} />
+            </CardActions>
+            <CardText expandable={true}>
+              <strong>Vendor: </strong>{item.vendor}<br />
+              <strong>Description: </strong>{item.description}<br />
+              <strong>Quantity: </strong>{item.quantity}<br />
+              <strong>Estimated Cost: </strong>{item.estCost}<br />
+              <strong>Date Required: </strong>{dateFormat(item.dateRequired, 'mmmm d, yyyy')}<br />
+              <strong>Intended Usage: </strong>{item.intendedUsage}<br />
+            </CardText>
+          </Card>
+        </Col>
       );
     }
   },
@@ -433,63 +434,52 @@ const UserDashboard = React.createClass({
         <div>
           <Tabs value={tab}>
             <Tab value={0} index={0} label="Projects" onActive={this.updateEmployeeTab} >
-              <Table selectable={false}>
-                <TableHeader displaySelectAll={false}>
-                  <TableRow selectable={false}>
-                    <TableHeaderColumn>Project Name</TableHeaderColumn>
-                    <TableHeaderColumn>Actions</TableHeaderColumn>
-                  </TableRow>
-                </TableHeader>
-                <TableBody displayRowCheckbox={false}>
+              <Grid style={{ width: '95%' }}>
+                <Row>
                   {this.state.employeeProjects.length > 0 ?
-                    this.state.employeeProjects.map(this.createProjectRow) :
+                    this.state.employeeProjects.map(this.createProjectCard) :
                     (
-                    <TableRow selectable={false}>
-                      <TableRowColumn>You do not belong to any projects.</TableRowColumn>
-                      <TableRowColumn />
-                    </TableRow>
+                      <Col lg={12} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
+                        <Card>
+                          <CardHeader
+                            title="You do not currently belong to any projects"
+                          />
+                        </Card>
+                      </Col>
                     )
                   }
-                </TableBody>
-              </Table>
+                </Row>
+              </Grid>
             </Tab>
             <Tab value={1} index={1} label="My MPAs" onActive={this.updateEmployeeTab} >
-              <div>
-                <Table selectable={false} style={{ tableLayout: 'auto', wordWrap: 'break-word' }}>
-                  <TableBody displayRowCheckbox={false}>
-                    <TableRow selectable={false} style={{ color: 'rgb(158, 158, 158)' }}>
-                      <TableRowColumn style={{ width: '5%', textAlign: 'left', fontSize: '12px' }}>Item</TableRowColumn>
-                      <TableRowColumn style={{ width: '8%', textAlign: 'left', fontSize: '12px' }}>Project Name</TableRowColumn>
-                      <TableRowColumn style={{ width: '15%', textAlign: 'left', fontSize: '12px' }}>
-                        Vendor Name, Address, Phone Number, & Website
-                      </TableRowColumn>
-                      <TableRowColumn style={{ width: '15%', textAlign: 'left', fontSize: '12px' }}>Item Description</TableRowColumn>
-                      <TableRowColumn style={{ width: '5%', textAlign: 'left', fontSize: '12px' }}>Part Number</TableRowColumn>
-                      <TableRowColumn style={{ width: '5%', textAlign: 'left', fontSize: '12px' }}>Quantity</TableRowColumn>
-                      <TableRowColumn style={{ width: '5%', textAlign: 'left', fontSize: '12px' }}>Unit Cost</TableRowColumn>
-                      <TableRowColumn style={{ width: '5%', textAlign: 'left', fontSize: '12px' }}>Total Cost</TableRowColumn>
-                      <TableRowColumn style={{ width: '5%', textAlign: 'left', fontSize: '12px' }}>Date Required</TableRowColumn>
-                      <TableRowColumn style={{ width: '10%', textAlign: 'left', fontSize: '12px' }}>Intended Program Usage</TableRowColumn>
-                      <TableRowColumn style={{ width: '5%', textAlign: 'left', fontSize: '12px' }}>Status</TableRowColumn>
-                      <TableRowColumn style={{ width: '5%', textAlign: 'left' }}>&nbsp;</TableRowColumn>
-                    </TableRow>
-                    {this.state.myRequests.length > 0 ?
-                      this.state.myRequests.map(this.createRequestRow) :
-                      (
-                      <TableRow selectable={false}>
-                        <TableRowColumn>You have not submitted any requests yet.</TableRowColumn>
-                        <TableRowColumn />
-                      </TableRow>
-                      )
-                    }
-                  </TableBody>
-                </Table>
-                <RaisedButton
-                  primary
-                  label="Submit New MPA"
-                  style={{ float: 'right', margin: '10px' }}
-                  onTouchTap={() => { this.goTo('/submitRequest'); }}
-                />
+              <div style={{ width: '95%', margin: '0 auto' }}>
+                <div>
+                  <RaisedButton
+                    primary
+                    label="Submit New MPA"
+                    style={{ float: 'right', marginTop: '10px' }}
+                    onTouchTap={() => { this.goTo('/submitRequest'); }}
+                  />
+                </div>
+                <div style={{ clear: 'both', position: 'relative' }}></div>
+                <div>
+                  <Grid style={{ width: '100%' }}>
+                    <Row>
+                      {this.state.myRequests.length > 0 ?
+                        this.state.myRequests.map(this.createRequestCard) :
+                        (
+                          <Col lg={12} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
+                            <Card>
+                              <CardHeader
+                                title="You have no outstanding MPAs"
+                              />
+                            </Card>
+                          </Col>
+                        )
+                      }
+                    </Row>
+                  </Grid>
+                </div>
               </div>
             </Tab>
             <Tab
@@ -498,42 +488,39 @@ const UserDashboard = React.createClass({
               label="My MER"
               onActive={this.updateEmployeeTab}
             >
-              <Table selectable={false}>
-                <TableBody displayRowCheckbox={false}>
-                  <TableRow selectable={false} style={{ color: 'rgb(158, 158, 158)' }}>
-                    <TableRowColumn style={{ width: '10%', textAlign: 'left', fontSize: '12px' }}>Date</TableRowColumn>
-                    <TableRowColumn style={{ width: '35%', textAlign: 'left', fontSize: '12px' }}>Description and Purpose of Expenditure</TableRowColumn>
-                    <TableRowColumn style={{ width: '10%', textAlign: 'left', fontSize: '12px' }}>Amount</TableRowColumn>
-                    <TableRowColumn style={{ width: '20%', textAlign: 'left', fontSize: '12px' }}>Paid by Scientia</TableRowColumn>
-                    <TableRowColumn style={{ width: '20%', textAlign: 'left', fontSize: '12px' }}>Due Employee</TableRowColumn>
-                    <TableRowColumn style={{ width: '8%', textAlign: 'left', fontSize: '12px' }}>Project/Charge Number</TableRowColumn>
-                  </TableRow>
-                  {this.state.myRequests.length > 0 ?
-                    this.state.myRequests.map(this.createReportRow) :
-                    (
-                    <TableRow selectable={false}>
-                      <TableRowColumn>You have not submitted any requests yet.</TableRowColumn>
-                      <TableRowColumn />
-                    </TableRow>
-                    )
-                  }
-                </TableBody>
-              </Table>
-              {this.state.incompleteRequests !== 0 && (
-                <div
-                  style={{ float: 'left', color: '#f44336', margin: '10px' }}
-                >
-                  There {this.state.incompleteRequests === 1 ? 'is' : 'are'} {this.state.incompleteRequests} approved
-                  MPA{this.state.incompleteRequests === 1 ? '' : 's'} missing a receipt.
-                  {this.state.incompleteRequests === 1 ? 'It was ' : 'They were '} not submitted.
-                </div>
-              )}
-              <RaisedButton
-                label="Submit MER"
-                primary
-                style={{ float: 'right', margin: '10px' }}
-                onTouchTap={this.submitReport}
-              />
+              <div style={{ width: '95%', margin: '0 auto' }}>
+                <Grid style={{ width: '100%' }}>
+                  <Row>
+                    {this.state.myRequests.length > 0 ?
+                      this.state.myRequests.map(this.createReportCard) :
+                      (
+                        <Col lg={12} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
+                          <Card>
+                            <CardHeader
+                              title="You have no outstanding MPAs"
+                            />
+                          </Card>
+                        </Col>
+                      )
+                    }
+                  </Row>
+                </Grid>
+                {this.state.incompleteRequests !== 0 && (
+                  <div
+                    style={{ float: 'left', color: '#f44336', margin: '10px' }}
+                  >
+                    There {this.state.incompleteRequests === 1 ? 'is' : 'are'} {this.state.incompleteRequests} approved
+                    MPA{this.state.incompleteRequests === 1 ? '' : 's'} missing a receipt.
+                    {this.state.incompleteRequests === 1 ? 'It was ' : 'They were '} not submitted.
+                  </div>
+                )}
+                <RaisedButton
+                  label="Submit MER"
+                  primary
+                  style={{ float: 'right', marginTop: '10px' }}
+                  onTouchTap={this.submitReport}
+                />
+              </div>
             </Tab>
             {this.state.isManager &&
             <Tab
@@ -562,29 +549,23 @@ const UserDashboard = React.createClass({
                     </TableHeaderColumn>
                   </TableRow>
                 </TableHeader>
-                <TableBody displayRowCheckbox={false}>
-                  <TableRow selectable={false} style={{ color: 'rgb(158, 158, 158)' }}>
-                    <TableRowColumn style={{ width: '8%', textAlign: 'left', fontSize: '12px' }}>Project Name</TableRowColumn>
-                    <TableRowColumn style={{ width: '15%', textAlign: 'left', fontSize: '12px' }}>
-                      Vendor Name, Address, Phone Number, & Website
-                    </TableRowColumn>
-                    <TableRowColumn style={{ width: '15%', textAlign: 'left', fontSize: '12px' }}>Item Description</TableRowColumn>
-                    <TableRowColumn style={{ width: '3%', textAlign: 'left', fontSize: '12px' }}>Quantity</TableRowColumn>
-                    <TableRowColumn style={{ width: '3%', textAlign: 'left', fontSize: '12px' }}>Total Cost</TableRowColumn>
-                    <TableRowColumn style={{ width: '8%', textAlign: 'left', fontSize: '12px' }}>Date Required</TableRowColumn>
-                    <TableRowColumn style={{ width: '10%', textAlign: 'left', fontSize: '12px' }}>Intended Program Usage</TableRowColumn>
-                  </TableRow>
+              </Table>
+              <Grid style={{ width: '95%' }}>
+                <Row>
                   {this.state.managerRequests.length > 0 ?
-                    this.state.managerRequests.map(this.createManagerRequestRow) :
+                    this.state.managerRequests.map(this.createManagerRequestCard) :
                     (
-                    <TableRow selectable={false}>
-                      <TableRowColumn>No requests require your attention.</TableRowColumn>
-                      <TableRowColumn />
-                    </TableRow>
+                      <Col lg={12} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
+                        <Card>
+                          <CardHeader
+                            title="No MPAs require your attention at this moment"
+                          />
+                        </Card>
+                      </Col>
                     )
                   }
-                </TableBody>
-              </Table>
+                </Row>
+              </Grid>
             </Tab>
             }
           </Tabs>

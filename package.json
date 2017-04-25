@@ -13,6 +13,7 @@
     "check": "^1.0.0",
     "classnames": "^2.2.5",
     "coffee-script": "^1.0.17",
+    "dateformat": "^2.0.0",
     "ejson": "^2.1.2",
     "flexboxgrid": "^6.3.1",
     "material-ui": "^0.16.4",
