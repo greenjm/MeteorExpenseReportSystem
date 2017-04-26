@@ -31,9 +31,9 @@ export default function getTheme() {
       color: palette.alternateTextColor,
     },
     raisedButton: {
-      color: palette.alternateTextColor,
+      color: grey300,
       textColor: palette.textColor,
-      primaryColor: '#ffae00',
+      primaryColor: palette.accent1Color,
       primaryTextColor: palette.alternateTextColor,
       secondaryColor: palette.accent1Color,
       secondaryTextColor: palette.alternateTextColor,

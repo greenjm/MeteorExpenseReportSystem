@@ -3,7 +3,7 @@ import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
 import { hashHistory } from 'react-router';
 import TextField from 'material-ui/TextField';
 import CircularProgress from 'material-ui/CircularProgress';
-import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
@@ -406,8 +406,8 @@ const SubmitRequest = React.createClass({
                       />
                       <div style={{ color: 'red' }}>{this.state.dialogError}</div>
                       <div style={{ float: 'right', margin: '10px' }}>
-                        <FlatButton label="Cancel" onTouchTap={this.cancelRequest} />
-                        <FlatButton type="submit" label="Submit" primary />
+                        <RaisedButton primary label="Cancel" onTouchTap={this.cancelRequest} />
+                        <RaisedButton primary type="submit" label="Submit" />
                       </div>
                     </form>
                   )}
