@@ -22,10 +22,18 @@ const UserDashboardContainer = createContainer(() => {
   let userReady = null;
 
   // Projects and Requests
-  const employeeProjects = (projectReady && user &&
-    Projects.find({ employees: user._id }).fetch()) || [];
-  const managerProjects = (projectReady && user &&
-    Projects.find({ managers: user._id }).fetch()) || [];
+  let employeeProjects = [];
+  if (isAdmin && projectReady) {
+    employeeProjects = Projects.find().fetch();
+  } else {
+    employeeProjects = user && Projects.find({ employees: user._id }).fetch();
+  }
+  let managerProjects = [];
+  if (isAdmin && projectReady) {
+    managerProjects = Projects.find().fetch();
+  } else {
+    managerProjects = (user && projectReady && Projects.find({ managers: user._id }).fetch()) || [];
+  }
   const myRequests = (requestReady && user &&
     Requests.find({ userId: user._id, submitted: false }).fetch()) || [];
   const managerIds = [];
@@ -35,7 +43,8 @@ const UserDashboardContainer = createContainer(() => {
     }
   }
   const managerRequests = (requestReady && user &&
-    Requests.find({ projectId: { $in: managerIds }, status: { $exists: false } }).fetch()) || [];
+    Requests.find({ projectId: { $in: managerIds },
+      $or: [{ status: { $exists: false } }, { status: null }] }).fetch()) || [];
   const requestUserIds = requestReady &&
     Requests.find({}, { fields: { userId: 1 } }).fetch();
   let users = [];

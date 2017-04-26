@@ -189,7 +189,7 @@ const ManagerView = React.createClass({
                 </TableBody>
               </Table>
             </Tab>
-            <Tab index={1} label="Material Purchase Approvals" onActive={this.props.updateTab} >
+            <Tab index={1} label="Material Purchase Approvals (MPA)" onActive={this.props.updateTab} >
               <Table selectable={false}>
                 <TableBody displayRowCheckbox={false}>
                   <TableRow selectable={false} style={{ color: 'rgb(158, 158, 158)' }}>

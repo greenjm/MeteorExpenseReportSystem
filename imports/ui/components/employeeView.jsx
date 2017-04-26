@@ -25,6 +25,7 @@ const EmployeeView = React.createClass({
       months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
       currentMonth: new Date().getMonth(),
       currentYear: new Date().getFullYear(),
+      incompleteRequests: 0,
     };
   },
 
@@ -78,17 +79,16 @@ const EmployeeView = React.createClass({
   },
 
   createRequestRow(item, index) {
-    let projectName = '';
-    for (let i = 0; i < this.state.projects.length; i += 1) {
-      const p = this.state.projects[i];
-      if (p._id === item.projectId) {
-        projectName = p.name;
-        break;
+    Meteor.call('projects.name', item.projectId, (err, results) => {
+      if (err) {
+        console.log(err);
+      } else {
+        this.projectName = results;
       }
-    }
-
+    });
+    
     let status = '';
-    if (item.status === undefined) {
+    if (item.status === undefined || item.status === null) {
       status = 'Pending';
     } else if (item.status) {
       status = 'Approved';
@@ -99,7 +99,7 @@ const EmployeeView = React.createClass({
     return (
       <TableRow>
         <TableRowColumn style={{ width: '5%', textAlign: 'left', wordWrap: 'break-word' }}>{index}</TableRowColumn>
-        <TableRowColumn style={{ width: '8%', textAlign: 'left', wordWrap: 'break-word' }}>{projectName}</TableRowColumn>
+        <TableRowColumn style={{ width: '8%', textAlign: 'left', wordWrap: 'break-word' }}>{this.projectName}</TableRowColumn>
         <TableRowColumn style={{ width: '15%', textAlign: 'left', wordWrap: 'break-word' }}>{item.vendor}</TableRowColumn>
         <TableRowColumn style={{ width: '15%', textAlign: 'left', wordWrap: 'break-word' }}>{item.description}</TableRowColumn>
         <TableRowColumn style={{ width: '5%', textAlign: 'left', wordWrap: 'break-word' }}>{item.partNo}</TableRowColumn>
@@ -186,13 +186,22 @@ const EmployeeView = React.createClass({
 
   submitReport() {
     const approvedRequests = [];
+    const notApprovedRequests = [];
     for (let x = 0; x < this.state.requests.length; x += 1) {
       if (this.state.requests[x].status) {
-        approvedRequests.push(this.state.requests[x]._id);
+        if (this.state.requests[x].receipt) {
+          approvedRequests.push(this.state.requests[x]._id);
+        }
+        else {
+          notApprovedRequests.push(this.state.requests[x]);
+        }
       }
     }
 
     if (approvedRequests.length === 0) {
+      if (notApprovedRequests.length > 0) {
+        this.setState({ incompleteRequests: notApprovedRequests.length });
+      }
       return;
     }
 
@@ -205,7 +214,8 @@ const EmployeeView = React.createClass({
         }
         if (result) {
           this.setState({
-            requests: [],
+            requests: notApprovedRequests,
+            incompleteRequests: notApprovedRequests.length,
           });
           for (let x = 0; x < approvedRequests.length; x += 1) {
             Meteor.call('requests.submission', approvedRequests[x], (err) => {
@@ -243,7 +253,7 @@ const EmployeeView = React.createClass({
               </TableBody>
             </Table>
           </Tab>
-          <Tab index={1} label="Material Purchase Approvals" onActive={this.props.updateTab} >
+          <Tab index={1} label="Material Purchase Approvals (MPA)" onActive={this.props.updateTab} >
             <div>
               <Table selectable={false} style={{ tableLayout: 'auto', wordWrap: 'break-word' }}>
                 <TableBody displayRowCheckbox={false}>
@@ -284,7 +294,7 @@ const EmployeeView = React.createClass({
           </Tab>
           <Tab
             index={2}
-            label="Monthly Expense Report"
+            label="Monthly Expense Report (MER)"
             onActive={this.props.updateTab}
           >
             <Table selectable={false}>
@@ -333,6 +343,14 @@ const EmployeeView = React.createClass({
               onChange={this.handleYearChange}
               style={{ margin: '10px' }}
             />
+            {this.state.incompleteRequests != 0 && (
+              <div
+              style={{ float: 'left', color: '#f44336', margin: '10px'}}>
+                There {this.state.incompleteRequests == 1 ? "is" : "are"} {this.state.incompleteRequests} approved
+                MPA{this.state.incompleteRequests == 1 ? "" : "s"} missing a receipt. {this.state.incompleteRequests == 1 ? "It was " : "They were "}
+                not submitted.
+              </div>
+            )}
             <RaisedButton
               label="Submit MER"
               primary

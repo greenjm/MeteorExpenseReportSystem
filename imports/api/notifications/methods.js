@@ -8,18 +8,20 @@ import './notifications.js';
 Meteor.methods({
   /**
   Creates a new notification.
-  @param user {String} the ID of the user to notify
+  @param users {Array} the IDs of the users to notify
   @param intext {String} the text of the notification
   @param url {String} the URL that the notification links to
   @return {Boolean} true if insert was successful
   */
-  'notifications.create': function createNotif(user, intext, url) {
-    check(user, String);
+  'notifications.create': function createNotif(users, intext, url, req) {
+    check(users, Array);
+    check(req, String);
     check(intext, String);
     check(url, String);
 
     const newNoti = {
-      userId: user,
+      userIds: users,
+      reqId: req,
       text: intext,
       URL: url,
       isRead: false,
@@ -54,14 +56,20 @@ Meteor.methods({
   'notifications.createHelper': function helpCreate(proj, managers, reqId) {
     let i = 0;
     const currentUser = Meteor.user();
+    const filteredMngrs = [];
     check(proj, String);
     check(managers, Array);
     check(reqId, String);
+    for (i = 0; i < managers.length; i += 1) {
+      if (currentUser._id !== managers[i]) {
+        filteredMngrs.push(managers[i]);
+      }
+    }
     const targetURL = `/requestDetail/${reqId}`;
     const noteText = `${currentUser.profile.name} has created a request for the project: ${proj}`;
-    for (i = 0; i < managers.length; i += 1) {
-      Meteor.call('notifications.create', managers[i], noteText, targetURL);
-    }
+    // for (i = 0; i < managers.length; i += 1) {
+    Meteor.call('notifications.create', filteredMngrs, noteText, targetURL, reqId);
+    // }
   },
 
   /**
@@ -72,16 +80,18 @@ Meteor.methods({
   */
   'notifications.respondHelper': function respondCreate(state, reqId, reqUser) {
     let reply = 'denied';
+    const reqUserArray = [];
     const currentUser = Meteor.user();
     check(state, Boolean);
     check(reqId, String);
     check(reqUser, String);
+    reqUserArray.push(reqUser);
     if (state) {
       reply = 'approved';
     }
     const targetURL = `/requestDetail/${reqId}`;
     const noteText = `${currentUser.profile.name} has ${reply} your request`;
-    Meteor.call('notifications.create', reqUser, noteText, targetURL);
+    Meteor.call('notifications.create', reqUserArray, noteText, targetURL, reqId);
   },
 
   /**
@@ -93,13 +103,17 @@ Meteor.methods({
   'notifications.createEditHelper': function helpEditCreate(proj, managers, reqId) {
     let i = 0;
     const currentUser = Meteor.user();
+    const filteredMngrs = [];
     check(proj, String);
     check(managers, Array);
     check(reqId, String);
+    for (i = 0; i < managers.length; i += 1) {
+      if (currentUser._id !== managers[i]) {
+        filteredMngrs.push(managers[i]);
+      }
+    }
     const targetURL = `/requestDetail/${reqId}`;
     const noteText = `${currentUser.profile.name} has resubmitted a request for the project: ${proj}`;
-    for (i = 0; i < managers.length; i += 1) {
-      Meteor.call('notifications.create', managers[i], noteText, targetURL);
-    }
+    Meteor.call('notifications.create', managers, noteText, targetURL, reqId);
   },
 });
