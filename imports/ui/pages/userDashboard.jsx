@@ -158,8 +158,16 @@ const UserDashboard = React.createClass({
             subtitle={`Project started ${dateFormat(item.bornOn, 'mmmm d, yyyy')}`}
           />
           <CardActions>
-            <FlatButton label="View Project Details" onTouchTap={() => { this.goTo(`/project/view/${item._id}`); }} />
-            <FlatButton label="Submit New MPA" onTouchTap={() => { this.goTo(`/submitRequest/${item._id}`); }} />
+            <RaisedButton
+              label="View Project Details"
+              onTouchTap={() => { this.goTo(`/project/view/${item._id}`); }}
+              primary
+            />
+            <RaisedButton
+              label="Submit New MPA"
+              onTouchTap={() => { this.goTo(`/submitRequest/${item._id}`); }}
+              primary
+            />
           </CardActions>
         </Card>
       </Col>
@@ -197,13 +205,18 @@ const UserDashboard = React.createClass({
             <strong>Current Status: </strong>{status}
           </CardText>
           <CardActions>
-            <FlatButton label="View" onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }} />
-            <FlatButton
+            <RaisedButton
+              label="View"
+              onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}
+              primary
+            />
+            <RaisedButton
               label="Delete"
               onTouchTap={() => {
                 Meteor.call('requests.delete', item._id);
                 this.removeItem(item._id);
               }}
+              primary
             />
           </CardActions>
           <CardText expandable>
@@ -247,7 +260,11 @@ const UserDashboard = React.createClass({
               showExpandableButton
             />
             <CardActions>
-              <FlatButton label="View" onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }} />
+              <RaisedButton
+                label="View"
+                onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}
+                primary
+              />
             </CardActions>
             <CardText expandable>
               <strong>Date Required: </strong>{dateFormat(item.dateRequired, 'mmmm d, yyyy')}<br />
@@ -375,9 +392,21 @@ const UserDashboard = React.createClass({
               showExpandableButton
             />
             <CardActions>
-              <FlatButton label="Approve" onTouchTap={() => { this.handleConfirmPress(item); }} />
-              <FlatButton label="Deny" onTouchTap={() => { this.handleDenyPress(item); }} />
-              <FlatButton label="View" onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }} />
+              <RaisedButton
+                label="Approve"
+                onTouchTap={() => { this.handleConfirmPress(item); }}
+                primary
+              />
+              <RaisedButton
+                label="Deny"
+                onTouchTap={() => { this.handleDenyPress(item); }}
+                primary
+              />
+              <RaisedButton
+                label="View"
+                onTouchTap={() => { this.goTo(`/requestDetail/${item._id}`); }}
+                primary
+              />
             </CardActions>
             <CardText expandable>
               <strong>Vendor: </strong>{item.vendor}<br />
