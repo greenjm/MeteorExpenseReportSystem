@@ -29,7 +29,10 @@ const ReportDetailContainer = createContainer(({ params }) => {
 
   const requests = [];
   for (let x = 0; reportReady && x < report.approvedRequests.length; x += 1) {
-    const request = requestReady && Requests.findOne(report.approvedRequests[x]);
+    let request = requestReady && Requests.findOne(report.approvedRequests[x]);
+    if (request == undefined) {
+      request = {};
+    }
     request.receipt = request.receipt && receiptReady && request.receipt.getFileRecord();
     requests.push(request);
   }
