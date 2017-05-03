@@ -41,3 +41,27 @@ Meteor.publish('projectGet', function retrieveProject(projectId) {
     managers: this.userId }, { employees: this.userId }] }] });
   return project;
 });
+
+Meteor.publish('projectNames', function projectNamesPublish(projectIdList) {
+  // Given a list of userIds, return the name of those users
+  check(projectIdList, Array);
+
+  const currentUser = Meteor.users.findOne(this.userId);
+
+  if (currentUser == null || currentUser.profile == null) {
+    return null;
+  }
+
+  const ids = [];
+  for (let i = 0; i < projectIdList.length; i += 1) {
+    if (!projectIdList[i].projectId) {
+      break;
+    }
+    ids.push(projectIdList[i].projectId);
+  }
+
+  const find = { $or: [{ _id: { $in: ids } }, { _id: { $in: projectIdList } }] };
+  const projection = { name: 1 };
+  const names = Projects.find(find, projection);
+  return names;
+});
