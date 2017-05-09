@@ -15,11 +15,13 @@ const UserDashboardContainer = createContainer(() => {
   const projectSub = Meteor.subscribe('projects');
   const requestSub = Meteor.subscribe('requests');
   let userNameSub = null;
+  let projectNameSub = null;
 
   // Subscription ready
   const projectReady = projectSub.ready();
   const requestReady = requestSub.ready();
   let userReady = null;
+  let projectNameReady = null;
 
   // Projects and Requests
   let employeeProjects = [];
@@ -53,6 +55,14 @@ const UserDashboardContainer = createContainer(() => {
     userReady = userNameSub.ready();
     users = (userReady && Meteor.users.find().fetch()) || [];
   }
+  const requestProjectIds = requestReady &&
+    Requests.find({}, { fields: { projectId: 1 } }).fetch();
+  let projectNames = [];
+  if (requestProjectIds) {
+    projectNameSub = Meteor.subscribe('projectNames', requestProjectIds);
+    projectNameReady = projectNameSub.ready();
+    projectNames = (projectNameReady && Projects.find().fetch()) || [];
+  }
 
   // Helper props
   const isEmployee = employeeProjects && employeeProjects.length > 0;
@@ -76,6 +86,7 @@ const UserDashboardContainer = createContainer(() => {
     myRequests,
     managerRequests,
     users,
+    projectNames,
     isManager,
     isEmployee,
   };
