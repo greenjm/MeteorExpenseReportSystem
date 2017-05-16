@@ -19,6 +19,7 @@ Notifications.schema = new SimpleSchema({
       return date;
     },
   },
+  tag: { type: String },
 });
 
 Factory.define('notification', Notifications, {
@@ -28,4 +29,5 @@ Factory.define('notification', Notifications, {
   URL: () => '',
   isRead: () => false,
   bornOn: () => new Date(),
+  tag: () => '',
 });

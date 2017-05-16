@@ -5,6 +5,10 @@ import './notifications.js';
 /* global Notifications:true*/
 /* eslint no-undef: "error"*/
 
+const monthNames = ['January', 'Feburary', 'March', 'April',
+  'May', 'June', 'July', 'August', 'September', 'October',
+  'November', 'December'];
+
 Meteor.methods({
   /**
   Creates a new notification.
@@ -13,12 +17,12 @@ Meteor.methods({
   @param url {String} the URL that the notification links to
   @return {Boolean} true if insert was successful
   */
-  'notifications.create': function createNotif(users, intext, url, req) {
+  'notifications.create': function createNotif(users, intext, url, req, tagIn) {
     check(users, Array);
     check(req, String);
     check(intext, String);
     check(url, String);
-
+    check(tagIn, String);
     const newNoti = {
       userIds: users,
       reqId: req,
@@ -26,8 +30,8 @@ Meteor.methods({
       URL: url,
       isRead: false,
       bornOn: new Date(),
+      tag: tagIn,
     };
-
     Notifications.schema.validate(newNoti);
     const result = Notifications.insert(newNoti);
     return result;
@@ -57,6 +61,7 @@ Meteor.methods({
     let i = 0;
     const currentUser = Meteor.user();
     const filteredMngrs = [];
+    const tag = 'mpa';
     check(proj, String);
     check(managers, Array);
     check(reqId, String);
@@ -68,7 +73,7 @@ Meteor.methods({
     const targetURL = `/requestDetail/${reqId}`;
     const noteText = `${currentUser.profile.name} has created a request for the project: ${proj}`;
     // for (i = 0; i < managers.length; i += 1) {
-    Meteor.call('notifications.create', filteredMngrs, noteText, targetURL, reqId);
+    Meteor.call('notifications.create', filteredMngrs, noteText, targetURL, reqId, tag);
     // }
   },
 
@@ -82,6 +87,7 @@ Meteor.methods({
     let reply = 'denied';
     const reqUserArray = [];
     const currentUser = Meteor.user();
+    const tag = 'mpa';
     check(state, Boolean);
     check(reqId, String);
     check(reqUser, String);
@@ -91,7 +97,7 @@ Meteor.methods({
     }
     const targetURL = `/requestDetail/${reqId}`;
     const noteText = `${currentUser.profile.name} has ${reply} your request`;
-    Meteor.call('notifications.create', reqUserArray, noteText, targetURL, reqId);
+    Meteor.call('notifications.create', reqUserArray, noteText, targetURL, reqId, tag);
   },
 
   /**
@@ -104,6 +110,7 @@ Meteor.methods({
     let i = 0;
     const currentUser = Meteor.user();
     const filteredMngrs = [];
+    const tag = 'mpa';
     check(proj, String);
     check(managers, Array);
     check(reqId, String);
@@ -114,6 +121,44 @@ Meteor.methods({
     }
     const targetURL = `/requestDetail/${reqId}`;
     const noteText = `${currentUser.profile.name} has resubmitted a request for the project: ${proj}`;
-    Meteor.call('notifications.create', managers, noteText, targetURL, reqId);
+    Meteor.call('notifications.create', managers, noteText, targetURL, reqId, tag);
+  },
+
+  /**
+  Helper method to send notifications for submission of MERs
+  @param tag {String} type of notification to create
+  */
+  'notifications.submitReportHelper': function reportNotiCreate(tag, monthNum) {
+    check(tag, String);
+    check(monthNum, Number);
+    const monthName = monthNames[monthNum];
+    let noteText = '';
+    if (tag === 'mer1') {
+      noteText = `Last day to submit MER for month of ${monthName}!`;
+    } else if (tag === 'mer2') {
+      noteText = `2 days to submit MER for month of ${monthName}.`;
+    } else if (tag === 'mer3') {
+      noteText = `3 days to submit MER for month of ${monthName}.`;
+    } else {
+      noteText = 'This text should not be seen!';
+    }
+    const currentUser = Meteor.user()._id;
+    const notiUserArray = [];
+    const targetURL = '/dashboard';
+    notiUserArray.push(currentUser);
+    if (Meteor.call('notifications.notiCheck', notiUserArray, tag)) {
+      return;
+    }
+    Meteor.call('notifications.create', notiUserArray, noteText, targetURL, currentUser, tag);
+  },
+
+  'notifications.notiCheck': function checkNotiExists(userArray, tagType) {
+    check(tagType, String);
+    check(userArray, Array);
+    const userNotis = Notifications.findOne({ userIds: userArray, tag: tagType });
+    if (userNotis) {
+      return true;
+    }
+    return false;
   },
 });

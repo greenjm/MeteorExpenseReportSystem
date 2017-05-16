@@ -2,7 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
 import UserDashboardPage from '../pages/userDashboard.jsx';
 
-/* global Requests Projects:true*/
+/* global Requests Projects Notifications:true*/
 /* eslint no-undef: "error"*/
 
 const UserDashboardContainer = createContainer(() => {
@@ -14,11 +14,13 @@ const UserDashboardContainer = createContainer(() => {
   // Subscriptions
   const projectSub = Meteor.subscribe('projects');
   const requestSub = Meteor.subscribe('requests');
+  const notiSub = Meteor.subscribe('notifications');
   let userNameSub = null;
 
   // Subscription ready
   const projectReady = projectSub.ready();
   const requestReady = requestSub.ready();
+  const notiReady = notiSub.ready();
   let userReady = null;
 
   // Projects and Requests
@@ -66,6 +68,33 @@ const UserDashboardContainer = createContainer(() => {
     },
   ];
 
+  // This chunk of of code allows for
+  // checking if today's date allows for submitting MERs
+  // and creating the necessary notification for the user
+  const today = new Date();
+  const month = today.getMonth();
+  let merDates = false;
+  let tag = '';
+  for (let k = 0; k < 4; k += 1) {
+    today.setDate(today.getDate() + k);
+    merDates = today.getMonth() !== month;
+    if (merDates) {
+      if (k === 1) {
+        tag = 'mer1';
+      } else if (k === 2) {
+        tag = 'mer2';
+      } else if (k === 3) {
+        tag = 'mer3';
+      }
+      if (notiReady) {
+        Meteor.call('notifications.submitReportHelper', tag, month);
+      }
+      break;
+    }
+  }
+  // today.setDate(today.getDate() + 3);
+  // const merDates = today.getMonth() !== month;
+
   return {
     breadcrumbs,
     user: !!user || false,
@@ -78,6 +107,7 @@ const UserDashboardContainer = createContainer(() => {
     users,
     isManager,
     isEmployee,
+    merDates,
   };
 }, UserDashboardPage);
 

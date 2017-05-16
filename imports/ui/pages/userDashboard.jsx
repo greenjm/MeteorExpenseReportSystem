@@ -40,6 +40,7 @@ const UserDashboard = React.createClass({
     users: React.PropTypes.array,
     isManager: React.PropTypes.bool,
     isEmployee: React.PropTypes.bool,
+    merDates: React.PropTypes.bool,
   },
 
   getInitialState() {
@@ -60,6 +61,7 @@ const UserDashboard = React.createClass({
       requestDialogOpen: false,
       statMsg: '',
       requestToDeny: {},
+      merDates: false,
     };
   },
 
@@ -75,6 +77,7 @@ const UserDashboard = React.createClass({
       isManager: this.props.isManager,
       isEmployee: this.props.isEmployee,
       viewToggle: this.state.viewToggle && this.props.isManager,
+      merDates: this.props.merDates,
     });
   },
 
@@ -91,6 +94,7 @@ const UserDashboard = React.createClass({
     const usersChange = this.state.users !== nextProps.users;
     const isManagerChange = this.state.isManager !== nextProps.isManager;
     const isEmployeeChange = this.state.isEmployee !== nextProps.isEmployee;
+    const merDatesChange = this.state.merDates !== nextProps.merDates;
 
     this.setState({
       name: nameChange ? nextProps.name : this.state.name,
@@ -106,6 +110,7 @@ const UserDashboard = React.createClass({
       isEmployee: isEmployeeChange ? nextProps.isEmployee : this.state.isEmployee,
       viewToggle: this.state.viewToggle && this.props.isManager,
       breadcrumbs: nextProps.breadcrumbs,
+      merDates: merDatesChange ? nextProps.merDates : this.state.merDates,
     });
   },
 
@@ -543,6 +548,7 @@ const UserDashboard = React.createClass({
                   </div>
                 )}
                 <RaisedButton
+                  disabled={!this.state.merDates}
                   label="Submit MER"
                   primary
                   style={{ float: 'right', marginTop: '10px' }}
