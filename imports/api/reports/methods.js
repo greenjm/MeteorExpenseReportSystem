@@ -28,19 +28,6 @@ Meteor.methods({
     check(month, Number);
     check(year, Number);
 
-    var projectDummy = reqs[0].projectId;
-    Meteor.call('requests.create', projectDummy, "Monthly Internet Bill", 75, "Internet", "1", 1, 75, Date.now(), "Internet", (error, result) => {
-      if (!error) {
-        reqs.push(result);
-      }
-    });
-
-    Meteor.call('requests.create', projectDummy, "Monthly Phone Bill", 75, "Phone", "1", 1, 75, Date.now(), "Phone", (error, result) => {
-      if (!error) {
-        reqs.push(result);
-      }
-    });
-
     const newReport = {
       userId: Meteor.userId(),
       approvedRequests: reqs,
