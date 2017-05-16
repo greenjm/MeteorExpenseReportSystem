@@ -17,6 +17,7 @@ const AdminDashboardContainer = createContainer(() => {
   const user = Meteor.user();
   const profile = user && user.profile;
   const isAdmin = profile && profile.isAdmin;
+  const fullTime = profile && profile.fullTime;
 
   const projectSub = Meteor.subscribe('projects');
   const userSub = Meteor.subscribe('users');
@@ -50,6 +51,7 @@ const AdminDashboardContainer = createContainer(() => {
     breadcrumbs,
     user: !!user || false,
     isAdmin,
+    fullTime,
     projectReady,
     userReady,
     reportReady,

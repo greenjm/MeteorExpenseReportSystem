@@ -20,6 +20,7 @@ Meteor.methods({
     check(profile, {
       name: String,
       isAdmin: Boolean,
+      fullTime: Boolean,
     });
 
     const currentUser = Meteor.user();
@@ -46,6 +47,7 @@ Meteor.methods({
         profile: {
           name: profile.name,
           isAdmin: profile.isAdmin,
+          fullTime: profile.fullTime,
         },
       },
     });
@@ -53,6 +55,7 @@ Meteor.methods({
     return {
       name: true,
       isAdmin: true,
+      fullTime: true,
     };
   },
 });

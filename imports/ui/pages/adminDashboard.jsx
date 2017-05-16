@@ -34,9 +34,9 @@ const paperStyle = {
   paddingLeft: '24px',
 };
 
-const actionsColStyle = {
-  paddingLeft: '50px',
-};
+// const actionsColStyle = {
+//   paddingLeft: '50px',
+// };
 
 const tableHeaderButtonStyle = {
   float: 'right',
@@ -67,6 +67,7 @@ const AdminDashboard = React.createClass({
       userNameError: '',
       emailError: '',
       isAdmin: false,
+      fullTime: false,
       dialogError: '',
       newProjectName: '',
       projectNameError: '',
@@ -132,11 +133,11 @@ const AdminDashboard = React.createClass({
   },
 
   createProjectCard(item) {
-    const date = new Date(item.bornOn);
+    // const date = new Date(item.bornOn);
     const url = `/#/project/edit/${item._id}`;
-    let style = {}
+    let style = {};
     if (!item.isActive) {
-      style = { backgroundColor: '#ccc' }
+      style = { backgroundColor: '#ccc' };
     }
     return (
       <Col xs={12} sm={12} md={6} lg={6} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
@@ -169,6 +170,7 @@ const AdminDashboard = React.createClass({
     const profile = {
       name: this.state.userName,
       isAdmin: this.state.isAdmin,
+      fullTime: this.state.fullTime,
     };
     Meteor.call('users.update', this.state.editUserId,
       profile,
@@ -190,6 +192,7 @@ const AdminDashboard = React.createClass({
       newUserName: '',
       newUserEmail: '',
       isAdmin: false,
+      fullTime: false,
     });
   },
 
@@ -228,6 +231,7 @@ const AdminDashboard = React.createClass({
       userName: user.profile.name,
       userNameError: '',
       isAdmin: user.profile.isAdmin,
+      fullTime: user.profile.fullTime,
       dialogError: '',
     });
     this.openUserDialog();
@@ -239,6 +243,10 @@ const AdminDashboard = React.createClass({
 
   handleIsAdminChange() {
     this.setState({ isAdmin: !this.state.isAdmin });
+  },
+
+  handleFullTimeChange() {
+    this.setState({ fullTime: !this.state.fullTime });
   },
 
   // Project Dialog functions
@@ -511,6 +519,13 @@ const AdminDashboard = React.createClass({
             style={switchStyle}
             toggled={this.state.isAdmin}
             onToggle={this.handleIsAdminChange}
+          />
+          <br />
+          <Toggle
+            label="Full-Time Employee?"
+            style={switchStyle}
+            toggled={this.state.fullTime}
+            onToggle={this.handleFullTimeChange}
           />
           <div style={{ color: 'red' }}>{this.state.dialogError}</div>
         </Dialog>
