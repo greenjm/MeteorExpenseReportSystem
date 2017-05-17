@@ -63,6 +63,7 @@ const AdminDashboard = React.createClass({
       userNameError: '',
       emailError: '',
       isAdmin: false,
+      fullTime: false,
       dialogError: '',
       newProjectName: '',
       projectNameError: '',
@@ -115,7 +116,12 @@ const AdminDashboard = React.createClass({
         <Card>
           <CardHeader
             title={item.profile.name}
-            subtitle={`Email: ${item.emails[0].address}`}
+            subtitle={
+              <div>
+                <div>Email: {item.emails[0].address}</div>
+                <div>{item.profile.fullTime ? 'Full-Time' : 'Part-Time'}</div>
+              </div>
+            }
           />
           <CardActions>
             <RaisedButton
@@ -171,6 +177,7 @@ const AdminDashboard = React.createClass({
     const profile = {
       name: this.state.userName,
       isAdmin: this.state.isAdmin,
+      fullTime: this.state.fullTime,
     };
     Meteor.call('users.update', this.state.editUserId,
       profile,
@@ -192,6 +199,7 @@ const AdminDashboard = React.createClass({
       newUserName: '',
       newUserEmail: '',
       isAdmin: false,
+      fullTime: false,
     });
   },
 
@@ -230,6 +238,7 @@ const AdminDashboard = React.createClass({
       userName: user.profile.name,
       userNameError: '',
       isAdmin: user.profile.isAdmin,
+      fullTime: user.profile.fullTime,
       dialogError: '',
     });
     this.openUserDialog();
@@ -241,6 +250,10 @@ const AdminDashboard = React.createClass({
 
   handleIsAdminChange() {
     this.setState({ isAdmin: !this.state.isAdmin });
+  },
+
+  handleFullTimeChange() {
+    this.setState({ fullTime: !this.state.fullTime });
   },
 
   // Project Dialog functions
@@ -528,6 +541,13 @@ const AdminDashboard = React.createClass({
             style={switchStyle}
             toggled={this.state.isAdmin}
             onToggle={this.handleIsAdminChange}
+          />
+          <br />
+          <Toggle
+            label="Full-Time Employee?"
+            style={switchStyle}
+            toggled={this.state.fullTime}
+            onToggle={this.handleFullTimeChange}
           />
           <div style={{ color: 'red' }}>{this.state.dialogError}</div>
         </Dialog>
