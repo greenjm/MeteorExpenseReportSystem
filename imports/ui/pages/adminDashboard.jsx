@@ -119,7 +119,12 @@ const AdminDashboard = React.createClass({
         <Card>
           <CardHeader
             title={item.profile.name}
-            subtitle={`Email: ${item.emails[0].address}`}
+            subtitle={
+              <div>
+                <div>Email: {item.emails[0].address}</div>
+                <div>{item.profile.fullTime ? 'Full-Time' : 'Part-Time'}</div>
+              </div>
+            }
           />
           <CardActions>
             <RaisedButton
