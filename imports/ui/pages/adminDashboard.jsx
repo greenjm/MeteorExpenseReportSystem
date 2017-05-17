@@ -3,7 +3,7 @@ import { hashHistory } from 'react-router';
 import Paper from 'material-ui/Paper';
 import { List, ListItem } from 'material-ui/List';
 import IconButton from 'material-ui/IconButton';
-import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
+import { Table, TableHeader, TableHeaderColumn, TableRow }
   from 'material-ui/Table';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
@@ -33,10 +33,6 @@ const paperStyle = {
   fontFamily: 'Roboto,sans-serif',
   paddingLeft: '24px',
 };
-
-// const actionsColStyle = {
-//   paddingLeft: '50px',
-// };
 
 const tableHeaderButtonStyle = {
   float: 'right',
@@ -76,6 +72,7 @@ const AdminDashboard = React.createClass({
       userFilter: null,
       projectFilter: null,
       startingTab: +localStorage.getItem('adminTab') || 0,
+      projectSelectVal: 1,
     };
   },
 
@@ -138,32 +135,37 @@ const AdminDashboard = React.createClass({
   },
 
   createProjectCard(item) {
-    // const date = new Date(item.bornOn);
-    const url = `/#/project/edit/${item._id}`;
-    let style = {};
-    if (!item.isActive) {
-      style = { backgroundColor: '#ccc' };
+    const showAll = this.state.projectSelectVal === 0;
+    const activeFilter = this.state.projectSelectVal === 1 && item.isActive;
+    const inactiveFilter = this.state.projectSelectVal === 2 && !item.isActive;
+    if (showAll || activeFilter || inactiveFilter) {
+      const url = `/#/project/edit/${item._id}`;
+      let style = {};
+      if (!item.isActive) {
+        style = { backgroundColor: '#ccc' };
+      }
+      return (
+        <Col xs={12} sm={12} md={6} lg={6} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
+          <Card style={style}>
+            <CardHeader
+              title={item.name}
+              subtitle={`Created on ${dateFormat(item.bornOn, 'mmmm d, yyyy')}`}
+            />
+            <CardText>
+              <strong>Current Status: </strong>{item.isActive ? 'Active' : 'Inactive'}
+            </CardText>
+            <CardActions>
+              <a href={url}>
+                <RaisedButton
+                  label="Edit Project"
+                  primary
+                />
+              </a>
+            </CardActions>
+          </Card>
+        </Col>);
     }
-    return (
-      <Col xs={12} sm={12} md={6} lg={6} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
-        <Card style={style}>
-          <CardHeader
-            title={item.name}
-            subtitle={`Created on ${dateFormat(item.bornOn, 'mmmm d, yyyy')}`}
-          />
-          <CardText>
-            <strong>Current Status: </strong>{item.isActive ? 'Active' : 'Inactive'}
-          </CardText>
-          <CardActions>
-            <a href={url}>
-              <RaisedButton
-                label="Edit Project"
-                primary
-              />
-            </a>
-          </CardActions>
-        </Card>
-      </Col>);
+    return null;
   },
 
   // User Dialog functions
@@ -314,7 +316,7 @@ const AdminDashboard = React.createClass({
       <ListItem
         leftCheckbox={leftIcon}
         rightIconButton={rightIcon}
-        primaryText={item.item.profile.name}
+        primaryText={`(${item.isManager ? 'Manager' : 'Employee'}) ${item.item.profile.name}`}
       />
     );
   },
@@ -373,6 +375,10 @@ const AdminDashboard = React.createClass({
   handleProjectFilterChange(e) {
     const regex = new RegExp(e.target.value, 'i');
     this.setState({ projects: this.state.projectFilter(regex) });
+  },
+
+  handleProjectSelectChange(e, index, value) {
+    this.setState({ projectSelectVal: value });
   },
 
   render() {
@@ -448,14 +454,25 @@ const AdminDashboard = React.createClass({
             <Table selectable={false}>
               <TableHeader displaySelectAll={false}>
                 <TableRow selectable={false}>
-                  <TableHeaderColumn colSpan="3">
+                  <TableHeaderColumn>
                     <TextField
                       hintText="Name"
                       floatingLabelText="Search Projects"
                       onChange={this.handleProjectFilterChange}
                     />
                   </TableHeaderColumn>
-                  <TableHeaderColumn colSpan="3" style={{ textAlign: 'center' }}>
+                  <TableHeaderColumn style={{ textAlign: 'left' }}>
+                    <SelectField
+                      value={this.state.projectSelectVal}
+                      onChange={this.handleProjectSelectChange}
+                      floatingLabelText="Filter Projects"
+                    >
+                      <MenuItem value={0} key={0} primaryText={"Show All"} />
+                      <MenuItem value={1} key={1} primaryText={"Show Active"} />
+                      <MenuItem value={2} key={2} primaryText={"Show Inactive"} />
+                    </SelectField>
+                  </TableHeaderColumn>
+                  <TableHeaderColumn style={{ textAlign: 'center' }}>
                     <RaisedButton label="New" primary style={tableHeaderButtonStyle} onTouchTap={this.openProjectDialog} />
                   </TableHeaderColumn>
                 </TableRow>

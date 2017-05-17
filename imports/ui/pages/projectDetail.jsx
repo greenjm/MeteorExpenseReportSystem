@@ -180,7 +180,7 @@ const ProjectDetail = React.createClass({
       <ListItem
         leftCheckbox={leftIcon}
         rightIconButton={this.state.mode === 'edit' ? rightIcon : null}
-        primaryText={item.item.profile.name}
+        primaryText={`(${item.isManager ? 'Manager' : 'Employee'}) ${item.item.profile.name}`}
       />
     );
   },
