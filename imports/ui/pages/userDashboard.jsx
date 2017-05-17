@@ -545,8 +545,18 @@ const UserDashboard = React.createClass({
                 <RaisedButton
                   label="Submit MER"
                   primary
-                  style={{ float: 'right', marginTop: '10px' }}
+                  style={{ float: 'right', marginTop: '10px', marginLeft: '10px' }}
                   onTouchTap={this.submitReport}
+                />
+                <RaisedButton
+                  label="Include Internet Receipt"
+                  primary
+                  style={{ float: 'right', marginTop: '10px', marginLeft: '10px' }}
+                />
+                <RaisedButton
+                  label="Include Phone Receipt"
+                  primary
+                  style={{ float: 'right', marginTop: '10px' }}
                 />
               </div>
             </Tab>

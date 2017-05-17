@@ -40,40 +40,43 @@ const UserDashboardContainer = createContainer(() => {
   // check if there is an Internet description
   // If it doesn't exist, make one
   // add it to the list of requests
-  let indirect = []
-  if (projectReady) {
-    // this should be findOne( {name: "Indirect"} );
-    indirect = Projects.find().fetch();
-  }
-  console.log(indirect);
-  const indirectRequests = Requests.find({ projectId: indirect._id, userId: user._id, submitted: false }).fetch();
-  let internetCreated = false;
-  let phoneCreated = false;
+  // let indirect = []
+  // if (projectReady) {
+  //   // this should be findOne( {name: "Indirect"} );
+  //   indirect = Projects.find().fetch();
+  // }
+  // console.log(indirect);
+  // const indirectRequests = Requests.find({ projectId: indirect._id,
+  // userId: user._id, submitted: false }).fetch();
+  // let internetCreated = false;
+  // let phoneCreated = false;
 
-  for (var req in indirectRequests) {
-    if (req.description == "Internet") {
-      internetCreated = true;
-    }
-    else if (req.description == "Phone") {
-      phoneCreated = true;
-    }
-  }
+  // for (var req in indirectRequests) {
+  //   if (req.description == "Internet") {
+  //     internetCreated = true;
+  //   }
+  //   else if (req.description == "Phone") {
+  //     phoneCreated = true;
+  //   }
+  // }
 
-  if (!internetCreated) {
-    Meteor.call('requests.create', indirect._id.toString(), "Monthly Internet Bill", 50, "Internet", "1", 1, 50, Date.now(), "Internet", (error, result) => {
-      if (!error) {
-        myRequests.push(result);
-      }
-    });
-  }
+  // if (!internetCreated) {
+  //   Meteor.call('requests.create', indirect._id.toString(), "Monthly Internet Bill",
+  // 50, "Internet", "1", 1, 50, Date.now(), "Internet", (error, result) => {
+  //     if (!error) {
+  //       myRequests.push(result);
+  //     }
+  //   });
+  // }
 
-  if (!phoneCreated) {
-    Meteor.call('requests.create', indirect._id.toString(), "Monthly Phone Bill", 50, "Phone", "1", 1, 50, Date.now(), "Phone", (error, result) => {
-      if (!error) {
-        myRequests.push(result);
-      }
-    });
-  }
+  // if (!phoneCreated) {
+  //   Meteor.call('requests.create', indirect._id.toString(), "Monthly Phone Bill",
+  // 50, "Phone", "1", 1, 50, Date.now(), "Phone", (error, result) => {
+  //     if (!error) {
+  //       myRequests.push(result);
+  //     }
+  //   });
+  // }
 
   const managerIds = [];
   if (managerProjects) {
