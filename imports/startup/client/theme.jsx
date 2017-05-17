@@ -4,7 +4,7 @@ import {
   grey100, grey300, grey200, red500,
   white, darkBlack, fullBlack, transparent,
 } from 'material-ui/styles/colors';
-import { darken, fade } from 'material-ui/utils/colorManipulator';
+import { fade } from 'material-ui/utils/colorManipulator';
 import typography from 'material-ui/styles/typography';
 
 export default function getTheme() {
@@ -37,7 +37,7 @@ export default function getTheme() {
       primaryTextColor: palette.alternateTextColor,
       secondaryColor: palette.accent1Color,
       secondaryTextColor: palette.alternateTextColor,
-      disabledColor: darken(palette.alternateTextColor, 0.1),
+      disabledColor: grey500,
       disabledTextColor: fade(palette.textColor, 0.3),
       fontSize: typography.fontStyleButtonFontSize,
       fontWeight: typography.fontWeightMedium,

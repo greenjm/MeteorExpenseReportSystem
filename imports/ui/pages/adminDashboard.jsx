@@ -6,6 +6,8 @@ import IconButton from 'material-ui/IconButton';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
   from 'material-ui/Table';
 import { Tabs, Tab } from 'material-ui/Tabs';
+import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
+import { Card, CardActions, CardHeader, CardText } from 'material-ui/Card';
 import ContentClear from 'material-ui/svg-icons/content/clear';
 import Dialog from 'material-ui/Dialog';
 import Checkbox from 'material-ui/Checkbox';
@@ -22,6 +24,7 @@ import Header from '../components/header.jsx';
 /* eslint no-undef: "error"*/
 
 const React = require('react');
+const dateFormat = require('dateformat');
 
 // Styles
 const paperStyle = {
@@ -109,53 +112,55 @@ const AdminDashboard = React.createClass({
     );
   },
 
-  createUserRow(item) {
+  createUserCard(item) {
     return (
-      <TableRow key={item._id} selectable={false}>
-        <TableRowColumn>{item.profile.name}</TableRowColumn>
-        <TableRowColumn>{item.emails[0].address}</TableRowColumn>
-        <TableRowColumn style={actionsColStyle}>
-          <RaisedButton label="Edit User" primary onTouchTap={() => this.editUser(item)} />
-        </TableRowColumn>
-      </TableRow>);
+      <Col xs={12} sm={12} md={6} lg={4} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
+        <Card>
+          <CardHeader
+            title={item.profile.name}
+            subtitle={`Email: ${item.emails[0].address}`}
+          />
+          <CardActions>
+            <RaisedButton
+              label="Edit User"
+              onTouchTap={() => this.editUser(item)}
+              primary
+            />
+          </CardActions>
+        </Card>
+      </Col>);
   },
 
-  createProjectRow(item) {
+  createProjectCard(item) {
     const date = new Date(item.bornOn);
     const url = `/#/project/edit/${item._id}`;
+    let style = {}
+    if (!item.isActive) {
+      style = { backgroundColor: '#ccc' }
+    }
     return (
-      <TableRow key={item._id} selectable={false}>
-        <TableRowColumn>{item.name}</TableRowColumn>
-        <TableRowColumn>{date.toDateString()}</TableRowColumn>
-        <TableRowColumn>{item.isActive ? 'Active' : 'Inactive'}</TableRowColumn>
-        <TableRowColumn style={actionsColStyle}>
-          <a href={url}>
-            <RaisedButton label="Edit Project" primary />
-          </a>
-        </TableRowColumn>
-      </TableRow>);
-  },
-
-  newProject(projectName) {
-    this.createItem(projectName, 4);
+      <Col xs={12} sm={12} md={6} lg={6} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
+        <Card style={style}>
+          <CardHeader
+            title={item.name}
+            subtitle={`Created on ${dateFormat(item.bornOn, 'mmmm d, yyyy')}`}
+          />
+          <CardText>
+            <strong>Current Status: </strong>{item.isActive ? 'Active' : 'Inactive'}
+          </CardText>
+          <CardActions>
+            <a href={url}>
+              <RaisedButton
+                label="Edit Project"
+                primary
+              />
+            </a>
+          </CardActions>
+        </Card>
+      </Col>);
   },
 
   // User Dialog functions
-  emptyUserFieldError() {
-    if (this.state.newUserEmail === '') {
-      this.setState({ emailError: 'This field is required.' });
-    }
-    if (this.state.newUserName === '') {
-      this.setState({ userNameError: 'This field is required.' });
-    }
-  },
-
-  hideUserForm() {
-    document.getElementById('userForm').style.display = 'none';
-    document.getElementById('userName').value = '';
-    document.getElementById('userID').value = '';
-  },
-
   submitUser() {
     if (this.state.userName === '') {
       this.setState({ userNameError: 'This field is required.' });
@@ -315,19 +320,35 @@ const AdminDashboard = React.createClass({
     this.setState({ selectedEmployees: employees });
   },
 
-  createReportRow(item) {
+  createReportCard(item) {
     const url = `/#/report/${item._id}`;
+    let userName = '';
+    for (let i = 0; i < this.state.allUsers.length; i += 1) {
+      const currUser = this.state.allUsers[i];
+      if (currUser._id === item.userId) {
+        userName = currUser.profile.name;
+      }
+    }
     return (
-      <TableRow key={item._id} selectable={false}>
-        <TableRowColumn style={{ width: '20%', textAlign: 'left' }}>{item.month + 1}</TableRowColumn>
-        <TableRowColumn style={{ width: '20%', textAlign: 'left' }}>{item.year}</TableRowColumn>
-        <TableRowColumn style={{ width: '20%', textAlign: 'left' }}>{item.approvedRequests.length}</TableRowColumn>
-        <TableRowColumn style={actionsColStyle}>
-          <a href={url}>
-            <RaisedButton label="View Report" primary />
-          </a>
-        </TableRowColumn>
-      </TableRow>);
+      <Col xs={12} sm={12} md={6} lg={4} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
+        <Card>
+          <CardHeader
+            title={`Submitted by ${userName}`}
+            subtitle={`Submitted on ${item.month + 1}/${item.year}`}
+          />
+          <CardText>
+            <strong>Number of MPAs: </strong>{item.approvedRequests.length}
+          </CardText>
+          <CardActions>
+            <a href={url}>
+              <RaisedButton
+                label="View Report"
+                primary
+              />
+            </a>
+          </CardActions>
+        </Card>
+      </Col>);
   },
 
   // Filters
@@ -391,91 +412,80 @@ const AdminDashboard = React.createClass({
                     />
                   </TableHeaderColumn>
                 </TableRow>
-                <TableRow selectable={false}>
-                  <TableHeaderColumn>Name</TableHeaderColumn>
-                  <TableHeaderColumn>Email</TableHeaderColumn>
-                  <TableHeaderColumn>Actions</TableHeaderColumn>
-                </TableRow>
               </TableHeader>
-              <TableBody displayRowCheckbox={false}>
+            </Table>
+            <Grid style={{ width: '95%' }}>
+              <Row>
                 {this.state.listUsers.length > 0 ?
-                  this.state.listUsers.map(this.createUserRow) :
+                  this.state.listUsers.map(this.createUserCard) :
                   (
-                  <TableRow selectable={false}>
-                    <TableRowColumn>No users found.</TableRowColumn>
-                    <TableRowColumn />
-                    <TableRowColumn />
-                  </TableRow>
+                  <Col lg={12} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
+                    <Card>
+                      <CardHeader
+                        title="There are no users in the system"
+                      />
+                    </Card>
+                  </Col>
                   )
                 }
-              </TableBody>
-            </Table>
+              </Row>
+            </Grid>
           </Tab>
           <Tab index={1} label="Projects" onActive={this.updateTab}>
-            <div>
-              <Table selectable={false}>
-                <TableHeader displaySelectAll={false}>
-                  <TableRow selectable={false}>
-                    <TableHeaderColumn>
-                      <TextField
-                        hintText="Name"
-                        floatingLabelText="Search Projects"
-                        onChange={this.handleProjectFilterChange}
+            <Table selectable={false}>
+              <TableHeader displaySelectAll={false}>
+                <TableRow selectable={false}>
+                  <TableHeaderColumn colSpan="3">
+                    <TextField
+                      hintText="Name"
+                      floatingLabelText="Search Projects"
+                      onChange={this.handleProjectFilterChange}
+                    />
+                  </TableHeaderColumn>
+                  <TableHeaderColumn colSpan="3" style={{ textAlign: 'center' }}>
+                    <RaisedButton label="New" primary style={tableHeaderButtonStyle} onTouchTap={this.openProjectDialog} />
+                  </TableHeaderColumn>
+                </TableRow>
+              </TableHeader>
+            </Table>
+            <Grid style={{ width: '95%' }}>
+              <Row>
+                {this.state.projects.length > 0 ?
+                  this.state.projects.map(this.createProjectCard) :
+                  (
+                  <Col lg={12} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
+                    <Card>
+                      <CardHeader
+                        title="There are no projects in the system"
                       />
-                    </TableHeaderColumn>
-                    <TableHeaderColumn colSpan="3" style={{ textAlign: 'center' }}>
-                      <RaisedButton label="New" primary style={tableHeaderButtonStyle} onTouchTap={this.openProjectDialog} />
-                    </TableHeaderColumn>
-                  </TableRow>
-                  <TableRow selectable={false}>
-                    <TableHeaderColumn>Project Name</TableHeaderColumn>
-                    <TableHeaderColumn>Date Created</TableHeaderColumn>
-                    <TableHeaderColumn>Is Active</TableHeaderColumn>
-                    <TableHeaderColumn>Actions</TableHeaderColumn>
-                  </TableRow>
-                </TableHeader>
-                <TableBody displayRowCheckbox={false}>
-                  {this.state.projects.length > 0 ?
-                    this.state.projects.map(this.createProjectRow) :
-                    (
-                    <TableRow selectable={false}>
-                      <TableRowColumn>No projects found.</TableRowColumn>
-                      <TableRowColumn />
-                      <TableRowColumn />
-                      <TableRowColumn />
-                    </TableRow>
-                    )
-                  }
-                </TableBody>
-              </Table>
-            </div>
+                    </Card>
+                  </Col>
+                  )
+                }
+              </Row>
+            </Grid>
           </Tab>
           <Tab
             index={2}
             label="Monthly Expense Reports"
             onActive={this.updateTab}
           >
-            <Table selectable={false}>
-              <TableBody displayRowCheckbox={false}>
-                <TableRow selectable={false} style={{ color: 'rgb(158, 158, 158)' }}>
-                  <TableRowColumn style={{ width: '20%', textAlign: 'left', fontSize: '12px' }}>Month</TableRowColumn>
-                  <TableRowColumn style={{ width: '20%', textAlign: 'left', fontSize: '12px' }}>Year</TableRowColumn>
-                  <TableRowColumn style={{ width: '20%', textAlign: 'left', fontSize: '12px' }}># of Requests</TableRowColumn>
-                  <TableRowColumn style={{ width: '20%', textAlign: 'left', fontSize: '12px' }}>Actions</TableRowColumn>
-                </TableRow>
+            <Grid style={{ width: '95%' }}>
+              <Row>
                 {this.state.reports.length > 0 ?
-                  this.state.reports.map(this.createReportRow) :
+                  this.state.reports.map(this.createReportCard) :
                   (
-                  <TableRow selectable={false}>
-                    <TableRowColumn>No MERs submitted.</TableRowColumn>
-                    <TableRowColumn />
-                    <TableRowColumn />
-                    <TableRowColumn />
-                  </TableRow>
+                  <Col lg={12} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
+                    <Card>
+                      <CardHeader
+                        title="No MERs have been submitted"
+                      />
+                    </Card>
+                  </Col>
                   )
                 }
-              </TableBody>
-            </Table>
+              </Row>
+            </Grid>
           </Tab>
         </Tabs>
 

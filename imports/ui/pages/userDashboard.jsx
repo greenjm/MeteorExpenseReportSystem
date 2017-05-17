@@ -38,8 +38,10 @@ const UserDashboard = React.createClass({
     myRequests: React.PropTypes.array,
     managerRequests: React.PropTypes.array,
     users: React.PropTypes.array,
+    projectNames: React.PropTypes.array,
     isManager: React.PropTypes.bool,
     isEmployee: React.PropTypes.bool,
+    merDates: React.PropTypes.bool,
   },
 
   getInitialState() {
@@ -53,6 +55,7 @@ const UserDashboard = React.createClass({
       myRequests: [],
       managerRequests: [],
       users: [],
+      projectNames: [],
       isManager: false,
       isEmployee: false,
       viewToggle: localStorage.getItem('viewToggle') === 'true' || false,
@@ -60,6 +63,7 @@ const UserDashboard = React.createClass({
       requestDialogOpen: false,
       statMsg: '',
       requestToDeny: {},
+      merDates: false,
     };
   },
 
@@ -72,9 +76,11 @@ const UserDashboard = React.createClass({
       myRequests: this.props.myRequests,
       managerRequests: this.props.managerRequests,
       users: this.props.users,
+      projectNames: this.props.projectNames,
       isManager: this.props.isManager,
       isEmployee: this.props.isEmployee,
       viewToggle: this.state.viewToggle && this.props.isManager,
+      merDates: this.props.merDates,
     });
   },
 
@@ -89,8 +95,10 @@ const UserDashboard = React.createClass({
     const myRequestsChange = this.state.myRequests !== nextProps.myRequests;
     const managerRequestsChange = this.state.managerRequests !== nextProps.managerRequests;
     const usersChange = this.state.users !== nextProps.users;
+    const projectNamesChange = this.state.projectNames !== nextProps.projectNames;
     const isManagerChange = this.state.isManager !== nextProps.isManager;
     const isEmployeeChange = this.state.isEmployee !== nextProps.isEmployee;
+    const merDatesChange = this.state.merDates !== nextProps.merDates;
 
     this.setState({
       name: nameChange ? nextProps.name : this.state.name,
@@ -102,10 +110,12 @@ const UserDashboard = React.createClass({
       managerRequests: managerRequestsChange ?
         nextProps.managerRequests : this.state.managerRequests,
       users: usersChange ? nextProps.users : this.state.users,
+      projectNames: projectNamesChange ? nextProps.projectNames : this.state.projectNames,
       isManager: isManagerChange ? nextProps.isManager : this.state.isManager,
       isEmployee: isEmployeeChange ? nextProps.isEmployee : this.state.isEmployee,
       viewToggle: this.state.viewToggle && this.props.isManager,
       breadcrumbs: nextProps.breadcrumbs,
+      merDates: merDatesChange ? nextProps.merDates : this.state.merDates,
     });
   },
 
@@ -175,13 +185,13 @@ const UserDashboard = React.createClass({
   },
 
   createRequestCard(item) {
-    Meteor.call('projects.name', item.projectId, (err, results) => {
-      if (err) {
-        console.log(err);
-      } else {
-        this.projectName = results;
+    let projectName = '';
+    for (let i = 0; i < this.state.projectNames.length; i += 1) {
+      const nextProject = this.state.projectNames[i];
+      if (nextProject._id === item.projectId) {
+        projectName = nextProject.name;
       }
-    });
+    }
 
     let status = '';
     if (item.status === undefined || item.status === null) {
@@ -196,7 +206,7 @@ const UserDashboard = React.createClass({
       <Col xs={12} sm={12} md={6} lg={4} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
         <Card>
           <CardHeader
-            title={this.projectName}
+            title={projectName}
             subtitle={`Submitted on ${dateFormat(item.bornOn, 'mmmm d, yyyy')}`}
             actAsExpander
             showExpandableButton
@@ -543,6 +553,7 @@ const UserDashboard = React.createClass({
                   </div>
                 )}
                 <RaisedButton
+                  disabled={!this.state.merDates}
                   label="Submit MER"
                   primary
                   style={{ float: 'right', marginTop: '10px', marginLeft: '10px' }}
