@@ -41,9 +41,11 @@ const UserDashboardContainer = createContainer(() => {
   const myRequests = (requestReady && user &&
     Requests.find({ userId: user._id, submitted: false }).fetch()) || [];
 
-  // check if there is an Internet description
-  // If it doesn't exist, make one
-  // add it to the list of requests
+  /* ISSUE 57 -- PHONE AND INTERNET NEED TO BE ADDED FOR FULL TIME EMPLOYEES.
+     Our entire group worked together to try to figure this out, and for some reason
+     this code won't work. Projects().find().fetch() always returns [], even though
+     it works above. We are genuinely stumped and out of time. */
+
   // let indirect = []
   // if (projectReady) {
   //   // this should be findOne( {name: "Indirect"} );

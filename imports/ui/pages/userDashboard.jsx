@@ -559,7 +559,7 @@ const UserDashboard = React.createClass({
                   style={{ float: 'right', marginTop: '10px', marginLeft: '10px' }}
                   onTouchTap={this.submitReport}
                 />
-                <RaisedButton
+                <!-- <RaisedButton
                   label="Include Internet Receipt"
                   primary
                   style={{ float: 'right', marginTop: '10px', marginLeft: '10px' }}
@@ -568,7 +568,7 @@ const UserDashboard = React.createClass({
                   label="Include Phone Receipt"
                   primary
                   style={{ float: 'right', marginTop: '10px' }}
-                />
+                /> -->
               </div>
             </Tab>
             {this.state.isManager &&
