@@ -3,7 +3,7 @@ import { hashHistory } from 'react-router';
 import Paper from 'material-ui/Paper';
 import { List, ListItem } from 'material-ui/List';
 import IconButton from 'material-ui/IconButton';
-import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn }
+import { Table, TableHeader, TableHeaderColumn, TableRow }
   from 'material-ui/Table';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import { Grid, Row, Col } from 'meteor/lifefilm:react-flexbox-grid';
@@ -32,10 +32,6 @@ const paperStyle = {
   lineHeight: '35px',
   fontFamily: 'Roboto,sans-serif',
   paddingLeft: '24px',
-};
-
-const actionsColStyle = {
-  paddingLeft: '50px',
 };
 
 const tableHeaderButtonStyle = {
@@ -75,7 +71,7 @@ const AdminDashboard = React.createClass({
       userFilter: null,
       projectFilter: null,
       startingTab: +localStorage.getItem('adminTab') || 0,
-      projectSelectVal: 1
+      projectSelectVal: 1,
     };
   },
 
@@ -137,11 +133,10 @@ const AdminDashboard = React.createClass({
     const activeFilter = this.state.projectSelectVal === 1 && item.isActive;
     const inactiveFilter = this.state.projectSelectVal === 2 && !item.isActive;
     if (showAll || activeFilter || inactiveFilter) {
-      const date = new Date(item.bornOn);
       const url = `/#/project/edit/${item._id}`;
-      let style = {}
+      let style = {};
       if (!item.isActive) {
-        style = { backgroundColor: '#ccc' }
+        style = { backgroundColor: '#ccc' };
       }
       return (
         <Col xs={12} sm={12} md={6} lg={6} style={{ paddingTop: '10px', paddingBottom: '10px' }}>
@@ -308,7 +303,7 @@ const AdminDashboard = React.createClass({
       <ListItem
         leftCheckbox={leftIcon}
         rightIconButton={rightIcon}
-        primaryText={`(${item.isManager ? "Manager" : "Employee"}) ${item.item.profile.name}`}
+        primaryText={`(${item.isManager ? 'Manager' : 'Employee'}) ${item.item.profile.name}`}
       />
     );
   },
