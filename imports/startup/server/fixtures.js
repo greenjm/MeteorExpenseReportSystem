@@ -1,8 +1,12 @@
 import { Meteor } from 'meteor/meteor';
 import { Accounts } from 'meteor/accounts-base';
 import '../../api/projects/projects.js';
+import '../../api/requests/requests.js';
+import '../../api/reports/reports.js';
+import '../../api/receipts/receipts.js';
+import '../../api/notifications/notifications.js';
 
-/* global Projects:true*/
+/* global Projects Requests Reports Notifications Receipts:true*/
 /* eslint no-undef: "error"*/
 function seedUsers() {
   const users = ['greenjm', 'havensid', 'kerrickm', 'weissna'];
@@ -16,8 +20,7 @@ function seedUsers() {
       profile: {
         name: `${user} Admin`,
         isAdmin: true,
-        autoInternet: true,
-        autoPhone: true,
+        fullTime: true,
       },
     });
     Accounts.createUser({
@@ -27,8 +30,7 @@ function seedUsers() {
       profile: {
         name: user,
         isAdmin: false,
-        autoInternet: true,
-        autoPhone: true,
+        fullTime: true,
       },
     });
   }
@@ -64,6 +66,10 @@ if (Meteor.users.find().count() <= 0) {
 
 // Uncomment the following line to reseed projects
 // Projects.remove({});
+// Requests.remove({});
+// Reports.remove({});
+// Notifications.remove({});
+// Receipts.remove({});
 if (Projects.find().count() <= 0) {
   // Seed new projects
   seedProjects();
