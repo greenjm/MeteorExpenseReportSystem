@@ -556,9 +556,19 @@ const UserDashboard = React.createClass({
                   disabled={!this.state.merDates}
                   label="Submit MER"
                   primary
-                  style={{ float: 'right', marginTop: '10px' }}
+                  style={{ float: 'right', marginTop: '10px', marginLeft: '10px' }}
                   onTouchTap={this.submitReport}
                 />
+                <!-- <RaisedButton
+                  label="Include Internet Receipt"
+                  primary
+                  style={{ float: 'right', marginTop: '10px', marginLeft: '10px' }}
+                />
+                <RaisedButton
+                  label="Include Phone Receipt"
+                  primary
+                  style={{ float: 'right', marginTop: '10px' }}
+                /> -->
               </div>
             </Tab>
             {this.state.isManager &&

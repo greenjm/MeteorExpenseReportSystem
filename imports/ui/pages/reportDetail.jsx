@@ -71,6 +71,7 @@ const ReportDetail = React.createClass({
   },
 
   createRequestRow(request) {
+    const receiptURL = request.receipt ? request.receipt.url() : '';
     return (
       <TableRow selectable={false}>
         <TableRowColumn style={{ width: '15%' }}>{request.vendor}</TableRowColumn>
@@ -81,7 +82,7 @@ const ReportDetail = React.createClass({
         <TableRowColumn style={{ width: '5%' }}>{request.dateRequired}</TableRowColumn>
         <TableRowColumn style={{ width: '10%' }}>{request.intendedUsage}</TableRowColumn>
         <TableRowColumn style={{ width: '10%' }}>
-          <a href={request.receipt.url()} rel="noopener noreferrer" target="_blank">Receipt</a>
+          <a href={receiptURL} rel="noopener noreferrer" target="_blank">Receipt</a>
         </TableRowColumn>
       </TableRow>
     );
